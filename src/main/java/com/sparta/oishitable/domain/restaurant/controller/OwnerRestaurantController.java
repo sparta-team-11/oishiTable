@@ -1,14 +1,12 @@
 package com.sparta.oishitable.domain.restaurant.controller;
 
 import com.sparta.oishitable.domain.restaurant.dto.request.RestaurantCreateRequest;
+import com.sparta.oishitable.domain.restaurant.dto.request.RestaurantProfileUpdateRequest;
 import com.sparta.oishitable.domain.restaurant.service.OwnerRestaurantService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/restaurants")
@@ -19,10 +17,20 @@ public class OwnerRestaurantController {
 
     @PostMapping
     public ResponseEntity<Void> createRestaurant(
-            @Validated @RequestBody RestaurantCreateRequest restaurantCreateRequest
+            @RequestBody @Valid RestaurantCreateRequest restaurantCreateRequest
     ) {
         ownerRestaurantService.createRestaurant(restaurantCreateRequest);
 
         return ResponseEntity.created(null).build();
+    }
+
+    @PatchMapping("/{restaurantId}")
+    public ResponseEntity<Void> updateRestaurant(
+            @PathVariable Long restaurantId,
+            @RequestBody @Valid RestaurantProfileUpdateRequest restaurantProfileUpdateRequest
+    ) {
+        ownerRestaurantService.updateRestaurantProfile(restaurantId, restaurantProfileUpdateRequest);
+
+        return ResponseEntity.ok().build();
     }
 }
