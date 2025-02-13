@@ -50,7 +50,7 @@ public class ReservationService {
         Reservation reservation = Reservation.builder()
                 .date(request.date())
                 .totalCount(request.totalCount())
-                .status(ReservationStatus.COMPLETED)
+                .status(ReservationStatus.RESERVED)
                 .user(user)
                 .restaurantSeat(restaurantSeat)
                 .build();
