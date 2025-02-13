@@ -22,11 +22,14 @@ public class UserService {
 
     @Transactional
     public UserSignupResponse signup(UserSignupRequest request) {
-        if (userRepository.findByEmail(request.email()).isPresent()) {
+        if (userRepository.existsByEmail(request.email())) {
             throw new CustomRuntimeException(ErrorCode.DUPLICATE_EMAIL);
         }
+
         User user = request.toEntity(passwordEncoder.encode(request.password()));
+
         User savedUser = userRepository.save(user);
+
         return UserSignupResponse.from(savedUser);
     }
 }

@@ -25,6 +25,7 @@ public record UserSignupRequest(
         @NotBlank(message = "전화번호 입력은 필수입니다.")
         String phoneNumber
 ) {
+
     public User toEntity(String encodedPassword) {
         return User.builder()
                 .email(email)
