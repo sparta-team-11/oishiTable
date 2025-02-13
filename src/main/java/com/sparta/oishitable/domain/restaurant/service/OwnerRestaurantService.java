@@ -34,13 +34,24 @@ public class OwnerRestaurantService {
 
     @Transactional
     public void updateRestaurantProfile(Long restaurantId, RestaurantProfileUpdateRequest restaurantProfileUpdateRequest) {
-        Restaurant restaurant = restaurantRepository.findById(restaurantId)
-                .orElseThrow(() -> new CustomRuntimeException(ErrorCode.RESTAURANT_NOT_FOUND));
+        Restaurant restaurant = findById(restaurantId);
 
         restaurant.updateProfile(
                 restaurantProfileUpdateRequest.name(),
                 restaurantProfileUpdateRequest.introduce(),
                 restaurantProfileUpdateRequest.deposit()
         );
+    }
+
+    @Transactional
+    public void deleteRestaurant(Long restaurantId) {
+        Restaurant restaurant = findById(restaurantId);
+
+        restaurantRepository.delete(restaurant);
+    }
+
+    public Restaurant findById(Long restaurantId) {
+        return restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new CustomRuntimeException(ErrorCode.RESTAURANT_NOT_FOUND));
     }
 }
