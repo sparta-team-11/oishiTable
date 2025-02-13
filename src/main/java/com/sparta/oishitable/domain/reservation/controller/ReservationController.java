@@ -1,6 +1,6 @@
 package com.sparta.oishitable.domain.reservation.controller;
 
-import com.sparta.oishitable.domain.reservation.dto.UserCreateRequest;
+import com.sparta.oishitable.domain.reservation.dto.ReservationCreateRequest;
 import com.sparta.oishitable.domain.reservation.service.ReservationService;
 import com.sparta.oishitable.domain.user.entity.User;
 import jakarta.validation.Valid;
@@ -22,7 +22,7 @@ public class ReservationController {
     @PostMapping
     public ResponseEntity<Void> createReservation(
             @AuthenticationPrincipal User user, //spring security에 관해 자세히 몰라 User user만 만들어 놓음
-            @Valid @RequestBody UserCreateRequest request
+            @Valid @RequestBody ReservationCreateRequest request
     ) {
 
         reservationService.createReservationService(user,request);
