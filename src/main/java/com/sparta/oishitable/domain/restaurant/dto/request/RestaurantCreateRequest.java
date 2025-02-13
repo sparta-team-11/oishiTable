@@ -47,6 +47,7 @@ public record RestaurantCreateRequest(
 
         List<RestaurantSeatCreateRequest> restaurantSeatCreateRequestList
 ) {
+
         public Restaurant toEntity() {
                 return Restaurant.builder()
                         .name(name)
