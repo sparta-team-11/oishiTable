@@ -22,12 +22,8 @@ public class RestaurantSeatService {
     private final SeatTypeService seatTypeService;
 
     public void createAllRestaurantSeat(Restaurant restaurant, List<RestaurantSeatCreateRequest> restaurantSeatCreateRequestList) {
-        List<SeatType> seatTypeList = restaurantSeatCreateRequestList.stream()
-                .map(r -> seatTypeService.findSeatTypeById(r.seatTypeId()))
-                .toList();
-
-        List<RestaurantSeat> restaurantSeatList = IntStream.range(0, restaurantSeatCreateRequestList.size())
-                .mapToObj(i -> restaurantSeatCreateRequestList.get(i).toEntity(restaurant, seatTypeList.get(i)))
+        List<RestaurantSeat> restaurantSeatList = restaurantSeatCreateRequestList.stream()
+                .map(r -> r.toEntity(restaurant, seatTypeService.findSeatTypeById(r.seatTypeId())))
                 .toList();
 
         // TODO: Refactoring?
