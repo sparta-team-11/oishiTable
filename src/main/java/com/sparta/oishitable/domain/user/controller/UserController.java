@@ -1,6 +1,8 @@
 package com.sparta.oishitable.domain.user.controller;
 
+import com.sparta.oishitable.domain.user.dto.request.UserSigninRequest;
 import com.sparta.oishitable.domain.user.dto.request.UserSignupRequest;
+import com.sparta.oishitable.domain.user.dto.response.UserSigninResponse;
 import com.sparta.oishitable.domain.user.dto.response.UserSignupResponse;
 import com.sparta.oishitable.domain.user.service.UserService;
 import jakarta.validation.Valid;
@@ -21,5 +23,10 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<UserSignupResponse> signup(@Valid @RequestBody UserSignupRequest request) {
         return ResponseEntity.ok(userService.signup(request));
+    }
+
+    @PostMapping("/signin")
+    public ResponseEntity<UserSigninResponse> signin(@Valid @RequestBody UserSigninRequest request) {
+        return ResponseEntity.ok(userService.signin(request));
     }
 }
