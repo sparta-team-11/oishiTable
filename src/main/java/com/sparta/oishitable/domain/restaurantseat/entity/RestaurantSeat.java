@@ -1,5 +1,6 @@
 package com.sparta.oishitable.domain.restaurantseat.entity;
 
+import com.sparta.oishitable.domain.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.seatType.entity.SeatType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -31,18 +32,24 @@ public class RestaurantSeat {
     @JoinColumn(name = "seat_type_id")
     private SeatType seatType;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "restaurant_id")
+    private Restaurant restaurant;
+
     @Builder
     public RestaurantSeat(
             Long id,
             Integer minGuestCount,
             Integer maxGuestCount,
             Integer quantity,
-            SeatType seatType
+            SeatType seatType,
+            Restaurant restaurant
     ) {
         this.id = id;
         this.minGuestCount = minGuestCount;
         this.maxGuestCount = maxGuestCount;
         this.quantity = quantity;
         this.seatType = seatType;
+        this.restaurant = restaurant;
     }
 }
