@@ -7,6 +7,6 @@ public record FeedRandomResponse(
     int randomSeed,
     Long nextCursor,
     boolean hasMore
-    ) {
+) {
 
 }
