@@ -25,19 +25,20 @@ public class JwtTokenProvider {
     private final SecretKey refreshTokenSecretKey;
 
     public JwtTokenProvider(
-            @Value("${spring.jwt.secret.access}") String secret,
+            @Value("${spring.jwt.secret.access}") String accessSecretKey,
             @Value("${spring.jwt.secret.refresh}") String refreshSecretKey
     ) {
         this.accessTokenSecretKey = new SecretKeySpec(
-                secret.getBytes(StandardCharsets.UTF_8),
+                accessSecretKey.getBytes(StandardCharsets.UTF_8),
                 Jwts.SIG.HS512.key().build().getAlgorithm()
         );
         this.refreshTokenSecretKey = new SecretKeySpec(
-                secret.getBytes(StandardCharsets.UTF_8),
+                refreshSecretKey.getBytes(StandardCharsets.UTF_8),
                 Jwts.SIG.HS512.key().build().getAlgorithm()
         );
     }
 
+    //
     public String generateAccessToken(String userId, String role) {
         Date now = new Date();
 
@@ -61,6 +62,10 @@ public class JwtTokenProvider {
     }
 
     public boolean validateAccessToken(String accessToken) {
+//        , TokenType tokenType
+//        ACCESS,
+        // removeBearer
+
         try {
             return Jwts.parser()
                     .verifyWith(accessTokenSecretKey)
@@ -70,6 +75,7 @@ public class JwtTokenProvider {
                     .getExpiration()
                     .after(new Date());
         } catch (SecurityException | MalformedJwtException e) {
+            // throw
             log.error("유효하지 않는 JWT 서명 입니다.");
         } catch (ExpiredJwtException e) {
             log.error("만료된 JWT token 입니다.");
@@ -78,6 +84,8 @@ public class JwtTokenProvider {
         } catch (Exception e) {
             log.error("유효하지 않는 JWT 토큰 입니다.");
         }
+
+        // 에러 필요 ()
         return false;
     }
 
@@ -106,12 +114,9 @@ public class JwtTokenProvider {
         return token.startsWith(BEARER_PREFIX);
     }
 
-    public String removeBearer(String token) {
-        return token.substring("Bearer ".length());
-    }
-
     public User getUserFromToken(String token) {
-        Claims claims = getClaimsFromToken(token);
+        String s = removeBearer(token);
+        Claims claims = parseClaimsFromToken(token);
 
         return User.builder()
                 .id(Long.parseLong(claims.get("id", String.class)))
@@ -119,11 +124,15 @@ public class JwtTokenProvider {
                 .build();
     }
 
-    private Claims getClaimsFromToken(String token) {
+    private Claims parseClaimsFromToken(String token) {
         return Jwts.parser()
                 .verifyWith(accessTokenSecretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    private String removeBearer(String token) {
+        return token.substring("Bearer ".length());
     }
 }
