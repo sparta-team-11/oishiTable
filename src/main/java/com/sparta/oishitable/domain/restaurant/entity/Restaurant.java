@@ -71,4 +71,10 @@ public class Restaurant extends BaseEntity {
         this.deposit = deposit;
         this.reservationInterval = reservationInterval;
     }
+
+    public void updateProfile(String name, String introduce, Integer deposit) {
+        this.name = name;
+        this.introduce = introduce;
+        this.deposit = deposit;
+    }
 }
