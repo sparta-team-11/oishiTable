@@ -1,6 +1,7 @@
 package com.sparta.oishitable.domain.comment.service;
 
 import com.sparta.oishitable.domain.comment.dto.request.CommentCreateRequest;
+import com.sparta.oishitable.domain.comment.dto.response.CommentResponse;
 import com.sparta.oishitable.domain.comment.entity.Comment;
 import com.sparta.oishitable.domain.comment.repository.CommentRepository;
 import com.sparta.oishitable.domain.post.entity.Post;
@@ -9,6 +10,7 @@ import com.sparta.oishitable.domain.user.entity.User;
 import com.sparta.oishitable.domain.user.repository.UserRepository;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
+import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -58,6 +60,17 @@ public class CommentService {
             commentRepository.save(comment);
         }
     }
+
+    public List<CommentResponse> getReplies(Long parentCommentId, Long cursorValue, int limit) {
+        return commentRepository.findReplies(parentCommentId, cursorValue, limit);
+    }
+
+    public List<CommentResponse> getPostComments(Long postId, Long cursorValue, int limit) {
+        return commentRepository.findPostComments(postId, cursorValue, limit);
+    }
+
+
+    // 헬퍼 메서드
 
     private User findUserById(Long userId) {
         return userRepository.findById(userId)
