@@ -1,11 +1,12 @@
 package com.sparta.oishitable.domain.post.repository;
 
-import com.sparta.oishitable.domain.post.dto.response.PostResponse;
+import com.sparta.oishitable.domain.post.dto.response.PostKeywordResponse;
+import com.sparta.oishitable.domain.post.dto.response.PostRandomResponse;
 import java.util.List;
 
 public interface PostRepositoryQuerydsl {
 
-    List<PostResponse> findAllPosts(Long userId, Long regionId, Long cursorId, int limit);
+    List<PostRandomResponse> findAllPosts(Long userId, Long regionId, Long cursorValue, int limit, int randomSeed);
 
-    List<PostResponse> getPostsByKeyword(Long userId, Long regionId, Long cursorId, String keyword, int limit);
+    List<PostKeywordResponse> getPostsByKeyword(Long userId, Long regionId, Long cursorValue, String keyword, int limit);
 }
