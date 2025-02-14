@@ -33,10 +33,11 @@ public enum ErrorCode {
     // 좋아요 관련 익셉션
     LIKE_DUPLICATED(HttpStatus.BAD_REQUEST, "이미 좋아요를 누르셨습니다."),
 
-    LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요를 누르지 않으셨습니다");
+    LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요를 누르지 않으셨습니다"),
 
-
-
+    // 북마크 관련 익셉션
+    ALREADY_BOOKMARKED_RESTAURANT(HttpStatus.CONFLICT, "이미 북마크된 식당입니다.")
+    ;
 
     private final HttpStatus status;
     private final String message;
