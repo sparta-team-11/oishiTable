@@ -56,4 +56,12 @@ public class Reservation extends BaseEntity {
         this.user = user;
         this.restaurantSeat = restaurantSeat;
     }
+
+    public void Cancel() {
+        this.status = ReservationStatus.CANCELED;
+    }
+
+    public void Complete() {
+        this.status = ReservationStatus.COMPLETED;
+    }
 }

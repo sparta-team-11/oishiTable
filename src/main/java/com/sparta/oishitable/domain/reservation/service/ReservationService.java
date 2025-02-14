@@ -67,6 +67,8 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(()-> new NotFoundException("예약을 찾을 수 없습니다."));
 
+        reservation.Complete();
+
         return new ReservationFindResponse(
                 reservation.getRestaurantSeat().getId(),
                 reservation.getDate(),
@@ -81,6 +83,8 @@ public class ReservationService {
 
         List<Reservation> reservations = reservationRepository.findByUser_Id(userId);
 
+        reservations.forEach(Reservation::Complete);
+
         return reservations.stream()
                 .map(reservation -> new ReservationFindResponse(
                         reservation.getRestaurantSeat().getId(),
@@ -90,5 +94,16 @@ public class ReservationService {
                         reservation.getStatus()))
                 .collect(Collectors.toList());
 
+    }
+
+    public void deleteReservationService(long reservationId){
+//        reservationRepository.deleteById(reservationId);
+
+        Reservation reservation = reservationRepository.findById(reservationId)
+                        .orElseThrow(() -> new RuntimeException("예약이 없습니다"));
+
+        reservation.Cancel();
+
+        reservationRepository.save(reservation);
     }
 }
