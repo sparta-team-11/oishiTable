@@ -8,7 +8,7 @@ import com.sparta.oishitable.global.security.handler.SecurityAccessDeniedHandler
 import com.sparta.oishitable.global.security.handler.SecurityAuthenticationEntryPoint;
 import com.sparta.oishitable.global.security.handler.SecurityAuthenticationFailureHandler;
 import com.sparta.oishitable.global.security.handler.SecurityAuthenticationSuccessHandler;
-import com.sparta.oishitable.global.util.RedisUtil;
+import com.sparta.oishitable.global.security.repository.RedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,7 +33,7 @@ public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
-    private final RedisUtil redisUtil;
+    private final RedisRepository redisUtil;
     private final AuthenticationConfiguration authenticationConfiguration;
 
     @Bean
