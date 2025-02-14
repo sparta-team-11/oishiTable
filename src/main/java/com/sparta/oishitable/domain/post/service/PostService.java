@@ -89,11 +89,14 @@ public class PostService {
         // 조회된 게시글 수가 limit과 동일하면 마지막 게시글의 id를 커서로 사용
         // 그렇지 않으면 더 이상 데이터가 없음을 의미하므로 null
         Long nextCursor = null;
+        boolean hasMore = false;
+
         if (posts.size() == limit) {
             nextCursor = posts.get(posts.size() - 1).postId();
+            hasMore = true;
         }
 
-        return new FeedKeywordResponse(posts, nextCursor);
+        return new FeedKeywordResponse(posts, nextCursor, hasMore);
     }
 
     @Transactional
