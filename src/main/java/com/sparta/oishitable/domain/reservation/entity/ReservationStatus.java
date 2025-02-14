@@ -6,11 +6,4 @@ public enum ReservationStatus {
 
     COMPLETED, RESERVED, CANCELED;
 
-    @JsonValue
-    public String toJson() {
-        if (this == RESERVED) {
-            return "COMPLETED";
-        }
-        return this.name();
-    }
 }
