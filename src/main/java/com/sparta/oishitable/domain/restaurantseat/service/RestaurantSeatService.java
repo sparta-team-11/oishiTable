@@ -27,4 +27,8 @@ public class RestaurantSeatService {
         // TODO: Refactoring?
         restaurantSeatRepository.saveAll(restaurantSeatList);
     }
+
+    public void deleteAllRestaurantSeat(Restaurant restaurant) {
+        restaurantSeatRepository.deleteByRestaurant(restaurant);
+    }
 }

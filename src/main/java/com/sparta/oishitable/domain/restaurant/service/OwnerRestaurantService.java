@@ -47,6 +47,7 @@ public class OwnerRestaurantService {
     public void deleteRestaurant(Long restaurantId) {
         Restaurant restaurant = findById(restaurantId);
 
+        restaurantSeatService.deleteAllRestaurantSeat(restaurant);
         restaurantRepository.delete(restaurant);
     }
 
