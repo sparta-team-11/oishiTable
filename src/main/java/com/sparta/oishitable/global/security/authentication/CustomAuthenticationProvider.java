@@ -1,11 +1,11 @@
 package com.sparta.oishitable.global.security.authentication;
 
-import com.sparta.oishitable.global.exception.UnauthorizedException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -27,11 +27,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String password = authentication.getCredentials().toString();
 
         CustomUserDetails userDetailsCustom = (CustomUserDetails) userDetailsService.loadUserByUsername(email);
-
-        if (!passwordEncoder.matches(password, userDetailsCustom.getPassword())) {
-            log.warn("login error: password mismatch");
-            throw new UnauthorizedException(ErrorCode.INVALID_PASSWORD);
-        }
+        validatePassword(userDetailsCustom.getPassword(), password);
 
         return new UsernamePasswordAuthenticationToken(userDetailsCustom, null, userDetailsCustom.getAuthorities());
     }
@@ -39,5 +35,12 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     @Override
     public boolean supports(Class<?> authentication) {
         return authentication.equals(UsernamePasswordAuthenticationToken.class);
+    }
+
+    private void validatePassword(String password, String loginPassword) {
+        if (!passwordEncoder.matches(password, loginPassword)) {
+            log.warn("login error: password mismatch");
+            throw new BadCredentialsException(ErrorCode.INVALID_PASSWORD.getMessage());
+        }
     }
 }

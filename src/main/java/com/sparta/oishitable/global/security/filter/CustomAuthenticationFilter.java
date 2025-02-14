@@ -1,6 +1,7 @@
 package com.sparta.oishitable.global.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.oishitable.global.exception.error.ErrorCode;
 import com.sparta.oishitable.global.security.dto.request.AuthLoginRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -44,7 +45,7 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
 
     private void validateAuthLoginRequest(AuthLoginRequest authLoginRequest) {
         if (!StringUtils.hasText(authLoginRequest.email()) || !StringUtils.hasText(authLoginRequest.password())) {
-            throw new BadCredentialsException("이메일과 비밀번호를 입력해주세요.");
+            throw new BadCredentialsException(ErrorCode.MISSING_CREDENTIALS.getMessage());
         }
     }
 }

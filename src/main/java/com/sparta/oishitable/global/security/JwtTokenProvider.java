@@ -4,10 +4,10 @@ import com.sparta.oishitable.domain.user.entity.User;
 import com.sparta.oishitable.domain.user.entity.UserRole;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import com.sparta.oishitable.global.security.enums.TokenType;
-import com.sparta.oishitable.global.security.exception.CustomAuthenticationException;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -83,16 +83,16 @@ public class JwtTokenProvider {
                     .after(new Date());
         } catch (SecurityException | MalformedJwtException e) {
             log.error(ErrorCode.INVALID_JWT_SIGNATURE.getMessage());
-            throw new CustomAuthenticationException(ErrorCode.INVALID_JWT_SIGNATURE);
+            throw new BadCredentialsException(ErrorCode.INVALID_JWT_SIGNATURE.getMessage());
         } catch (ExpiredJwtException e) {
             log.error(ErrorCode.EXPIRED_JWT_TOKEN.getMessage());
-            throw new CustomAuthenticationException(ErrorCode.EXPIRED_JWT_TOKEN);
+            throw new BadCredentialsException(ErrorCode.EXPIRED_JWT_TOKEN.getMessage());
         } catch (UnsupportedJwtException e) {
             log.error(ErrorCode.UNSUPPORTED_JWT_TOKEN.getMessage());
-            throw new CustomAuthenticationException(ErrorCode.UNSUPPORTED_JWT_TOKEN);
+            throw new BadCredentialsException(ErrorCode.UNSUPPORTED_JWT_TOKEN.getMessage());
         } catch (Exception e) {
             log.error(ErrorCode.INVALID_JWT_TOKEN.getMessage());
-            throw new CustomAuthenticationException(ErrorCode.INVALID_JWT_TOKEN);
+            throw new BadCredentialsException(ErrorCode.INVALID_JWT_TOKEN.getMessage());
         }
     }
 

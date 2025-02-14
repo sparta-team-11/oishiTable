@@ -1,18 +1,20 @@
 package com.sparta.oishitable.global.security.filter;
 
 import com.sparta.oishitable.domain.user.entity.User;
+import com.sparta.oishitable.global.exception.error.ErrorCode;
 import com.sparta.oishitable.global.security.JwtTokenProvider;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
+import com.sparta.oishitable.global.security.enums.TokenType;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -30,9 +32,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
+        log.info("JwtAuthenticationFilter triggered");  // 디버깅 로그 추가
+
         String token = resolveHeader(request);
 
-        if (StringUtils.hasText(token) && jwtTokenProvider.validateAccessToken(token)) {
+        if (jwtTokenProvider.validateToken(token, TokenType.ACCESS)) {
             User user = jwtTokenProvider.getUserFromToken(token);
             CustomUserDetails userDetails = new CustomUserDetails(user);
 
@@ -49,9 +53,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = request.getHeader(AUTHORIZATION_HEADER);
 
         if (token == null || !jwtTokenProvider.isStartsWithBearer(token)) {
-            return null;
+            throw new BadCredentialsException(ErrorCode.INVALID_TOKEN.getMessage());
         }
 
-        return jwtTokenProvider.removeBearer(token);
+        return token;
     }
 }
