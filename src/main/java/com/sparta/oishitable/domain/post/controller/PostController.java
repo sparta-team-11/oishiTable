@@ -45,7 +45,12 @@ public class PostController {
         // 커서값이 null 이거나 랜덤시드가 전달되지 않았으면 새로운 랜덤시드 생성
         int seed = (cursorValue == null || randomSeed == null) ? new Random().nextInt() : randomSeed;
 
-        FeedRandomResponse response = postService.getAllPosts(userId, regionId, cursorValue, limit, seed);
+        FeedRandomResponse response = postService.getAllPosts(
+            userId,
+            regionId,
+            cursorValue,
+            limit,
+            seed);
 
         return ResponseEntity.ok(response);
     }
