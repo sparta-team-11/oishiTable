@@ -24,10 +24,10 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String email = authentication.getName();
-        String password = authentication.getCredentials().toString();
+        String rawPassword = authentication.getCredentials().toString();
 
         CustomUserDetails userDetailsCustom = (CustomUserDetails) userDetailsService.loadUserByUsername(email);
-        validatePassword(userDetailsCustom.getPassword(), password);
+        validatePassword(rawPassword, userDetailsCustom.getPassword());
 
         return new UsernamePasswordAuthenticationToken(userDetailsCustom, null, userDetailsCustom.getAuthorities());
     }
@@ -37,8 +37,8 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         return authentication.equals(UsernamePasswordAuthenticationToken.class);
     }
 
-    private void validatePassword(String password, String loginPassword) {
-        if (!passwordEncoder.matches(password, loginPassword)) {
+    private void validatePassword(String rawPassword, String password) {
+        if (!passwordEncoder.matches(rawPassword, password)) {
             log.warn("login error: password mismatch");
             throw new BadCredentialsException(ErrorCode.INVALID_PASSWORD.getMessage());
         }
