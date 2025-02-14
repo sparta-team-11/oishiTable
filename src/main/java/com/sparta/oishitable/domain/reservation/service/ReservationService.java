@@ -91,4 +91,8 @@ public class ReservationService {
                 .collect(Collectors.toList());
 
     }
+
+    public void deleteReservationService(long reservationId){
+        reservationRepository.deleteById(reservationId);
+    }
 }

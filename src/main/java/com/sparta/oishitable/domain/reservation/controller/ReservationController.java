@@ -25,7 +25,7 @@ public class ReservationController {
             @Valid @RequestBody ReservationCreateRequest request
     ) {
 
-        reservationService.createReservationService(user,request);
+        reservationService.createReservationService(user, request);
 
         return new ResponseEntity<>(HttpStatus.OK);
 
@@ -36,7 +36,7 @@ public class ReservationController {
             @PathVariable long reservationId
     ) {
 
-        return new ResponseEntity<>(reservationService.findReservationService(reservationId),HttpStatus.OK);
+        return new ResponseEntity<>(reservationService.findReservationService(reservationId), HttpStatus.OK);
 
     }
 
@@ -50,5 +50,18 @@ public class ReservationController {
         return new ResponseEntity<>(reservationResponses, HttpStatus.OK);
     }
 
+    @DeleteMapping("/{reservationId}")
+    public ResponseEntity<Void> deleteReservation(
+            @PathVariable long reservationId
+    ) {
+
+        reservationService.deleteReservationService(reservationId);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+
+    }
 
 }
+
+
+
