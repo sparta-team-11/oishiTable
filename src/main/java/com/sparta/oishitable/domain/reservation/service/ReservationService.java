@@ -73,7 +73,7 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(()-> new CustomRuntimeException(ErrorCode.RESERVATION_NOT_FOUND));
 
-        reservation.Complete();
+        reservation.complete();
 
         return new ReservationFindResponse(
                 reservation.getRestaurantSeat().getId(),
@@ -106,7 +106,7 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(()-> new CustomRuntimeException(ErrorCode.RESERVATION_NOT_FOUND));
 
-        reservation.Cancel();
+        reservation.cancel();
 
         reservationRepository.save(reservation);
     }
