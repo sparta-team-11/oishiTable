@@ -79,7 +79,7 @@ public class ReservationService {
 
     public List<ReservationFindResponse> findAllReservationsService(Long userId){
 
-        List<Reservation> reservations = reservationRepository.findByUserId(userId);
+        List<Reservation> reservations = reservationRepository.findByUser_Id(userId);
 
         return reservations.stream()
                 .map(reservation -> new ReservationFindResponse(

@@ -10,5 +10,6 @@ import java.util.List;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     int countByRestaurantSeatAndDate(RestaurantSeat restaurantSeat, LocalDateTime reservationDate);
 
-    List<Reservation> findByUserId(Long Id);
+    List<Reservation> findByUser_Id(Long userId);
 }
+
