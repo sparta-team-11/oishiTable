@@ -6,7 +6,8 @@ import com.sparta.oishitable.global.exception.InvalidException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import com.sparta.oishitable.global.security.JwtTokenProvider;
 import com.sparta.oishitable.global.security.dto.response.AuthLoginResponse;
-import com.sparta.oishitable.global.util.RedisUtil;
+import com.sparta.oishitable.global.security.enums.TokenType;
+import com.sparta.oishitable.global.security.repository.RedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,9 +19,9 @@ import java.time.Duration;
 public class AuthService {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final RedisUtil redisUtil;
+    private final RedisRepository redisUtil;
 
-    private final long DURATION = Duration.ofDays(7).toMillis();
+    private final long DURATION = Duration.ofDays(3).toMillis();
 
     @Transactional
     public AuthLoginResponse recreateAccessAndRefreshToken(AccessTokenReissueReq accessTokenReissueReq) {
@@ -30,7 +31,7 @@ public class AuthService {
 
         String userId = String.valueOf(user.getId());
 
-        if (!jwtTokenProvider.validateRefreshToken(accessTokenReissueReq.refreshToken()) ||
+        if (!jwtTokenProvider.validateToken(accessTokenReissueReq.refreshToken(), TokenType.REFRESH) ||
                 !redisUtil.getData(userId).equals(refreshToken)) {
             throw new InvalidException(ErrorCode.INVALID_REFRESH_TOKEN);
         }

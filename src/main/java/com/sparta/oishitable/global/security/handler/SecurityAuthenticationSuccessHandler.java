@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.oishitable.global.security.JwtTokenProvider;
 import com.sparta.oishitable.global.security.dto.response.AuthLoginResponse;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
-import com.sparta.oishitable.global.util.RedisUtil;
+import com.sparta.oishitable.global.security.repository.RedisRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +23,8 @@ public class SecurityAuthenticationSuccessHandler extends SimpleUrlAuthenticatio
 
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
-    private final RedisUtil redisUtil;
-    private final long DURATION = Duration.ofDays(7).toMillis();
+    private final RedisRepository redisUtil;
+    private final long DURATION = Duration.ofDays(3).toMillis();
 
     @Override
     public void onAuthenticationSuccess(

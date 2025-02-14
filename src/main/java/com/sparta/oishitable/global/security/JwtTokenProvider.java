@@ -2,6 +2,9 @@ package com.sparta.oishitable.global.security;
 
 import com.sparta.oishitable.domain.user.entity.User;
 import com.sparta.oishitable.domain.user.entity.UserRole;
+import com.sparta.oishitable.global.exception.error.ErrorCode;
+import com.sparta.oishitable.global.security.enums.TokenType;
+import com.sparta.oishitable.global.security.exception.CustomAuthenticationException;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +21,7 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     private final long ACCESS_TOKEN_EXPIRED_TIME = Duration.ofMinutes(30).toMillis();
-    private final long REFRESH_TOKEN_EXPIRED_TIME = Duration.ofDays(7).toMillis();
+    private final long REFRESH_TOKEN_EXPIRED_TIME = Duration.ofDays(3).toMillis();
 
     private final String BEARER_PREFIX = "Bearer ";
     private final SecretKey accessTokenSecretKey;
@@ -38,7 +41,6 @@ public class JwtTokenProvider {
         );
     }
 
-    //
     public String generateAccessToken(String userId, String role) {
         Date now = new Date();
 
@@ -54,60 +56,44 @@ public class JwtTokenProvider {
     public String generateRefreshToken() {
         Date now = new Date();
 
-        return BEARER_PREFIX + Jwts.builder()
+        return Jwts.builder()
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + REFRESH_TOKEN_EXPIRED_TIME))
                 .signWith(refreshTokenSecretKey)
                 .compact();
     }
 
-    public boolean validateAccessToken(String accessToken) {
-//        , TokenType tokenType
-//        ACCESS,
-        // removeBearer
+    public boolean validateToken(String token, TokenType tokenType) {
+        SecretKey tokenSecretKey;
+
+        if (tokenType.equals(TokenType.ACCESS)) {
+            tokenSecretKey = accessTokenSecretKey;
+            token = removeBearer(token);
+        } else {
+            tokenSecretKey = refreshTokenSecretKey;
+        }
 
         try {
             return Jwts.parser()
-                    .verifyWith(accessTokenSecretKey)
+                    .verifyWith(tokenSecretKey)
                     .build()
-                    .parseSignedClaims(accessToken)
+                    .parseSignedClaims(token)
                     .getPayload()
                     .getExpiration()
                     .after(new Date());
         } catch (SecurityException | MalformedJwtException e) {
-            // throw
-            log.error("유효하지 않는 JWT 서명 입니다.");
+            log.error(ErrorCode.INVALID_JWT_SIGNATURE.getMessage());
+            throw new CustomAuthenticationException(ErrorCode.INVALID_JWT_SIGNATURE);
         } catch (ExpiredJwtException e) {
-            log.error("만료된 JWT token 입니다.");
+            log.error(ErrorCode.EXPIRED_JWT_TOKEN.getMessage());
+            throw new CustomAuthenticationException(ErrorCode.EXPIRED_JWT_TOKEN);
         } catch (UnsupportedJwtException e) {
-            log.error("지원되지 않는 JWT 토큰 입니다.");
+            log.error(ErrorCode.UNSUPPORTED_JWT_TOKEN.getMessage());
+            throw new CustomAuthenticationException(ErrorCode.UNSUPPORTED_JWT_TOKEN);
         } catch (Exception e) {
-            log.error("유효하지 않는 JWT 토큰 입니다.");
+            log.error(ErrorCode.INVALID_JWT_TOKEN.getMessage());
+            throw new CustomAuthenticationException(ErrorCode.INVALID_JWT_TOKEN);
         }
-
-        // 에러 필요 ()
-        return false;
-    }
-
-    public boolean validateRefreshToken(String refreshToken) {
-        try {
-            return Jwts.parser()
-                    .verifyWith(refreshTokenSecretKey)
-                    .build()
-                    .parseSignedClaims(refreshToken)
-                    .getPayload()
-                    .getExpiration()
-                    .after(new Date());
-        } catch (SecurityException | MalformedJwtException e) {
-            log.error("유효하지 않는 JWT 서명 입니다.");
-        } catch (ExpiredJwtException e) {
-            log.error("만료된 JWT token 입니다.");
-        } catch (UnsupportedJwtException e) {
-            log.error("지원되지 않는 JWT 토큰 입니다.");
-        } catch (Exception e) {
-            log.error("유효하지 않는 JWT 토큰 입니다.");
-        }
-        return false;
     }
 
     public boolean isStartsWithBearer(String token) {
@@ -115,8 +101,8 @@ public class JwtTokenProvider {
     }
 
     public User getUserFromToken(String token) {
-        String s = removeBearer(token);
-        Claims claims = parseClaimsFromToken(token);
+        String accessToken = removeBearer(token);
+        Claims claims = parseClaimsFromToken(accessToken);
 
         return User.builder()
                 .id(Long.parseLong(claims.get("id", String.class)))
