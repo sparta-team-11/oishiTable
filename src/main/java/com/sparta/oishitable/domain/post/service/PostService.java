@@ -104,7 +104,7 @@ public class PostService {
 
         Post post = findPostById(postId);
 
-        validateUser(post.getUser().getId(), request.userId());
+        isPostOwner(post.getUser().getId(), request.userId());
 
         Region region = regionRepository.findById(request.regionId()).orElse(null);
 
@@ -116,7 +116,7 @@ public class PostService {
 
         Post post = findPostById(postId);
 
-        validateUser(post.getUser().getId(), userId);
+        isPostOwner(post.getUser().getId(), userId);
 
         postRepository.delete(post);
     }
@@ -138,7 +138,7 @@ public class PostService {
             .orElseThrow(() -> new CustomRuntimeException(ErrorCode.POST_NOT_FOUND));
     }
 
-    private void validateUser(Long postUserId, Long userId) {
+    private void isPostOwner(Long postUserId, Long userId) {
         if (!Objects.equals(postUserId, userId)) {
             throw new CustomRuntimeException(ErrorCode.USER_UNAUTHORIZED);
         }
