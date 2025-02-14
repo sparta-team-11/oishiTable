@@ -1,7 +1,9 @@
 package com.sparta.oishitable.global.exception;
 
-public class NotFoundException extends RuntimeException {
-    public NotFoundException(String message) {
-        super(message);
+import com.sparta.oishitable.global.exception.error.ErrorCode;
+
+public class NotFoundException extends CustomRuntimeException {
+    public NotFoundException(ErrorCode errorCode) {
+        super(errorCode);
     }
 }
