@@ -28,11 +28,11 @@ public class SecurityAuthenticationEntryPoint implements AuthenticationEntryPoin
     ) throws IOException {
         log.warn("Security Authentication error: need to login");
 
-        ErrorCode error = ErrorCode.NEED_LOGIN_EXCEPTION;
+        ErrorCode errorCode = ErrorCode.NEED_LOGIN_EXCEPTION;
 
         response.setContentType("application/json;charset=UTF-8");
-        response.setStatus(error.getStatus().value());
+        response.setStatus(errorCode.getStatus().value());
         response.getWriter().write(objectMapper.writeValueAsString(
-                new ErrorResponse(error.getStatus(), error.getMessage())));
+                new ErrorResponse(errorCode.getStatus(), errorCode.getMessage())));
     }
 }

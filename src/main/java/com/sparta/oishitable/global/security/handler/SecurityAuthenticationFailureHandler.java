@@ -28,9 +28,11 @@ public class SecurityAuthenticationFailureHandler extends SimpleUrlAuthenticatio
     ) throws IOException {
         log.warn("login error: {}", exception.getMessage());
 
+        ErrorCode errorCode = ErrorCode.LOGIN_FAILED_EXCEPTION;
+
         response.setContentType("application/json;charset=UTF-8");
-        response.setStatus(ErrorCode.LOGIN_FAILED_EXCEPTION.getStatus().value());
+        response.setStatus(errorCode.getStatus().value());
         response.getWriter().write(objectMapper.writeValueAsString(
-                new ErrorResponse(ErrorCode.LOGIN_FAILED_EXCEPTION.getStatus(), exception.getMessage())));
+                new ErrorResponse(errorCode.getStatus(), errorCode.getMessage())));
     }
 }

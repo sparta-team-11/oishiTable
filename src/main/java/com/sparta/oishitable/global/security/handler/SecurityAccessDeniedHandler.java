@@ -28,11 +28,11 @@ public class SecurityAccessDeniedHandler implements AccessDeniedHandler {
     ) throws IOException {
         log.warn("Security Authorization error: Access denied");
 
-        ErrorCode error = ErrorCode.AUTHORIZATION_EXCEPTION;
+        ErrorCode errorCode = ErrorCode.AUTHORIZATION_EXCEPTION;
 
         response.setContentType("application/json;charset=UTF-8");
-        response.setStatus(error.getStatus().value());
+        response.setStatus(errorCode.getStatus().value());
         response.getWriter().write(objectMapper.writeValueAsString(
-                new ErrorResponse(error.getStatus(), error.getMessage())));
+                new ErrorResponse(errorCode.getStatus(), errorCode.getMessage())));
     }
 }
