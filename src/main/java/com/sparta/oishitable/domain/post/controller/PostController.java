@@ -2,9 +2,10 @@ package com.sparta.oishitable.domain.post.controller;
 
 import com.sparta.oishitable.domain.post.dto.request.PostCreateRequest;
 import com.sparta.oishitable.domain.post.dto.request.PostUpdateRequest;
-import com.sparta.oishitable.domain.post.dto.response.PostResponse;
+import com.sparta.oishitable.domain.post.dto.response.FeedKeywordResponse;
+import com.sparta.oishitable.domain.post.dto.response.FeedRandomResponse;
 import com.sparta.oishitable.domain.post.service.PostService;
-import java.util.List;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,34 +35,38 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PostResponse>> readAllPosts(
+    public ResponseEntity<FeedRandomResponse> readAllPosts(
         @RequestParam(required = false) Long userId,
         @RequestParam(required = false) Long regionId,
-        @RequestParam(required = false) Long cursorId,
+        @RequestParam(required = false) Long cursorValue, // 마지막 행의 랜덤 값
+        @RequestParam(required = false) Integer randomSeed, // 클라이언트가 전달하는 이전 랜덤 시드값
         @RequestParam(defaultValue = "10") int limit
     ) {
-        List<PostResponse> posts = postService.getAllPosts(userId, regionId, cursorId, limit);
+        // 커서값이 null 이거나 랜덤시드가 전달되지 않았으면 새로운 랜덤시드 생성
+        int seed = (cursorValue == null || randomSeed == null) ? new Random().nextInt() : randomSeed;
 
-        return ResponseEntity.ok(posts);
+        FeedRandomResponse response = postService.getAllPosts(userId, regionId, cursorValue, limit, seed);
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/keyword")
-    public ResponseEntity<List<PostResponse>> readPostsByKeyword(
+    public ResponseEntity<FeedKeywordResponse> readPostsByKeyword(
         @RequestParam(required = false) Long userId,
         @RequestParam(required = false) Long regionId,
-        @RequestParam(required = false) Long cursorId,
+        @RequestParam(required = false) Long cursorValue,
         @RequestParam String keyword,
         @RequestParam(defaultValue = "10") int limit
     ) {
-        List<PostResponse> posts = postService.getPostsByKeyword(
+        FeedKeywordResponse response = postService.getPostsByKeyword(
             userId,
             regionId,
-            cursorId,
+            cursorValue,
             keyword,
             limit
         );
 
-        return ResponseEntity.ok(posts);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{postId}")
