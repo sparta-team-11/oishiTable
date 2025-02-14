@@ -14,6 +14,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.stream.Collectors;
 
 @Component
@@ -23,6 +24,7 @@ public class SecurityAuthenticationSuccessHandler extends SimpleUrlAuthenticatio
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
     private final RedisUtil redisUtil;
+    private final long DURATION = Duration.ofDays(7).toMillis();
 
     @Override
     public void onAuthenticationSuccess(
@@ -41,7 +43,7 @@ public class SecurityAuthenticationSuccessHandler extends SimpleUrlAuthenticatio
         String refreshToken = jwtTokenProvider.generateRefreshToken();
         AuthLoginResponse authLoginResponse = AuthLoginResponse.of(accessToken, refreshToken);
 
-        redisUtil.setDataWithExpire(principal.getId(), refreshToken);
+        redisUtil.setDataWithExpire(principal.getId(), refreshToken, DURATION);
 
         response.setContentType("application/json; charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);

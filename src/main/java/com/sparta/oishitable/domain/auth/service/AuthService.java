@@ -11,12 +11,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisUtil redisUtil;
+
+    private final long DURATION = Duration.ofDays(7).toMillis();
 
     @Transactional
     public AuthLoginResponse recreateAccessAndRefreshToken(AccessTokenReissueReq accessTokenReissueReq) {
@@ -31,12 +35,10 @@ public class AuthService {
             throw new InvalidException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
-        redisUtil.deleteData(userId);
-
         String newAccessToken = jwtTokenProvider.generateAccessToken(userId, user.getRole().getValue());
         String newRefreshToken = jwtTokenProvider.generateRefreshToken();
 
-        redisUtil.setDataWithExpire(userId, newRefreshToken);
+        redisUtil.setDataWithExpire(userId, newRefreshToken, DURATION);
 
         return new AuthLoginResponse(newAccessToken, newRefreshToken);
     }

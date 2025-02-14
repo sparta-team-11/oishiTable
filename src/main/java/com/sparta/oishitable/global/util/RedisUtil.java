@@ -6,13 +6,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
-
 @Component
 public class RedisUtil {
 
     private final RedisTemplate<String, String> redisTemplate;
-    private final long DURATION = Duration.ofDays(7).toMillis();
 
     public RedisUtil(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
@@ -26,12 +23,8 @@ public class RedisUtil {
         return valueOperations.get(key);
     }
 
-    public void setDataWithExpire(String key, String value) {
+    public void setDataWithExpire(String key, String value, long duration) {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-        valueOperations.set(key, value, DURATION);
-    }
-
-    public void deleteData(String key) {
-        redisTemplate.delete(key);
+        valueOperations.set(key, value, duration);
     }
 }
