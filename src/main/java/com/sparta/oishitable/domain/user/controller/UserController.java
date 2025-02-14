@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -25,8 +25,8 @@ public class UserController {
         return ResponseEntity.ok(userService.signup(request));
     }
 
-    @PostMapping("/signin")
-    public ResponseEntity<UserSigninResponse> signin(@Valid @RequestBody UserSigninRequest request) {
-        return ResponseEntity.ok(userService.signin(request));
-    }
+//    @PostMapping("/signin")
+//    public ResponseEntity<UserSigninResponse> signin(@Valid @RequestBody UserSigninRequest request) {
+//        return ResponseEntity.ok(userService.signin(request));
+//    }
 }

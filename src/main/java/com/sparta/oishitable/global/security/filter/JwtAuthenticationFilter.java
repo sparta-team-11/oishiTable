@@ -32,11 +32,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-        log.info("JwtAuthenticationFilter triggered");  // 디버깅 로그 추가
+        String token = request.getHeader(AUTHORIZATION_HEADER);
 
-        String token = resolveHeader(request);
-
-        if (jwtTokenProvider.validateToken(token, TokenType.ACCESS)) {
+        if (token != null && jwtTokenProvider.validateToken(token, TokenType.ACCESS)) {
             User user = jwtTokenProvider.getUserFromToken(token);
             CustomUserDetails userDetails = new CustomUserDetails(user);
 
@@ -47,15 +45,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private String resolveHeader(HttpServletRequest request) {
-        String token = request.getHeader(AUTHORIZATION_HEADER);
-
-        if (token == null || !jwtTokenProvider.isStartsWithBearer(token)) {
-            throw new BadCredentialsException(ErrorCode.INVALID_TOKEN.getMessage());
-        }
-
-        return token;
     }
 }
