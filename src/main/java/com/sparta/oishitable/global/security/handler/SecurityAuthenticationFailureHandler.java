@@ -33,6 +33,6 @@ public class SecurityAuthenticationFailureHandler extends SimpleUrlAuthenticatio
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(errorCode.getStatus().value());
         response.getWriter().write(objectMapper.writeValueAsString(
-                new ErrorResponse(errorCode.getStatus(), errorCode.getMessage())));
+                new ErrorResponse(errorCode.getStatus(), exception.getMessage())));
     }
 }
