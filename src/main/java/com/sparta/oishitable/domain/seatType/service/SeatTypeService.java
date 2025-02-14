@@ -19,4 +19,9 @@ public class SeatTypeService {
         return seatTypeRepository.findById(seatTypeId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorCode.SEAT_TYPE_NOT_FOUND));
     }
+
+    public SeatType findSeatTypeByName(String seatTypeName){
+        return seatTypeRepository.findByName(seatTypeName)
+                .orElseThrow(() -> new CustomRuntimeException(ErrorCode.SEAT_TYPE_NAME_NOT_FOUND));
+    }
 }
