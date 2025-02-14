@@ -65,7 +65,7 @@ public class ReservationService {
     public ReservationFindResponse findReservationService(long reservationId){
 
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(()-> new NotFoundException("예약을 생성해 주세요"));
+                .orElseThrow(()-> new NotFoundException("예약을 찾을 수 없습니다."));
 
         return new ReservationFindResponse(
                 reservation.getRestaurantSeat().getId(),
