@@ -39,12 +39,8 @@ public class ReservationService {
     ) {
 
         SeatType seatType = seatTypeService.findSeatTypeByName(request.seatTypeName());
-//        SeatType seatType = seatTypeRepository.findByName(request.seatTypeName())
-//                .orElseThrow(() -> new NotFoundException("좌석 타입이 없습니다"));
-        RestaurantSeat restaurantSeat = restaurantSeatService.findBySeatType(seatType);
 
-//        RestaurantSeat restaurantSeat = restaurantSeatRepository.findBySeatType(seatType)
-//                .orElseThrow(() -> new NotFoundException("좌석이 없습니다."));
+        RestaurantSeat restaurantSeat = restaurantSeatService.findBySeatType(seatType);
 
         LocalDateTime reservationDate = request.date();
 
