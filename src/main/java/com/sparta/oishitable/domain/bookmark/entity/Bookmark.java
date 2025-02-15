@@ -16,7 +16,7 @@ public class Bookmark {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "bookmark_id")
-    private int id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -27,7 +27,7 @@ public class Bookmark {
     private Restaurant restaurant;
 
     @Builder
-    public Bookmark(int id, User user, Restaurant restaurant) {
+    public Bookmark(Long id, User user, Restaurant restaurant) {
         this.id = id;
         this.user = user;
         this.restaurant = restaurant;

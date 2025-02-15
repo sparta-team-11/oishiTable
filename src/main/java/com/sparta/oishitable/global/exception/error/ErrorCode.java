@@ -36,7 +36,8 @@ public enum ErrorCode {
     LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요를 누르지 않으셨습니다"),
 
     // 북마크 관련 익셉션
-    ALREADY_BOOKMARKED_RESTAURANT(HttpStatus.CONFLICT, "이미 북마크된 식당입니다.")
+    BOOKMARK_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 북마크입니다."),
+    BOOKMARK_ALREADY_EXISTS_RESTAURANT(HttpStatus.CONFLICT, "이미 북마크된 식당입니다.")
     ;
 
     private final HttpStatus status;
