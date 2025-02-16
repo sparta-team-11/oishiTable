@@ -1,10 +1,8 @@
 package com.sparta.oishitable.domain.user.dto.request;
 
 import com.sparta.oishitable.domain.user.entity.User;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import com.sparta.oishitable.domain.user.entity.UserRole;
+import jakarta.validation.constraints.*;
 
 public record UserSignupRequest(
         @NotBlank(message = "이메일 입력은 필수입니다.")
@@ -23,7 +21,10 @@ public record UserSignupRequest(
         String name,
 
         @NotBlank(message = "전화번호 입력은 필수입니다.")
-        String phoneNumber
+        String phoneNumber,
+
+        @NotNull
+        UserRole userRole
 ) {
 
     public User toEntity(String encodedPassword) {
@@ -32,6 +33,7 @@ public record UserSignupRequest(
                 .password(encodedPassword)
                 .name(name)
                 .phoneNumber(phoneNumber)
+                .role(userRole)
                 .build();
     }
 }

@@ -36,7 +36,7 @@ public class ReservationController {
             @PathVariable long reservationId
     ) {
 
-        return new ResponseEntity<>(reservationService.findReservationService(reservationId), HttpStatus.OK);
+        return new ResponseEntity<>(reservationService.findReservation(reservationId), HttpStatus.OK);
 
     }
 
@@ -45,7 +45,7 @@ public class ReservationController {
             @RequestParam Long userId
     ) {
 
-        List<ReservationFindResponse> reservationResponses = reservationService.findAllReservationsService(userId);
+        List<ReservationFindResponse> reservationResponses = reservationService.findAllReservations(userId);
 
         return new ResponseEntity<>(reservationResponses, HttpStatus.OK);
     }
@@ -55,7 +55,7 @@ public class ReservationController {
             @PathVariable long reservationId
     ) {
 
-        reservationService.deleteReservationService(reservationId);
+        reservationService.deleteReservation(reservationId);
 
         return new ResponseEntity<>(HttpStatus.OK);
 
