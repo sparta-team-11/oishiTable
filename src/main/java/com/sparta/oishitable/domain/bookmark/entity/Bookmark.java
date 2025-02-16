@@ -10,7 +10,12 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "bookmarks")
+@Table(
+        name = "bookmarks",
+        indexes = {
+                @Index(name = "idx_fk_user_id", columnList = "user_id"),
+                @Index(name = "idx_fk_restaurant_id", columnList = "restaurant_id")
+        })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Bookmark {
 
@@ -19,11 +24,11 @@ public class Bookmark {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "restaurant_id")
+    @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
     @Builder

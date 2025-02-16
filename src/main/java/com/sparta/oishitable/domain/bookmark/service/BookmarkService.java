@@ -6,6 +6,7 @@ import com.sparta.oishitable.domain.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.oishitable.domain.user.entity.User;
 import com.sparta.oishitable.domain.user.repository.UserRepository;
+import com.sparta.oishitable.global.exception.ConflictException;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
@@ -24,8 +25,8 @@ public class BookmarkService {
 
     @Transactional
     public void createBookmark(Long userId, Long restaurantId) {
-        if (bookmarkRepository.existsByUser_IdAndRestaurant_Id(userId, restaurantId))  {
-            throw new CustomRuntimeException(ErrorCode.BOOKMARK_ALREADY_EXISTS_RESTAURANT);
+        if (bookmarkRepository.existsByUserIdAndRestaurantId(userId, restaurantId))  {
+            throw new ConflictException(ErrorCode.BOOKMARK_ALREADY_EXISTS_RESTAURANT.getMessage());
         }
 
         User user = userRepository.findById(userId)
@@ -43,18 +44,14 @@ public class BookmarkService {
     }
 
     @Transactional
-    public void deleteBookmark(Long userId, Long bookmarkId) {
-        Bookmark bookmark = findById(bookmarkId);
-
-        if (!bookmark.getUser().getId().equals(userId)) {
-            throw new CustomRuntimeException(ErrorCode.USER_UNAUTHORIZED);
-        }
+    public void deleteBookmark(Long userId, Long restaurantId) {
+        Bookmark bookmark = findByUserIdAndRestaurantId(userId, restaurantId);
 
         bookmarkRepository.delete(bookmark);
     }
 
-    private Bookmark findById(Long bookmarkId) {
-        return bookmarkRepository.findById(bookmarkId)
+    private Bookmark findByUserIdAndRestaurantId(Long userId, Long restaurantId) {
+        return bookmarkRepository.findByUserIdAndRestaurantId(userId, restaurantId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.BOOKMARK_NOT_FOUND.getMessage()));
     }
 }
