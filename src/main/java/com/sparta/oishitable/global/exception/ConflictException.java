@@ -1,7 +1,9 @@
 package com.sparta.oishitable.global.exception;
 
-public class ConflictException extends RuntimeException {
-    public ConflictException(String message) {
-        super(message);
+import com.sparta.oishitable.global.exception.error.ErrorCode;
+
+public class ConflictException extends CustomRuntimeException {
+    public ConflictException(ErrorCode errorCode) {
+        super(errorCode);
     }
 }

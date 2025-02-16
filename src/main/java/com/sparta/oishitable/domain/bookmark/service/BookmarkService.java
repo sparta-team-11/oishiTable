@@ -26,14 +26,14 @@ public class BookmarkService {
     @Transactional
     public void createBookmark(Long userId, Long restaurantId) {
         if (bookmarkRepository.existsByUserIdAndRestaurantId(userId, restaurantId))  {
-            throw new ConflictException(ErrorCode.BOOKMARK_ALREADY_EXISTS_RESTAURANT.getMessage());
+            throw new ConflictException(ErrorCode.BOOKMARK_ALREADY_EXISTS_RESTAURANT);
         }
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.RESTAURANT_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.RESTAURANT_NOT_FOUND));
 
         Bookmark bookmark = Bookmark.builder()
                 .user(user)
@@ -52,6 +52,6 @@ public class BookmarkService {
 
     private Bookmark findByUserIdAndRestaurantId(Long userId, Long restaurantId) {
         return bookmarkRepository.findByUserIdAndRestaurantId(userId, restaurantId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.BOOKMARK_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.BOOKMARK_NOT_FOUND));
     }
 }
