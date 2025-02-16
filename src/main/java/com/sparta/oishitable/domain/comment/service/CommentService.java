@@ -13,6 +13,9 @@ import com.sparta.oishitable.global.exception.error.ErrorCode;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,12 +64,28 @@ public class CommentService {
         }
     }
 
-    public List<CommentResponse> getReplies(Long parentCommentId, Long cursorValue, int limit) {
-        return commentRepository.findReplies(parentCommentId, cursorValue, limit);
+    public Slice<CommentResponse> getReplies(Long parentCommentId, Long cursorValue, int limit) {
+
+        List<CommentResponse> replies = commentRepository.findReplies(
+            parentCommentId,
+            cursorValue,
+            limit);
+
+        boolean hasNext = replies.size() == limit;
+
+        return new SliceImpl<>(replies, PageRequest.of(0, limit), hasNext);
     }
 
-    public List<CommentResponse> getPostComments(Long postId, Long cursorValue, int limit) {
-        return commentRepository.findPostComments(postId, cursorValue, limit);
+    public Slice<CommentResponse> getPostComments(Long postId, Long cursorValue, int limit) {
+
+        List<CommentResponse> replies = commentRepository.findPostComments(
+            postId,
+            cursorValue,
+            limit);
+
+        boolean hasNext = replies.size() == limit;
+
+        return new SliceImpl<>(replies, PageRequest.of(0, limit), hasNext);
     }
 
 
