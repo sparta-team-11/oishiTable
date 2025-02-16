@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 public class CommentRepositoryQuerydslImpl implements CommentRepositoryQuerydsl{
 
     private final JPAQueryFactory queryFactory;
-    QComment comment = QComment.comment;
+    private final QComment comment = QComment.comment;
 
     @Override
     public List<CommentResponse> findPostComments(Long postId, Long cursorValue, int limit) {
