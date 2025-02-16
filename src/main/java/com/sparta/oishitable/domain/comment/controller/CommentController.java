@@ -5,6 +5,7 @@ import com.sparta.oishitable.domain.comment.dto.response.CommentResponse;
 import com.sparta.oishitable.domain.comment.service.CommentService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,23 +30,23 @@ public class CommentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CommentResponse>> readPostComments(
+    public ResponseEntity<Slice<CommentResponse>> readPostComments(
         @RequestParam Long postId,
         @RequestParam(required = false) Long cursorValue,
         @RequestParam(defaultValue = "10") int limit
     ) {
-        List<CommentResponse> comments = commentService.getPostComments(postId, cursorValue, limit);
+        Slice<CommentResponse> comments = commentService.getPostComments(postId, cursorValue, limit);
 
         return ResponseEntity.ok(comments);
     }
 
     @GetMapping("/replies")
-    public ResponseEntity<List<CommentResponse>> readReplies(
+    public ResponseEntity<Slice<CommentResponse>> readReplies(
         @RequestParam Long commentId,
         @RequestParam(required = false) Long cursorValue,
         @RequestParam(defaultValue = "10") int limit
     ) {
-        List<CommentResponse> replies = commentService.getReplies(commentId, cursorValue, limit);
+        Slice<CommentResponse> replies = commentService.getReplies(commentId, cursorValue, limit);
 
         return ResponseEntity.ok(replies);
     }
