@@ -1,10 +1,10 @@
 package com.sparta.oishitable.domain.customer.follow.service;
 
+import com.sparta.oishitable.domain.common.user.entity.User;
+import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.domain.customer.follow.dto.FollowUserResponse;
 import com.sparta.oishitable.domain.customer.follow.entity.Follow;
 import com.sparta.oishitable.domain.customer.follow.repository.FollowRepository;
-import com.sparta.oishitable.domain.common.user.entity.User;
-import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class FollowService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void followUser(Long followerId, Long followingId) {
+    public Long createFollow(Long followerId, Long followingId) {
         if (followerId.equals(followingId)) {
             throw new CustomRuntimeException(ErrorCode.CANNOT_FOLLOW_SELF);
         }
@@ -43,22 +43,24 @@ public class FollowService {
                 .build();
 
         followRepository.save(follow);
+
+        return follow.getId();
     }
 
     @Transactional
-    public void unfollowUser(Long followerId, Long followingId) {
+    public void deleteUnfollow(Long followerId, Long followingId) {
         Follow follow = followRepository.findByFollowerIdAndFollowingId(followerId, followingId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorCode.FOLLOW_NOT_FOUND));
 
         followRepository.delete(follow);
     }
 
-    public Page<FollowUserResponse> getFollowers(Long userId, Pageable pageable) {
+    public Page<FollowUserResponse> findFollowers(Long userId, Pageable pageable) {
         return followRepository.findFollowersByFollowingId(userId, pageable)
                 .map(FollowUserResponse::from);
     }
 
-    public Page<FollowUserResponse> getFollowings(Long userId, Pageable pageable) {
+    public Page<FollowUserResponse> findFollowings(Long userId, Pageable pageable) {
         return followRepository.findFollowingsByFollowerId(userId, pageable)
                 .map(FollowUserResponse::from);
     }
