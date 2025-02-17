@@ -5,9 +5,7 @@ import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.domain.customer.post.entity.Post;
 import com.sparta.oishitable.domain.customer.post.like.entity.PostLike;
 import com.sparta.oishitable.domain.customer.post.like.repository.PostLikeRepository;
-
 import com.sparta.oishitable.domain.customer.post.repository.PostRepository;
-import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
