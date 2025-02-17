@@ -21,8 +21,12 @@ public enum ErrorCode {
 
     // SeatType 관련 익셉션
     SEAT_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 좌석 타입 입니다."),
-
     SEAT_TYPE_NAME_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 좌석 타입 이름 입니다."),
+
+    // 팔로우 관련 익셉션
+    CANNOT_FOLLOW_SELF(HttpStatus.BAD_REQUEST, "자기 자신을 팔로우 할 수 없습니다."),
+    ALREADY_FOLLOWING(HttpStatus.BAD_REQUEST, "이미 팔로우 중인 관계입니다."),
+    FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, "팔로우 관계를 찾을 수 없습니다."),
 
     // RESTAURANT_SEAT_TYPE 관련 익셉션
     RESTAURANT_SEAT_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 레스토랑 좌석입니다."),
