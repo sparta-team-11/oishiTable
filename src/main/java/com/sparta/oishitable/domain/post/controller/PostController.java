@@ -5,9 +5,12 @@ import com.sparta.oishitable.domain.post.dto.request.PostUpdateRequest;
 import com.sparta.oishitable.domain.post.dto.response.FeedKeywordResponse;
 import com.sparta.oishitable.domain.post.dto.response.FeedRandomResponse;
 import com.sparta.oishitable.domain.post.service.PostService;
+import com.sparta.oishitable.global.security.entity.CustomUserDetails;
+import jakarta.validation.Valid;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -27,9 +30,10 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<Void> create(
-        @RequestBody PostCreateRequest request
+        @AuthenticationPrincipal CustomUserDetails user,
+        @RequestBody @Valid PostCreateRequest request
     ) {
-        postService.create(request);
+        postService.create(user.getId(), request);
 
         return ResponseEntity.created(null).build();
     }
@@ -76,20 +80,21 @@ public class PostController {
 
     @PatchMapping("/{postId}")
     public ResponseEntity<Void> update(
+        @AuthenticationPrincipal CustomUserDetails user,
         @PathVariable Long postId,
-        @RequestBody PostUpdateRequest request
+        @RequestBody @Valid PostUpdateRequest request
     ) {
-        postService.update(postId, request);
+        postService.update(user.getId(), postId, request);
 
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{postId}")
     public ResponseEntity<Void> delete(
-        @PathVariable Long postId,
-        @RequestParam Long userId
+        @AuthenticationPrincipal CustomUserDetails user,
+        @PathVariable Long postId
     ) {
-        postService.delete(postId, userId);
+        postService.delete(postId, user.getId());
 
         return ResponseEntity.noContent().build();
     }
