@@ -1,7 +1,6 @@
 package com.sparta.oishitable.domain.follow.controller;
 
-import com.sparta.oishitable.domain.follow.dto.response.FollowStatsResponse;
-import com.sparta.oishitable.domain.follow.dto.response.FollowUserResponse;
+import com.sparta.oishitable.domain.follow.dto.FollowUserResponse;
 import com.sparta.oishitable.domain.follow.service.FollowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -62,18 +61,5 @@ public class FollowController {
     ) {
 
         return ResponseEntity.ok(followService.getFollowings(userId, pageable));
-    }
-
-    @GetMapping("/{userId}/followStats")
-    public ResponseEntity<FollowStatsResponse> getFollowStats(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long userId
-    ) {
-
-        Long followerId = Long.parseLong(userDetails.getUsername());
-
-        FollowStatsResponse response = followService.getFollowStats(followerId, userId);
-
-        return ResponseEntity.ok(response);
     }
 }
