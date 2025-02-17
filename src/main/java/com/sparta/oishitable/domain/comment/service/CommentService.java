@@ -1,6 +1,7 @@
 package com.sparta.oishitable.domain.comment.service;
 
 import com.sparta.oishitable.domain.comment.dto.request.CommentCreateRequest;
+import com.sparta.oishitable.domain.comment.dto.request.CommentUpdateRequest;
 import com.sparta.oishitable.domain.comment.dto.response.CommentResponse;
 import com.sparta.oishitable.domain.comment.entity.Comment;
 import com.sparta.oishitable.domain.comment.repository.CommentRepository;
@@ -86,6 +87,30 @@ public class CommentService {
         boolean hasNext = replies.size() == limit;
 
         return new SliceImpl<>(replies, PageRequest.of(0, limit), hasNext);
+    }
+
+    @Transactional
+    public void update(Long commentId, CommentUpdateRequest request) {
+
+        Comment comment = findCommentById(commentId);
+
+        isCommentOwner(comment.getUser().getId(), request.userId());
+
+        comment.update(request.content());
+    }
+
+    @Transactional
+    public void delete(Long commentId, Long userId) {
+
+        Comment comment = findCommentById(commentId);
+
+        isCommentOwner(comment.getUser().getId(), userId);
+
+        Post post = comment.getPost();
+
+        post.removeComment(comment);
+
+        commentRepository.delete(comment);
     }
 
 
