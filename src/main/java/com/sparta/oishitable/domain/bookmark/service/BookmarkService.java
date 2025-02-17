@@ -7,7 +7,6 @@ import com.sparta.oishitable.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.oishitable.domain.user.entity.User;
 import com.sparta.oishitable.domain.user.repository.UserRepository;
 import com.sparta.oishitable.global.exception.ConflictException;
-import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
