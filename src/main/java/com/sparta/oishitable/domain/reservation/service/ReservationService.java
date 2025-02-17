@@ -7,10 +7,14 @@ import com.sparta.oishitable.domain.reservation.entity.ReservationStatus;
 import com.sparta.oishitable.domain.reservation.repository.ReservationRepository;
 import com.sparta.oishitable.domain.restaurantseat.entity.RestaurantSeat;
 import com.sparta.oishitable.domain.restaurantseat.repository.RestaurantSeatRepository;
+import com.sparta.oishitable.domain.restaurantseat.service.RestaurantSeatService;
 import com.sparta.oishitable.domain.seatType.entity.SeatType;
 import com.sparta.oishitable.domain.seatType.repository.SeatTypeRepository;
+import com.sparta.oishitable.domain.seatType.service.SeatTypeService;
 import com.sparta.oishitable.domain.user.entity.User;
+import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.NotFoundException;
+import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,8 +28,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ReservationService {
     private final ReservationRepository reservationRepository;
-    private final SeatTypeRepository seatTypeRepository;
-    private final RestaurantSeatRepository restaurantSeatRepository;
+    private final RestaurantSeatService restaurantSeatService;
+    private final SeatTypeService seatTypeService;
 
 
     @Transactional
@@ -34,11 +38,9 @@ public class ReservationService {
             ReservationCreateRequest request
     ) {
 
-        SeatType seatType = seatTypeRepository.findByName(request.seatTypeName())
-                .orElseThrow(() -> new NotFoundException("좌석 타입이 없습니다"));
+        SeatType seatType = seatTypeService.findSeatTypeByName(request.seatTypeName());
 
-        RestaurantSeat restaurantSeat = restaurantSeatRepository.findBySeatType(seatType)
-                .orElseThrow(() -> new NotFoundException("좌석이 없습니다."));
+        RestaurantSeat restaurantSeat = restaurantSeatService.findBySeatType(seatType);
 
         LocalDateTime reservationDate = request.date();
 
@@ -62,10 +64,12 @@ public class ReservationService {
 
     }
 
-    public ReservationFindResponse findReservationService(long reservationId){
+    public ReservationFindResponse findReservation(long reservationId){
 
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(()-> new NotFoundException("예약을 찾을 수 없습니다."));
+                .orElseThrow(()-> new CustomRuntimeException(ErrorCode.RESERVATION_NOT_FOUND));
+
+        reservation.complete();
 
         return new ReservationFindResponse(
                 reservation.getRestaurantSeat().getId(),
@@ -77,7 +81,7 @@ public class ReservationService {
 
     }
 
-    public List<ReservationFindResponse> findAllReservationsService(Long userId){
+    public List<ReservationFindResponse> findAllReservations(Long userId){
 
         List<Reservation> reservations = reservationRepository.findByUser_Id(userId);
 
@@ -90,5 +94,16 @@ public class ReservationService {
                         reservation.getStatus()))
                 .collect(Collectors.toList());
 
+    }
+
+    public void deleteReservation(long reservationId){
+//        reservationRepository.deleteById(reservationId);
+
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(()-> new CustomRuntimeException(ErrorCode.RESERVATION_NOT_FOUND));
+
+        reservation.cancel();
+
+        reservationRepository.save(reservation);
     }
 }
