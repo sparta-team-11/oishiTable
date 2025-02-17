@@ -11,6 +11,7 @@ import com.sparta.oishitable.domain.user.entity.User;
 import com.sparta.oishitable.domain.user.repository.UserRepository;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -102,13 +103,23 @@ public class CommentService {
     @Transactional
     public void delete(Long commentId, Long userId) {
 
-        Comment comment = findCommentById(commentId);
+        Comment comment = commentRepository.findCommentWithRepliesById(commentId)
+            .orElseThrow(() -> new CustomRuntimeException(ErrorCode.COMMENT_NOT_FOUND));
 
         isCommentOwner(comment.getUser().getId(), userId);
 
-        Post post = comment.getPost();
+        if (comment.getReplies() != null) {
 
-        post.removeComment(comment);
+            List<Comment> repliesCopy = new ArrayList<>(comment.getReplies());
+
+            for (Comment reply : repliesCopy) {
+                comment.removeReply(reply);
+            }
+
+        } else {
+
+            comment.getPost().removeComment(comment);
+        }
 
         commentRepository.delete(comment);
     }
