@@ -59,6 +59,8 @@ public enum ErrorCode {
     // 게시글 관련 익셉션
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게시글 입니다."),
 
+    POST_NOT_EQUAL(HttpStatus.BAD_REQUEST, "해당 게시글이 아닙니다."),
+
     // 댓글 관련 익셉션
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 댓글 입니다."),
 
