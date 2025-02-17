@@ -7,6 +7,7 @@ import com.sparta.oishitable.domain.customer.comment.like.repository.CommentLike
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
+import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -50,16 +51,16 @@ public class CommentLikeService {
 
     private CommentLike findCommentLikeByCommentAndUser(Comment comment, User user) {
         return commentLikeRepository.findCommentLikeByCommentAndUser(comment, user)
-            .orElseThrow(() -> new CustomRuntimeException(ErrorCode.LIKE_NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.LIKE_NOT_FOUND));
     }
 
     private User findUserById(Long userId) {
         return userRepository.findById(userId)
-            .orElseThrow(() -> new CustomRuntimeException(ErrorCode.USER_NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 
     private Comment findCommentById(Long commentId) {
         return commentRepository.findById(commentId)
-            .orElseThrow(() -> new CustomRuntimeException(ErrorCode.COMMENT_NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.COMMENT_NOT_FOUND));
     }
 }
