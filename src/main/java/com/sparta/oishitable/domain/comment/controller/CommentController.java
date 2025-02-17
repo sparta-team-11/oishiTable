@@ -2,7 +2,8 @@ package com.sparta.oishitable.domain.comment.controller;
 
 import com.sparta.oishitable.domain.comment.dto.request.CommentCreateRequest;
 import com.sparta.oishitable.domain.comment.dto.request.CommentUpdateRequest;
-import com.sparta.oishitable.domain.comment.dto.response.CommentResponse;
+import com.sparta.oishitable.domain.comment.dto.response.CommentPostResponse;
+import com.sparta.oishitable.domain.comment.dto.response.CommentRepliesResponse;
 import com.sparta.oishitable.domain.comment.service.CommentService;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -39,23 +40,23 @@ public class CommentController {
     }
 
     @GetMapping
-    public ResponseEntity<Slice<CommentResponse>> readPostComments(
+    public ResponseEntity<Slice<CommentPostResponse>> readPostComments(
         @RequestParam Long postId,
         @RequestParam(required = false) Long cursorValue,
         @RequestParam(defaultValue = "10") int limit
     ) {
-        Slice<CommentResponse> comments = commentService.getPostComments(postId, cursorValue, limit);
+        Slice<CommentPostResponse> comments = commentService.getPostComments(postId, cursorValue, limit);
 
         return ResponseEntity.ok(comments);
     }
 
     @GetMapping("/replies")
-    public ResponseEntity<Slice<CommentResponse>> readReplies(
+    public ResponseEntity<Slice<CommentRepliesResponse>> readReplies(
         @RequestParam Long commentId,
         @RequestParam(required = false) Long cursorValue,
         @RequestParam(defaultValue = "10") int limit
     ) {
-        Slice<CommentResponse> replies = commentService.getReplies(commentId, cursorValue, limit);
+        Slice<CommentRepliesResponse> replies = commentService.getReplies(commentId, cursorValue, limit);
 
         return ResponseEntity.ok(replies);
     }
