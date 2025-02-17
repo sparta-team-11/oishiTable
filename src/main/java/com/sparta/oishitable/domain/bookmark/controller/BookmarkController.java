@@ -22,8 +22,7 @@ public class BookmarkController {
             @AuthenticationPrincipal CustomUserDetails user,
             @Valid @RequestBody BookmarkCreateRequest bookmarkCreateReq
     ) {
-        Long userId = Long.valueOf(user.getId());
-        bookmarkService.createBookmark(userId, bookmarkCreateReq.restaurantId());
+        bookmarkService.createBookmark(user.getId(), bookmarkCreateReq.restaurantId());
 
         return ResponseEntity.created(null).build();
     }
@@ -33,8 +32,7 @@ public class BookmarkController {
             @AuthenticationPrincipal CustomUserDetails user,
             @Valid @RequestBody BookmarkDeleteRequest bookmarkDeleteReq
     ) {
-        Long userId = Long.valueOf(user.getId());
-        bookmarkService.deleteBookmark(userId, bookmarkDeleteReq.restaurantId());
+        bookmarkService.deleteBookmark(user.getId(), bookmarkDeleteReq.restaurantId());
 
         return ResponseEntity.noContent().build();
     }
