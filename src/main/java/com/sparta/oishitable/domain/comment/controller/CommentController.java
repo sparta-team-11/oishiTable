@@ -4,9 +4,11 @@ import com.sparta.oishitable.domain.comment.dto.request.CommentCreateRequest;
 import com.sparta.oishitable.domain.comment.dto.request.CommentUpdateRequest;
 import com.sparta.oishitable.domain.comment.dto.response.CommentResponse;
 import com.sparta.oishitable.domain.comment.service.CommentService;
+import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -26,9 +28,13 @@ public class CommentController {
 
     @PostMapping
     public ResponseEntity<Void> create(
+        @AuthenticationPrincipal CustomUserDetails user,
         @RequestBody CommentCreateRequest request
+
     ) {
-        commentService.create(request);
+        Long userId = Long.valueOf(user.getId());
+        commentService.create(userId, request);
+
         return ResponseEntity.created(null).build();
     }
 
@@ -56,19 +62,22 @@ public class CommentController {
 
     @PatchMapping("/{commentId}")
     public ResponseEntity<Void> update(
+        @AuthenticationPrincipal CustomUserDetails user,
         @PathVariable Long commentId,
         @RequestBody CommentUpdateRequest request
     ) {
-        commentService.update(commentId, request);
+        Long userId = Long.valueOf(user.getId());
+        commentService.update(userId, commentId, request);
 
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> delete(
-        @PathVariable Long commentId,
-        @RequestParam Long userId
+        @AuthenticationPrincipal CustomUserDetails user,
+        @PathVariable Long commentId
     ) {
+        Long userId = Long.valueOf(user.getId());
         commentService.delete(commentId, userId);
 
         return ResponseEntity.ok().build();

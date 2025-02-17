@@ -30,10 +30,10 @@ public class CommentService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void create(CommentCreateRequest request) {
+    public void create(Long userId, CommentCreateRequest request) {
 
         Post post = findPostById(request.postId());
-        User user = findUserById(request.userId());
+        User user = findUserById(userId);
 
         // 부분적으로 빌드 후 게시글 댓글인지 대댓글인지 구분 후 조건에 따라 완성
         Comment.CommentBuilder builder = Comment.builder()
@@ -90,11 +90,11 @@ public class CommentService {
     }
 
     @Transactional
-    public void update(Long commentId, CommentUpdateRequest request) {
+    public void update(Long userId, Long commentId, CommentUpdateRequest request) {
 
         Comment comment = findCommentById(commentId);
 
-        isCommentOwner(comment.getUser().getId(), request.userId());
+        isCommentOwner(comment.getUser().getId(), userId);
 
         comment.update(request.content());
     }
