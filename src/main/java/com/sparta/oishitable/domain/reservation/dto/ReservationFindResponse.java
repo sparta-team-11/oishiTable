@@ -18,5 +18,7 @@ public record ReservationFindResponse(
     @NotNull
     String seatTypeName,
     @NotNull
-    ReservationStatus status
+    ReservationStatus status,
+    @NotNull
+    boolean couponExist
 ) {}
