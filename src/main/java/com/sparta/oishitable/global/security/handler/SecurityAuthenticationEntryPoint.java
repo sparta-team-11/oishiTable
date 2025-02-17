@@ -1,12 +1,12 @@
 package com.sparta.oishitable.global.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.oishitable.global.exception.error.ErrorCode;
 import com.sparta.oishitable.global.exception.error.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -28,11 +28,11 @@ public class SecurityAuthenticationEntryPoint implements AuthenticationEntryPoin
     ) throws IOException {
         log.warn("Security Authentication error: need to login");
 
-        ErrorCode errorCode = ErrorCode.NEED_LOGIN_EXCEPTION;
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
 
         response.setContentType("application/json;charset=UTF-8");
-        response.setStatus(errorCode.getStatus().value());
+        response.setStatus(status.value());
         response.getWriter().write(objectMapper.writeValueAsString(
-                new ErrorResponse(errorCode.getStatus(), errorCode.getMessage())));
+                new ErrorResponse(status, authException.getMessage())));
     }
 }

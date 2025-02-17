@@ -1,7 +1,6 @@
 package com.sparta.oishitable.global.security.filter;
 
 import com.sparta.oishitable.domain.user.entity.User;
-import com.sparta.oishitable.global.exception.error.ErrorCode;
 import com.sparta.oishitable.global.security.JwtTokenProvider;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import com.sparta.oishitable.global.security.enums.TokenType;
@@ -11,7 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

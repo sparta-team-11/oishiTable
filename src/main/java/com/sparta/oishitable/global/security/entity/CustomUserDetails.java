@@ -49,7 +49,7 @@ public class CustomUserDetails implements UserDetails {
         return user.getName();
     }
 
-    public String getId() {
-        return String.valueOf(user.getId());
+    public Long getId() {
+        return user.getId();
     }
 }

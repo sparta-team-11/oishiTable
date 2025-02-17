@@ -1,10 +1,10 @@
-package com.sparta.oishitable.domain.user.dto.request;
+package com.sparta.oishitable.domain.auth.dto.request;
 
 import com.sparta.oishitable.domain.user.entity.User;
 import com.sparta.oishitable.domain.user.entity.UserRole;
 import jakarta.validation.constraints.*;
 
-public record UserSignupRequest(
+public record AuthSigninRequest(
         @NotBlank(message = "이메일 입력은 필수입니다.")
         @Email(message = "올바른 이메일 형식을 입력해주세요.")
         String email,
