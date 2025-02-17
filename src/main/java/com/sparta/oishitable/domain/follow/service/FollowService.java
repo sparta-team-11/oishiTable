@@ -1,5 +1,6 @@
 package com.sparta.oishitable.domain.follow.service;
 
+import com.sparta.oishitable.domain.follow.dto.response.FollowStatsResponse;
 import com.sparta.oishitable.domain.follow.dto.response.FollowUserResponse;
 import com.sparta.oishitable.domain.follow.entity.Follow;
 import com.sparta.oishitable.domain.follow.repository.FollowRepository;
@@ -63,15 +64,14 @@ public class FollowService {
                 .map(FollowUserResponse::from);
     }
 
-    public Long getFollowerCount(Long userId) {
-        return followRepository.countFollowersByUserId(userId);
-    }
+    public FollowStatsResponse getFollowStats(Long followerId, Long userId) {
 
-    public Long getFollowingCount(Long userId) {
-        return followRepository.countFollowingsByUserId(userId);
-    }
+        Long followerCount = followRepository.countFollowersByUserId(userId);
 
-    public boolean isFollowing(Long followerId, Long followingId) {
-        return followRepository.isFollowing(followerId, followingId);
+        Long followingCount = followRepository.countFollowingsByUserId(userId);
+
+        Boolean isFollowing = followRepository.existsByFollowerIdAndFollowingId(followerId, userId);
+
+        return new FollowStatsResponse(followerCount, followingCount, isFollowing);
     }
 }

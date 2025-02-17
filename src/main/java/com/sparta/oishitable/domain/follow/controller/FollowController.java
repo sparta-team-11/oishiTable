@@ -1,5 +1,6 @@
 package com.sparta.oishitable.domain.follow.controller;
 
+import com.sparta.oishitable.domain.follow.dto.response.FollowStatsResponse;
 import com.sparta.oishitable.domain.follow.dto.response.FollowUserResponse;
 import com.sparta.oishitable.domain.follow.service.FollowService;
 import lombok.RequiredArgsConstructor;
@@ -62,34 +63,16 @@ public class FollowController {
         return ResponseEntity.ok(followService.getFollowings(userId, pageable));
     }
 
-    @GetMapping("/{userId}/followers/count")
-    public ResponseEntity<Long> getFollowerCount(
-            @AuthenticationPrincipal UserDetails userDetails
-    ) {
-
-        Long userId = Long.parseLong(userDetails.getUsername());
-
-        return ResponseEntity.ok(followService.getFollowerCount(userId));
-    }
-
-    @GetMapping("/{userId}/followings/count")
-    public ResponseEntity<Long> getFollowingCount(
-            @AuthenticationPrincipal UserDetails userDetails
-    ) {
-
-        Long userId = Long.parseLong(userDetails.getUsername());
-        
-        return ResponseEntity.ok(followService.getFollowingCount(userId));
-    }
-
-    @GetMapping("/check/{followingId}")
-    public ResponseEntity<Boolean> isFollowing(
+    @GetMapping("/{userId}/followStats")
+    public ResponseEntity<FollowStatsResponse> getFollowStats(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long followingId
+            @PathVariable Long userId
     ) {
 
         Long followerId = Long.parseLong(userDetails.getUsername());
 
-        return ResponseEntity.ok(followService.isFollowing(followerId, followingId));
+        FollowStatsResponse response = followService.getFollowStats(followerId, userId);
+
+        return ResponseEntity.ok(response);
     }
 }
