@@ -1,4 +1,4 @@
-package com.sparta.oishitable.global.security.dto.response;
+package com.sparta.oishitable.domain.auth.dto.response;
 
 import lombok.AccessLevel;
 import lombok.Builder;
