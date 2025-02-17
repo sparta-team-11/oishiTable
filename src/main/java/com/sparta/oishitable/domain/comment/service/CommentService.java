@@ -2,7 +2,8 @@ package com.sparta.oishitable.domain.comment.service;
 
 import com.sparta.oishitable.domain.comment.dto.request.CommentCreateRequest;
 import com.sparta.oishitable.domain.comment.dto.request.CommentUpdateRequest;
-import com.sparta.oishitable.domain.comment.dto.response.CommentResponse;
+import com.sparta.oishitable.domain.comment.dto.response.CommentPostResponse;
+import com.sparta.oishitable.domain.comment.dto.response.CommentRepliesResponse;
 import com.sparta.oishitable.domain.comment.entity.Comment;
 import com.sparta.oishitable.domain.comment.repository.CommentRepository;
 import com.sparta.oishitable.domain.post.entity.Post;
@@ -11,7 +12,6 @@ import com.sparta.oishitable.domain.user.entity.User;
 import com.sparta.oishitable.domain.user.repository.UserRepository;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -69,9 +69,9 @@ public class CommentService {
         }
     }
 
-    public Slice<CommentResponse> getReplies(Long parentCommentId, Long cursorValue, int limit) {
+    public Slice<CommentRepliesResponse> getReplies(Long parentCommentId, Long cursorValue, int limit) {
 
-        List<CommentResponse> replies = commentRepository.findReplies(
+        List<CommentRepliesResponse> replies = commentRepository.findReplies(
             parentCommentId,
             cursorValue,
             limit);
@@ -81,9 +81,9 @@ public class CommentService {
         return new SliceImpl<>(replies, PageRequest.of(0, limit), hasNext);
     }
 
-    public Slice<CommentResponse> getPostComments(Long postId, Long cursorValue, int limit) {
+    public Slice<CommentPostResponse> getPostComments(Long postId, Long cursorValue, int limit) {
 
-        List<CommentResponse> replies = commentRepository.findPostComments(
+        List<CommentPostResponse> replies = commentRepository.findPostComments(
             postId,
             cursorValue,
             limit);
