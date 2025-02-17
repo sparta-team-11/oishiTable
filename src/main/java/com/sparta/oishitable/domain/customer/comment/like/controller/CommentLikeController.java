@@ -15,23 +15,13 @@ public class CommentLikeController {
 
     private final CommentLikeService commentLikeService;
 
-    @PostMapping
-    public ResponseEntity<Void> likeComment(
+    @PutMapping
+    public ResponseEntity<Void> likeAndUnlikeComment(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam Long commentId
     ) {
-        commentLikeService.likeComment(commentId, userDetails.getId());
+        commentLikeService.likeAndUnlikeComment(commentId, userDetails.getId());
 
         return ResponseEntity.ok().build();
-    }
-
-    @DeleteMapping
-    public ResponseEntity<Void> unlikeComment(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestParam Long commentId
-    ) {
-        commentLikeService.unlikeComment(commentId, userDetails.getId());
-
-        return ResponseEntity.noContent().build();
     }
 }

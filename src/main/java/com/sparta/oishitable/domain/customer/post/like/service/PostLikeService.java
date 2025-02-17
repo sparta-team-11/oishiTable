@@ -23,31 +23,23 @@ public class PostLikeService {
     private final PostLikeRepository postLikeRepository;
     private final PostRepository postRepository;
 
-    public void likePost(Long postId, Long userId) {
-
+    public void likeAndUnlikePost(Long postId, Long userId) {
         Post post = findPostById(postId);
         User user = findUserById(userId);
 
         if (postLikeRepository.existsByPostAndUser(post, user)) {
-            throw new CustomRuntimeException(ErrorCode.LIKE_DUPLICATED);
+
+            PostLike postLike = findPostLikeByPostAndUser(post, user);
+
+            postLikeRepository.delete(postLike);
+        } else {
+            PostLike postLike = PostLike.builder()
+                    .post(post)
+                    .user(user)
+                    .build();
+
+            postLikeRepository.save(postLike);
         }
-
-        PostLike postLike = PostLike.builder()
-            .post(post)
-            .user(user)
-            .build();
-
-        postLikeRepository.save(postLike);
-    }
-
-    public void unlikePost(Long postId, Long userId) {
-
-        Post post = findPostById(postId);
-        User user = findUserById(userId);
-
-        PostLike postLike = findPostLikeByPostAndUser(post, user);
-
-        postLikeRepository.delete(postLike);
     }
 
     private PostLike findPostLikeByPostAndUser(Post post, User user) {
@@ -64,5 +56,4 @@ public class PostLikeService {
         return postRepository.findById(commentId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND));
     }
-
 }
