@@ -5,9 +5,6 @@ import jakarta.validation.constraints.NotNull;
 
 public record PostUpdateRequest (
     @NotNull
-    Long userId,
-
-    @NotNull
     Long regionId,
 
     @NotBlank

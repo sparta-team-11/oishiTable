@@ -38,6 +38,7 @@ public class CommentService {
 
         // 부분적으로 빌드 후 게시글 댓글인지 대댓글인지 구분 후 조건에 따라 완성
         Comment.CommentBuilder builder = Comment.builder()
+            .post(post)
             .content(request.content())
             .user(user);
 
@@ -45,8 +46,11 @@ public class CommentService {
             // 대댓글 : 부모 댓글 조회 후 설정
             Comment parentComment = findCommentById(request.parentId());
 
+            if (!post.getId().equals(parentComment.getPost().getId())) {
+                throw new CustomRuntimeException(ErrorCode.POST_NOT_EQUAL);
+            }
+
             Comment comment = builder.parent(parentComment)
-                .post(parentComment.getPost())
                 .build();
 
             // 댓글의 대댓글 리스트에만 추가
@@ -56,8 +60,7 @@ public class CommentService {
 
         } else {
             // 게시글 댓글
-            Comment comment = builder.post(post)
-                    .build();
+            Comment comment = builder.build();
 
             // 게시글의 댓글리스트에 추가
             post.addComment(comment);
@@ -107,19 +110,6 @@ public class CommentService {
             .orElseThrow(() -> new CustomRuntimeException(ErrorCode.COMMENT_NOT_FOUND));
 
         isCommentOwner(comment.getUser().getId(), userId);
-
-        if (comment.getReplies() != null) {
-
-            List<Comment> repliesCopy = new ArrayList<>(comment.getReplies());
-
-            for (Comment reply : repliesCopy) {
-                comment.removeReply(reply);
-            }
-
-        } else {
-
-            comment.getPost().removeComment(comment);
-        }
 
         commentRepository.delete(comment);
     }
