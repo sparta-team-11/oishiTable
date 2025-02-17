@@ -5,6 +5,7 @@ import com.sparta.oishitable.domain.comment.dto.request.CommentUpdateRequest;
 import com.sparta.oishitable.domain.comment.dto.response.CommentResponse;
 import com.sparta.oishitable.domain.comment.service.CommentService;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
@@ -29,11 +30,10 @@ public class CommentController {
     @PostMapping
     public ResponseEntity<Void> create(
         @AuthenticationPrincipal CustomUserDetails user,
-        @RequestBody CommentCreateRequest request
+        @RequestBody @Valid CommentCreateRequest request
 
     ) {
-        Long userId = Long.valueOf(user.getId());
-        commentService.create(userId, request);
+        commentService.create(user.getId(), request);
 
         return ResponseEntity.created(null).build();
     }
@@ -64,10 +64,9 @@ public class CommentController {
     public ResponseEntity<Void> update(
         @AuthenticationPrincipal CustomUserDetails user,
         @PathVariable Long commentId,
-        @RequestBody CommentUpdateRequest request
+        @RequestBody @Valid CommentUpdateRequest request
     ) {
-        Long userId = Long.valueOf(user.getId());
-        commentService.update(userId, commentId, request);
+        commentService.update(user.getId(), commentId, request);
 
         return ResponseEntity.ok().build();
     }
@@ -77,10 +76,9 @@ public class CommentController {
         @AuthenticationPrincipal CustomUserDetails user,
         @PathVariable Long commentId
     ) {
-        Long userId = Long.valueOf(user.getId());
-        commentService.delete(commentId, userId);
+        commentService.delete(commentId, user.getId());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 }
