@@ -11,10 +11,12 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(
         name = "follows",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"follower_id", "following_id"})},
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uq_follower_following", columnNames = {"follower_id", "following_id"})
+        },
         indexes = {
-                @Index(name = "idx_follower", columnList = "follower_id"),
-                @Index(name = "idx_following", columnList = "following_id")
+                @Index(name = "idx_fk_follower_id", columnList = "follower_id"),
+                @Index(name = "idx_fk_following_id", columnList = "following_id")
         }
 )
 @Getter
@@ -27,11 +29,11 @@ public class Follow extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "follower_id", nullable = false)
+    @JoinColumn(name = "follower_id", nullable = false, foreignKey = @ForeignKey(name = "fk_follower"))
     private User follower;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "following_id", nullable = false)
+    @JoinColumn(name = "following_id", nullable = false, foreignKey = @ForeignKey(name = "fk_following"))
     private User following;
 
     @Builder

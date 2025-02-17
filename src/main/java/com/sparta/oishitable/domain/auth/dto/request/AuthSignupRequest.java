@@ -2,11 +2,17 @@ package com.sparta.oishitable.domain.auth.dto.request;
 
 import com.sparta.oishitable.domain.user.entity.User;
 import com.sparta.oishitable.domain.user.entity.UserRole;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
-public record AuthSigninRequest(
+public record AuthSignupRequest(
         @NotBlank(message = "이메일 입력은 필수입니다.")
-        @Email(message = "올바른 이메일 형식을 입력해주세요.")
+        @Pattern(
+                regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]$",
+                message = "올바른 이메일 형식을 입력해주세요."
+        )
         String email,
 
         @NotBlank(message = "비밀번호 입력은 필수입니다.")

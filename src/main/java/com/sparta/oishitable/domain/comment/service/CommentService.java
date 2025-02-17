@@ -1,7 +1,9 @@
 package com.sparta.oishitable.domain.comment.service;
 
 import com.sparta.oishitable.domain.comment.dto.request.CommentCreateRequest;
-import com.sparta.oishitable.domain.comment.dto.response.CommentResponse;
+import com.sparta.oishitable.domain.comment.dto.request.CommentUpdateRequest;
+import com.sparta.oishitable.domain.comment.dto.response.CommentPostResponse;
+import com.sparta.oishitable.domain.comment.dto.response.CommentRepliesResponse;
 import com.sparta.oishitable.domain.comment.entity.Comment;
 import com.sparta.oishitable.domain.comment.repository.CommentRepository;
 import com.sparta.oishitable.domain.post.entity.Post;
@@ -29,13 +31,14 @@ public class CommentService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void create(CommentCreateRequest request) {
+    public void create(Long userId, CommentCreateRequest request) {
 
         Post post = findPostById(request.postId());
-        User user = findUserById(request.userId());
+        User user = findUserById(userId);
 
         // 부분적으로 빌드 후 게시글 댓글인지 대댓글인지 구분 후 조건에 따라 완성
         Comment.CommentBuilder builder = Comment.builder()
+            .post(post)
             .content(request.content())
             .user(user);
 
@@ -43,8 +46,11 @@ public class CommentService {
             // 대댓글 : 부모 댓글 조회 후 설정
             Comment parentComment = findCommentById(request.parentId());
 
+            if (!post.getId().equals(parentComment.getPost().getId())) {
+                throw new CustomRuntimeException(ErrorCode.POST_NOT_EQUAL);
+            }
+
             Comment comment = builder.parent(parentComment)
-                .post(parentComment.getPost())
                 .build();
 
             // 댓글의 대댓글 리스트에만 추가
@@ -54,8 +60,7 @@ public class CommentService {
 
         } else {
             // 게시글 댓글
-            Comment comment = builder.post(post)
-                    .build();
+            Comment comment = builder.build();
 
             // 게시글의 댓글리스트에 추가
             post.addComment(comment);
@@ -64,9 +69,9 @@ public class CommentService {
         }
     }
 
-    public Slice<CommentResponse> getReplies(Long parentCommentId, Long cursorValue, int limit) {
+    public Slice<CommentRepliesResponse> getReplies(Long parentCommentId, Long cursorValue, int limit) {
 
-        List<CommentResponse> replies = commentRepository.findReplies(
+        List<CommentRepliesResponse> replies = commentRepository.findReplies(
             parentCommentId,
             cursorValue,
             limit);
@@ -76,9 +81,9 @@ public class CommentService {
         return new SliceImpl<>(replies, PageRequest.of(0, limit), hasNext);
     }
 
-    public Slice<CommentResponse> getPostComments(Long postId, Long cursorValue, int limit) {
+    public Slice<CommentPostResponse> getPostComments(Long postId, Long cursorValue, int limit) {
 
-        List<CommentResponse> replies = commentRepository.findPostComments(
+        List<CommentPostResponse> replies = commentRepository.findPostComments(
             postId,
             cursorValue,
             limit);
@@ -86,6 +91,27 @@ public class CommentService {
         boolean hasNext = replies.size() == limit;
 
         return new SliceImpl<>(replies, PageRequest.of(0, limit), hasNext);
+    }
+
+    @Transactional
+    public void update(Long userId, Long commentId, CommentUpdateRequest request) {
+
+        Comment comment = findCommentById(commentId);
+
+        isCommentOwner(comment.getUser().getId(), userId);
+
+        comment.update(request.content());
+    }
+
+    @Transactional
+    public void delete(Long commentId, Long userId) {
+
+        Comment comment = commentRepository.findCommentWithRepliesById(commentId)
+            .orElseThrow(() -> new CustomRuntimeException(ErrorCode.COMMENT_NOT_FOUND));
+
+        isCommentOwner(comment.getUser().getId(), userId);
+
+        commentRepository.delete(comment);
     }
 
 

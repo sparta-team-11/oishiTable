@@ -29,9 +29,13 @@ public enum ErrorCode {
 
     // RESTAURANT_SEAT_TYPE 관련 익셉션
     RESTAURANT_SEAT_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 레스토랑 좌석입니다."),
+    RESTAURANT_SEAT_TYPE_QUANTITY_NOT_FOUND(HttpStatus.NOT_FOUND,"가게 좌석의 수량이 부족합니다"),
+
 
     // 예약 관련 익셉션
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 예약 입니다."),
+    RESERVATION_COUPON_LIMIT_EXCEEDED(HttpStatus.NOT_FOUND,"할인 쿠폰 지급 이벤트가 끝났습니다."),
+    RESERVATION_CONFLICT(HttpStatus.NOT_FOUND,"예약 동시성 오류"),
 
     // Security 관련 익셉션
     LOGIN_FAILED_EXCEPTION(HttpStatus.UNAUTHORIZED, "로그인에 실패하였습니다."),
@@ -53,6 +57,8 @@ public enum ErrorCode {
 
     // 게시글 관련 익셉션
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게시글 입니다."),
+
+    POST_NOT_EQUAL(HttpStatus.BAD_REQUEST, "해당 게시글이 아닙니다."),
 
     // 댓글 관련 익셉션
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 댓글 입니다."),

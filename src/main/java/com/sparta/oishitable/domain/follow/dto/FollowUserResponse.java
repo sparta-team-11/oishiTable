@@ -1,4 +1,4 @@
-package com.sparta.oishitable.domain.follow.dto.response;
+package com.sparta.oishitable.domain.follow.dto;
 
 import com.sparta.oishitable.domain.user.entity.User;
 import lombok.AccessLevel;
