@@ -1,6 +1,6 @@
 package com.sparta.oishitable.domain.auth.dto.response;
 
-import com.sparta.oishitable.domain.user.entity.User;
+import com.sparta.oishitable.domain.common.user.entity.User;
 import lombok.AccessLevel;
 import lombok.Builder;
 

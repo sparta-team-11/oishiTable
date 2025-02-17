@@ -1,6 +1,6 @@
 package com.sparta.oishitable.global.security.entity;
 
-import com.sparta.oishitable.domain.user.entity.User;
+import com.sparta.oishitable.domain.common.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

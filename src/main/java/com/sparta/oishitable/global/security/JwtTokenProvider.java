@@ -1,7 +1,7 @@
 package com.sparta.oishitable.global.security;
 
-import com.sparta.oishitable.domain.user.entity.User;
-import com.sparta.oishitable.domain.user.entity.UserRole;
+import com.sparta.oishitable.domain.common.user.entity.User;
+import com.sparta.oishitable.domain.common.user.entity.UserRole;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import com.sparta.oishitable.global.security.enums.TokenType;
 import io.jsonwebtoken.*;
