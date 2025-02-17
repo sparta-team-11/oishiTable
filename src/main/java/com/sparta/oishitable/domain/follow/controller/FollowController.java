@@ -1,12 +1,12 @@
 package com.sparta.oishitable.domain.follow.controller;
 
-import com.sparta.oishitable.domain.follow.dto.response.FollowResponse;
-import com.sparta.oishitable.domain.follow.dto.response.FollowUserResponse;
+import com.sparta.oishitable.domain.follow.dto.FollowUserResponse;
 import com.sparta.oishitable.domain.follow.service.FollowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,7 +20,7 @@ public class FollowController {
     private final FollowService followService;
 
     @PostMapping("/{followingId}")
-    public ResponseEntity<FollowResponse> followUser(
+    public ResponseEntity<Void> followUser(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long followingId
     ) {
@@ -29,11 +29,11 @@ public class FollowController {
 
         followService.followUser(followerId, followingId);
 
-        return ResponseEntity.ok(new FollowResponse("팔로우 성공"));
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping("/{followingId}")
-    public ResponseEntity<FollowResponse> unfollowUser(
+    public ResponseEntity<Void> unfollowUser(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long followingId
     ) {
@@ -42,7 +42,7 @@ public class FollowController {
 
         followService.unfollowUser(followerId, followingId);
 
-        return ResponseEntity.ok(new FollowResponse("언팔로우 성공"));
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{userId}/followers")
@@ -61,32 +61,5 @@ public class FollowController {
     ) {
 
         return ResponseEntity.ok(followService.getFollowings(userId, pageable));
-    }
-
-    @GetMapping("/{userId}/followers/count")
-    public ResponseEntity<Long> getFollowerCount(
-            @PathVariable Long userId
-    ) {
-
-        return ResponseEntity.ok(followService.getFollowerCount(userId));
-    }
-
-    @GetMapping("/{userId}/followings/count")
-    public ResponseEntity<Long> getFollowingCount(
-            @PathVariable Long userId
-    ) {
-
-        return ResponseEntity.ok(followService.getFollowingCount(userId));
-    }
-
-    @GetMapping("/check/{followingId}")
-    public ResponseEntity<Boolean> isFollowing(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long followingId
-    ) {
-
-        Long followerId = Long.parseLong(userDetails.getUsername());
-
-        return ResponseEntity.ok(followService.isFollowing(followerId, followingId));
     }
 }
