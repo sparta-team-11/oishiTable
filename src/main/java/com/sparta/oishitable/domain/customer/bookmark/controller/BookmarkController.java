@@ -4,11 +4,14 @@ import com.sparta.oishitable.domain.customer.bookmark.dto.request.BookmarkCreate
 import com.sparta.oishitable.domain.customer.bookmark.dto.request.BookmarkDeleteRequest;
 import com.sparta.oishitable.domain.customer.bookmark.service.BookmarkService;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
+import com.sparta.oishitable.global.util.UriBuilderUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/customer/api/bookmarks")
@@ -23,16 +26,27 @@ public class BookmarkController {
             @RequestBody @Valid BookmarkCreateRequest bookmarkCreateReq
     ) {
         bookmarkService.createBookmark(userDetails.getId(), bookmarkCreateReq.restaurantId());
+        URI location = UriBuilderUtil.create("/customer/api/restaurants/{restaurantsId}", bookmarkCreateReq.restaurantId());
 
-        return ResponseEntity.created(null).build();
+        return ResponseEntity.created(location).build();
+    }
+
+    @DeleteMapping("/{bookmarkId}")
+    public ResponseEntity<Void> deleteBookmark(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long bookmarkId
+    ) {
+        bookmarkService.deleteBookmark(userDetails.getId(), bookmarkId);
+
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteBookmark(
+    public ResponseEntity<Void> deleteBookmarkByUserIdAndRestaurantId(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody @Valid BookmarkDeleteRequest bookmarkDeleteReq
     ) {
-        bookmarkService.deleteBookmark(userDetails.getId(), bookmarkDeleteReq.restaurantId());
+        bookmarkService.deleteBookmarkByUserIdAndRestaurantId(userDetails.getId(), bookmarkDeleteReq.restaurantId());
 
         return ResponseEntity.noContent().build();
     }

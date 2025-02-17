@@ -20,7 +20,7 @@ public class OwnerRestaurantService {
     private final RestaurantSeatService restaurantSeatService;
 
     @Transactional
-    public void createRestaurant(RestaurantCreateRequest restaurantCreateRequest) {
+    public Long createRestaurant(RestaurantCreateRequest restaurantCreateRequest) {
         Restaurant restaurant = restaurantCreateRequest.toEntity();
         Restaurant savedRestaurant = restaurantRepository.save(restaurant);
 
@@ -28,6 +28,12 @@ public class OwnerRestaurantService {
                 savedRestaurant,
                 restaurantCreateRequest.restaurantSeatCreateRequestList()
         );
+
+        return savedRestaurant.getId();
+    }
+
+    public Restaurant findRestaurant(Long restaurantId) {
+        return findById(restaurantId);
     }
 
     @Transactional
@@ -49,7 +55,7 @@ public class OwnerRestaurantService {
         restaurantRepository.delete(restaurant);
     }
 
-    public Restaurant findById(Long restaurantId) {
+    private Restaurant findById(Long restaurantId) {
         return restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorCode.RESTAURANT_NOT_FOUND));
     }
