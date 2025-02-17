@@ -11,5 +11,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     int countByRestaurantSeatAndDate(RestaurantSeat restaurantSeat, LocalDateTime reservationDate);
 
     List<Reservation> findByUser_Id(Long userId);
+
+    long countByCouponExistTrue();
+
+//    long countByDiscount(int discount);
 }
 
