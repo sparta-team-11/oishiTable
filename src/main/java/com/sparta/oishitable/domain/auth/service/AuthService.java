@@ -1,7 +1,8 @@
 package com.sparta.oishitable.domain.auth.service;
 
 import com.sparta.oishitable.domain.auth.dto.request.AccessTokenReissueReq;
-import com.sparta.oishitable.domain.auth.dto.request.AuthSigninRequest;
+import com.sparta.oishitable.domain.auth.dto.request.AuthLoginRequest;
+import com.sparta.oishitable.domain.auth.dto.request.AuthSignupRequest;
 import com.sparta.oishitable.domain.auth.dto.response.AuthLoginResponse;
 import com.sparta.oishitable.domain.auth.dto.response.AuthSignupResponse;
 import com.sparta.oishitable.domain.user.entity.User;
@@ -33,7 +34,7 @@ public class AuthService {
     private final long DURATION = Duration.ofDays(3).toMillis();
 
     @Transactional
-    public AuthSignupResponse signup(AuthSigninRequest request) {
+    public AuthSignupResponse signup(AuthSignupRequest request) {
         if (userRepository.existsByEmail(request.email())) {
             throw new DuplicatedResourceException(ErrorCode.DUPLICATE_EMAIL);
         }
@@ -46,7 +47,7 @@ public class AuthService {
     }
 
     @Transactional
-    public AuthLoginResponse signin(AuthSigninRequest request) {
+    public AuthLoginResponse signin(AuthLoginRequest request) {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
