@@ -20,22 +20,22 @@ public class PostLikeController {
 
     @PostMapping
     public ResponseEntity<Void> likePost(
-            @AuthenticationPrincipal CustomUserDetails user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam Long postId
 
     ) {
-        postLikeService.likePost(postId, user.getId());
+        postLikeService.likePost(postId, userDetails.getId());
 
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping
     public ResponseEntity<Void> unlikePost(
-            @AuthenticationPrincipal CustomUserDetails user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam Long postId
 
     ) {
-        postLikeService.unlikePost(postId, user.getId());
+        postLikeService.unlikePost(postId, userDetails.getId());
 
         return ResponseEntity.noContent().build();
     }

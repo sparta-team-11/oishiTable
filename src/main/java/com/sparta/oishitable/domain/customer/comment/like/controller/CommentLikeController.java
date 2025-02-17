@@ -5,6 +5,7 @@ import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,20 +17,20 @@ public class CommentLikeController {
 
     @PostMapping
     public ResponseEntity<Void> likeComment(
-            @AuthenticationPrincipal CustomUserDetails user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam Long commentId
     ) {
-        commentLikeService.likeComment(commentId, user.getId());
+        commentLikeService.likeComment(commentId, userDetails.getId());
 
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping
     public ResponseEntity<Void> unlikeComment(
-            @AuthenticationPrincipal CustomUserDetails user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam Long commentId
     ) {
-        commentLikeService.unlikeComment(commentId, user.getId());
+        commentLikeService.unlikeComment(commentId, userDetails.getId());
 
         return ResponseEntity.noContent().build();
     }
