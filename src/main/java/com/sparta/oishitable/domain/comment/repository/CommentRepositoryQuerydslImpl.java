@@ -9,9 +9,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.oishitable.domain.comment.dto.response.CommentResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 
-@Repository
 @RequiredArgsConstructor
 public class CommentRepositoryQuerydslImpl implements CommentRepositoryQuerydsl{
 
