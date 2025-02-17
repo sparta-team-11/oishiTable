@@ -67,6 +67,8 @@ public class JwtTokenProvider {
         SecretKey tokenSecretKey;
 
         if (tokenType.equals(TokenType.ACCESS)) {
+            validateAccessTokenStartsWithBearer(token);
+
             tokenSecretKey = accessTokenSecretKey;
             token = removeBearer(token);
         } else {
@@ -96,10 +98,6 @@ public class JwtTokenProvider {
         }
     }
 
-    public boolean isStartsWithBearer(String token) {
-        return token.startsWith(BEARER_PREFIX);
-    }
-
     public User getUserFromToken(String token) {
         String accessToken = removeBearer(token);
         Claims claims = parseClaimsFromToken(accessToken);
@@ -108,6 +106,12 @@ public class JwtTokenProvider {
                 .id(Long.parseLong(claims.get("id", String.class)))
                 .role(UserRole.of(claims.get("role", String.class)))
                 .build();
+    }
+
+    private void validateAccessTokenStartsWithBearer(String token) {
+        if (!token.startsWith(BEARER_PREFIX)) {
+            throw new BadCredentialsException(ErrorCode.INVALID_TOKEN.getMessage());
+        }
     }
 
     private Claims parseClaimsFromToken(String token) {
