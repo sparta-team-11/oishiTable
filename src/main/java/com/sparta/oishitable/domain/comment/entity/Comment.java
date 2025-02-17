@@ -58,6 +58,7 @@ public class Comment extends BaseEntity {
         this.content = content;
         this.user = user;
         this.post = post;
+        this.parent = parent;
     }
 
     public void setPost(Post post) {
@@ -72,6 +73,11 @@ public class Comment extends BaseEntity {
     public void addReply(Comment reply) {
         replies.add(reply);
         reply.setParent(this);
+    }
+
+    public void removeReply(Comment reply) {
+        replies.remove(reply);
+        reply.setParent(null);
     }
 
     public void update(String content) {
