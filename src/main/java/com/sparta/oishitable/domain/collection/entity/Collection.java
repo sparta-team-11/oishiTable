@@ -1,5 +1,6 @@
 package com.sparta.oishitable.domain.collection.entity;
 
+import com.sparta.oishitable.domain.collection.dto.request.CollectionUpdateRequest;
 import com.sparta.oishitable.domain.common.BaseEntity;
 import com.sparta.oishitable.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -42,5 +43,19 @@ public class Collection extends BaseEntity {
         this.description = description;
         this.isPublic = isPublic;
         this.user = user;
+    }
+
+    public void updateCollectionInfo(CollectionUpdateRequest collectionUpdateRequest) {
+        if (collectionUpdateRequest.name() != null) {
+            this.name = collectionUpdateRequest.name();
+        }
+
+        if (collectionUpdateRequest.description() != null) {
+            this.description = collectionUpdateRequest.description();
+        }
+
+        if (collectionUpdateRequest.isPublic() != null) {
+            this.isPublic = collectionUpdateRequest.isPublic();
+        }
     }
 }
