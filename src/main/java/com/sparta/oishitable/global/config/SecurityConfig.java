@@ -2,13 +2,9 @@ package com.sparta.oishitable.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.oishitable.global.security.JwtTokenProvider;
-import com.sparta.oishitable.global.security.filter.CustomAuthenticationFilter;
 import com.sparta.oishitable.global.security.filter.JwtAuthenticationFilter;
 import com.sparta.oishitable.global.security.handler.SecurityAccessDeniedHandler;
 import com.sparta.oishitable.global.security.handler.SecurityAuthenticationEntryPoint;
-import com.sparta.oishitable.global.security.handler.SecurityAuthenticationFailureHandler;
-import com.sparta.oishitable.global.security.handler.SecurityAuthenticationSuccessHandler;
-import com.sparta.oishitable.global.security.repository.RedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,8 +18,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.context.DelegatingSecurityContextRepository;
-import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -33,7 +27,6 @@ public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
-    private final RedisRepository redisUtil;
     private final AuthenticationConfiguration authenticationConfiguration;
 
     @Bean
@@ -52,10 +45,12 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
+                        .requestMatchers("/api/owner/**").hasRole("OWNER")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
 
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(customAuthenticationFilter(), JwtAuthenticationFilter.class)
 
                 .exceptionHandling(handler ->
                         handler.authenticationEntryPoint(new SecurityAuthenticationEntryPoint(objectMapper)))
@@ -67,20 +62,5 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
-    }
-
-    @Bean
-    public CustomAuthenticationFilter customAuthenticationFilter() throws Exception {
-        CustomAuthenticationFilter filter = new CustomAuthenticationFilter(objectMapper);
-        filter.setAuthenticationManager(authenticationManager());
-        filter.setAuthenticationSuccessHandler(new SecurityAuthenticationSuccessHandler(jwtTokenProvider, objectMapper, redisUtil));
-        filter.setAuthenticationFailureHandler(new SecurityAuthenticationFailureHandler(objectMapper));
-
-        filter.setSecurityContextRepository(
-                new DelegatingSecurityContextRepository(
-                        new RequestAttributeSecurityContextRepository()
-                ));
-
-        return filter;
     }
 }

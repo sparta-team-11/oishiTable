@@ -1,6 +1,7 @@
 package com.sparta.oishitable.domain.comment.service;
 
 import com.sparta.oishitable.domain.comment.dto.request.CommentCreateRequest;
+import com.sparta.oishitable.domain.comment.dto.response.CommentResponse;
 import com.sparta.oishitable.domain.comment.entity.Comment;
 import com.sparta.oishitable.domain.comment.repository.CommentRepository;
 import com.sparta.oishitable.domain.post.entity.Post;
@@ -9,8 +10,12 @@ import com.sparta.oishitable.domain.user.entity.User;
 import com.sparta.oishitable.domain.user.repository.UserRepository;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
+import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +63,33 @@ public class CommentService {
             commentRepository.save(comment);
         }
     }
+
+    public Slice<CommentResponse> getReplies(Long parentCommentId, Long cursorValue, int limit) {
+
+        List<CommentResponse> replies = commentRepository.findReplies(
+            parentCommentId,
+            cursorValue,
+            limit);
+
+        boolean hasNext = replies.size() == limit;
+
+        return new SliceImpl<>(replies, PageRequest.of(0, limit), hasNext);
+    }
+
+    public Slice<CommentResponse> getPostComments(Long postId, Long cursorValue, int limit) {
+
+        List<CommentResponse> replies = commentRepository.findPostComments(
+            postId,
+            cursorValue,
+            limit);
+
+        boolean hasNext = replies.size() == limit;
+
+        return new SliceImpl<>(replies, PageRequest.of(0, limit), hasNext);
+    }
+
+
+    // 헬퍼 메서드
 
     private User findUserById(Long userId) {
         return userRepository.findById(userId)
