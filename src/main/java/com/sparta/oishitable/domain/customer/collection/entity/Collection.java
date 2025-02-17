@@ -38,7 +38,13 @@ public class Collection extends BaseEntity {
     private User user;
 
     @Builder
-    public Collection(Long id, String name, String description, boolean isPublic, User user) {
+    public Collection(
+            Long id,
+            String name,
+            String description,
+            boolean isPublic,
+            User user
+    ) {
         this.id = id;
         this.name = name;
         this.description = description;
