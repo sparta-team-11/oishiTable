@@ -2,6 +2,7 @@ package com.sparta.oishitable.domain.collection.service;
 
 import com.sparta.oishitable.domain.collection.dto.request.CollectionCreateRequest;
 import com.sparta.oishitable.domain.collection.dto.request.CollectionUpdateRequest;
+import com.sparta.oishitable.domain.collection.dto.response.CollectionInfoResponse;
 import com.sparta.oishitable.domain.collection.entity.Collection;
 import com.sparta.oishitable.domain.collection.repository.CollectionRepository;
 import com.sparta.oishitable.domain.user.entity.User;
@@ -10,8 +11,11 @@ import com.sparta.oishitable.global.exception.ForbiddenException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -56,6 +60,10 @@ public class CollectionService {
         }
 
         collectionRepository.delete(collection);
+    }
+    
+    public List<CollectionInfoResponse> findCollectionList(Long userId) {
+        return collectionRepository.findAllByUserId(userId);
     }
 
     private Collection findById(Long collectionId) {
