@@ -2,7 +2,7 @@ package com.sparta.oishitable.domain.collection.entity;
 
 import com.sparta.oishitable.domain.collection.dto.request.CollectionUpdateRequest;
 import com.sparta.oishitable.domain.common.BaseEntity;
-import com.sparta.oishitable.domain.user.entity.User;
+import com.sparta.oishitable.domain.common.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
