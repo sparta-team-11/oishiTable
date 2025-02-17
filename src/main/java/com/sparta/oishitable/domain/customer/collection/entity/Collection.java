@@ -1,6 +1,6 @@
-package com.sparta.oishitable.domain.collection.entity;
+package com.sparta.oishitable.domain.customer.collection.entity;
 
-import com.sparta.oishitable.domain.collection.dto.request.CollectionUpdateRequest;
+import com.sparta.oishitable.domain.customer.collection.dto.request.CollectionUpdateRequest;
 import com.sparta.oishitable.domain.common.BaseEntity;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import jakarta.persistence.*;
@@ -19,8 +19,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Collection extends BaseEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "collections_id")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "collection_id")
     private Long id;
 
     @Column(length = 10, nullable = false)
@@ -37,7 +38,7 @@ public class Collection extends BaseEntity {
     private User user;
 
     @Builder
-    public Collection(Long id, String name, String description, Boolean isPublic, User user) {
+    public Collection(Long id, String name, String description, boolean isPublic, User user) {
         this.id = id;
         this.name = name;
         this.description = description;

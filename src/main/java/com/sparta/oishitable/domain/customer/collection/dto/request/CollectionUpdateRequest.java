@@ -1,4 +1,4 @@
-package com.sparta.oishitable.domain.collection.dto.request;
+package com.sparta.oishitable.domain.customer.collection.dto.request;
 
 
 public record CollectionUpdateRequest(

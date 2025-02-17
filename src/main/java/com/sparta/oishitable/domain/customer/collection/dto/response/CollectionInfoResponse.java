@@ -1,4 +1,4 @@
-package com.sparta.oishitable.domain.collection.dto.response;
+package com.sparta.oishitable.domain.customer.collection.dto.response;
 
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
