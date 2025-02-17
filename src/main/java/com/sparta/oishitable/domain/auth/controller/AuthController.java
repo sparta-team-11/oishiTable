@@ -1,7 +1,8 @@
 package com.sparta.oishitable.domain.auth.controller;
 
 import com.sparta.oishitable.domain.auth.dto.request.AccessTokenReissueReq;
-import com.sparta.oishitable.domain.auth.dto.request.AuthSigninRequest;
+import com.sparta.oishitable.domain.auth.dto.request.AuthLoginRequest;
+import com.sparta.oishitable.domain.auth.dto.request.AuthSignupRequest;
 import com.sparta.oishitable.domain.auth.dto.response.AuthLoginResponse;
 import com.sparta.oishitable.domain.auth.dto.response.AuthSignupResponse;
 import com.sparta.oishitable.domain.auth.service.AuthService;
@@ -21,12 +22,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<AuthSignupResponse> signup(@Valid @RequestBody AuthSigninRequest request) {
+    public ResponseEntity<AuthSignupResponse> signup(@Valid @RequestBody AuthSignupRequest request) {
         return ResponseEntity.ok(authService.signup(request));
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<AuthLoginResponse> signin(@Valid @RequestBody AuthSigninRequest request) {
+    public ResponseEntity<AuthLoginResponse> signin(@Valid @RequestBody AuthLoginRequest request) {
         return ResponseEntity.ok(authService.signin(request));
     }
 
