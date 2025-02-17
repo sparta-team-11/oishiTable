@@ -7,7 +7,9 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.oishitable.domain.comment.dto.response.CommentResponse;
+import com.sparta.oishitable.domain.comment.entity.Comment;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -72,5 +74,14 @@ public class CommentRepositoryQuerydslImpl implements CommentRepositoryQuerydsl{
             .orderBy(comment.createdAt.desc())
             .limit(limit)
             .fetch();
+    }
+
+    @Override
+    public Optional<Comment> findCommentWithRepliesById(Long commentId) {
+        return  Optional.ofNullable(queryFactory
+            .selectFrom(comment)
+            .leftJoin(comment.replies).fetchJoin()
+            .where(comment.id.eq(commentId))
+            .fetchOne());
     }
 }

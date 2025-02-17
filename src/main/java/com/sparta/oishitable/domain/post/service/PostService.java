@@ -32,9 +32,9 @@ public class PostService {
 
 
     @Transactional
-    public void create(PostCreateRequest request) {
+    public void create(Long userId, PostCreateRequest request) {
 
-        User user = findUserById(request.userId());
+        User user = findUserById(userId);
         Region region = findRegionById(request.regionId());
 
         Post post = Post.builder()
@@ -100,11 +100,11 @@ public class PostService {
     }
 
     @Transactional
-    public void update(Long postId, PostUpdateRequest request) {
+    public void update(Long userId, Long postId, PostUpdateRequest request) {
 
         Post post = findPostById(postId);
 
-        isPostOwner(post.getUser().getId(), request.userId());
+        isPostOwner(post.getUser().getId(), userId);
 
         Region region = regionRepository.findById(request.regionId()).orElse(null);
 

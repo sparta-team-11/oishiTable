@@ -1,6 +1,7 @@
 package com.sparta.oishitable.domain.comment.service;
 
 import com.sparta.oishitable.domain.comment.dto.request.CommentCreateRequest;
+import com.sparta.oishitable.domain.comment.dto.request.CommentUpdateRequest;
 import com.sparta.oishitable.domain.comment.dto.response.CommentResponse;
 import com.sparta.oishitable.domain.comment.entity.Comment;
 import com.sparta.oishitable.domain.comment.repository.CommentRepository;
@@ -10,6 +11,7 @@ import com.sparta.oishitable.domain.user.entity.User;
 import com.sparta.oishitable.domain.user.repository.UserRepository;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -29,13 +31,14 @@ public class CommentService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void create(CommentCreateRequest request) {
+    public void create(Long userId, CommentCreateRequest request) {
 
         Post post = findPostById(request.postId());
-        User user = findUserById(request.userId());
+        User user = findUserById(userId);
 
         // 부분적으로 빌드 후 게시글 댓글인지 대댓글인지 구분 후 조건에 따라 완성
         Comment.CommentBuilder builder = Comment.builder()
+            .post(post)
             .content(request.content())
             .user(user);
 
@@ -43,8 +46,11 @@ public class CommentService {
             // 대댓글 : 부모 댓글 조회 후 설정
             Comment parentComment = findCommentById(request.parentId());
 
+            if (!post.getId().equals(parentComment.getPost().getId())) {
+                throw new CustomRuntimeException(ErrorCode.POST_NOT_EQUAL);
+            }
+
             Comment comment = builder.parent(parentComment)
-                .post(parentComment.getPost())
                 .build();
 
             // 댓글의 대댓글 리스트에만 추가
@@ -54,8 +60,7 @@ public class CommentService {
 
         } else {
             // 게시글 댓글
-            Comment comment = builder.post(post)
-                    .build();
+            Comment comment = builder.build();
 
             // 게시글의 댓글리스트에 추가
             post.addComment(comment);
@@ -86,6 +91,27 @@ public class CommentService {
         boolean hasNext = replies.size() == limit;
 
         return new SliceImpl<>(replies, PageRequest.of(0, limit), hasNext);
+    }
+
+    @Transactional
+    public void update(Long userId, Long commentId, CommentUpdateRequest request) {
+
+        Comment comment = findCommentById(commentId);
+
+        isCommentOwner(comment.getUser().getId(), userId);
+
+        comment.update(request.content());
+    }
+
+    @Transactional
+    public void delete(Long commentId, Long userId) {
+
+        Comment comment = commentRepository.findCommentWithRepliesById(commentId)
+            .orElseThrow(() -> new CustomRuntimeException(ErrorCode.COMMENT_NOT_FOUND));
+
+        isCommentOwner(comment.getUser().getId(), userId);
+
+        commentRepository.delete(comment);
     }
 
 
