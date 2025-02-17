@@ -1,11 +1,12 @@
 package com.sparta.oishitable.domain.comment.repository;
 
 
+import static com.sparta.oishitable.domain.comment.entity.QComment.comment;
+
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.oishitable.domain.comment.dto.response.CommentResponse;
-import com.sparta.oishitable.domain.comment.entity.QComment;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Repository;
 public class CommentRepositoryQuerydslImpl implements CommentRepositoryQuerydsl{
 
     private final JPAQueryFactory queryFactory;
-    private final QComment comment = QComment.comment;
 
     @Override
     public List<CommentResponse> findPostComments(Long postId, Long cursorValue, int limit) {
