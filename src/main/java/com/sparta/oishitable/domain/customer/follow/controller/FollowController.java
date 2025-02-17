@@ -22,11 +22,11 @@ public class FollowController {
     private final FollowService followService;
 
     @PostMapping("/{followingId}")
-    public ResponseEntity<Void> createFollow(
+    public ResponseEntity<Void> followUser(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long followingId
     ) {
-        Long followId = followService.createFollow(userDetails.getId(), followingId);
+        Long followId = followService.followUser(userDetails.getId(), followingId);
 
         URI location = UriBuilderUtil.create("/customer/api/follows", followId);
 
@@ -34,11 +34,11 @@ public class FollowController {
     }
 
     @DeleteMapping("/{followingId}")
-    public ResponseEntity<Void> deleteUnfollow(
+    public ResponseEntity<Void> unfollowUser(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long followingId
     ) {
-        followService.deleteUnfollow(userDetails.getId(), followingId);
+        followService.unfollowUser(userDetails.getId(), followingId);
 
         return ResponseEntity.noContent().build();
     }

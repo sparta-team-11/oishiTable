@@ -22,7 +22,7 @@ public class FollowService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Long createFollow(Long followerId, Long followingId) {
+    public Long followUser(Long followerId, Long followingId) {
         if (followerId.equals(followingId)) {
             throw new CustomRuntimeException(ErrorCode.CANNOT_FOLLOW_SELF);
         }
@@ -48,7 +48,7 @@ public class FollowService {
     }
 
     @Transactional
-    public void deleteUnfollow(Long followerId, Long followingId) {
+    public void unfollowUser(Long followerId, Long followingId) {
         Follow follow = followRepository.findByFollowerIdAndFollowingId(followerId, followingId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorCode.FOLLOW_NOT_FOUND));
 
