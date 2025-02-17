@@ -13,6 +13,10 @@ import lombok.NoArgsConstructor;
         name = "follows",
         uniqueConstraints = {
                 @UniqueConstraint(name = "uq_follower_following", columnNames = {"follower_id", "following_id"})
+        },
+        indexes = {
+                @Index(name = "idx_fk_follower_id", columnList = "follower_id"),
+                @Index(name = "idx_fk_following_id", columnList = "following_id")
         }
 )
 @Getter
