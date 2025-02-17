@@ -71,7 +71,11 @@ public enum ErrorCode {
 
     // 북마크 관련 익셉션
     BOOKMARK_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 북마크입니다."),
-    BOOKMARK_ALREADY_EXISTS_RESTAURANT(HttpStatus.CONFLICT, "이미 북마크된 식당입니다.");
+    BOOKMARK_ALREADY_EXISTS_RESTAURANT(HttpStatus.CONFLICT, "이미 북마크된 식당입니다."),
+
+    // 컬렉션 관련 익셉션
+    COLLECTION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 컬렉션입니다.")
+    ;
 
     private final HttpStatus status;
     private final String message;
