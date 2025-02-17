@@ -12,9 +12,8 @@ public enum ErrorCode {
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
-    INVALID_USER_ROLE(HttpStatus.BAD_REQUEST, "유효하지 않은 사용자 권한입니다."),
 
-    USER_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다"),
+    USER_UNAUTHORIZED(HttpStatus.FORBIDDEN, "접근 권한이 없습니다"),
 
     // 식당 관련 익셉션
     RESTAURANT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 식당 입니다."),
@@ -67,7 +66,12 @@ public enum ErrorCode {
     // 좋아요 관련 익셉션
     LIKE_DUPLICATED(HttpStatus.BAD_REQUEST, "이미 좋아요를 누르셨습니다."),
 
-    LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요를 누르지 않으셨습니다");
+    LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요를 누르지 않으셨습니다"),
+
+    // 북마크 관련 익셉션
+    BOOKMARK_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 북마크입니다."),
+    BOOKMARK_ALREADY_EXISTS_RESTAURANT(HttpStatus.CONFLICT, "이미 북마크된 식당입니다.")
+    ;
 
     private final HttpStatus status;
     private final String message;
