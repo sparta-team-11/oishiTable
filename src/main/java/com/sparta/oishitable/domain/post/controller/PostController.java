@@ -40,7 +40,7 @@ public class PostController {
 
     @GetMapping
     public ResponseEntity<FeedRandomResponse> readAllPosts(
-        @RequestParam(required = false) Long userId,
+        @AuthenticationPrincipal CustomUserDetails user,
         @RequestParam(required = false) Long regionId,
         @RequestParam(required = false) Long cursorValue, // 마지막 행의 랜덤 값
         @RequestParam(required = false) Integer randomSeed, // 클라이언트가 전달하는 이전 랜덤 시드값
@@ -50,7 +50,7 @@ public class PostController {
         int seed = (cursorValue == null || randomSeed == null) ? new Random().nextInt() : randomSeed;
 
         FeedRandomResponse response = postService.getAllPosts(
-            userId,
+            user.getId(),
             regionId,
             cursorValue,
             limit,
