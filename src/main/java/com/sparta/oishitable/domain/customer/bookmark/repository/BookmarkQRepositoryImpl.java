@@ -4,6 +4,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.oishitable.domain.customer.bookmark.entity.Bookmark;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.sparta.oishitable.domain.customer.bookmark.entity.QBookmark.bookmark;
@@ -36,5 +37,13 @@ public class BookmarkQRepositoryImpl implements BookmarkQRepository {
                         bookmark.restaurant.id.eq(restaurantId)
                 )
                 .fetchOne());
+    }
+
+    @Override
+    public List<Bookmark> findAllByBookmarkIds(List<Long> bookmarkIds) {
+        return queryFactory
+                .selectFrom(bookmark)
+                .where(bookmark.id.in(bookmarkIds))
+                .fetch();
     }
 }
