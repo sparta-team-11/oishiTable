@@ -29,11 +29,11 @@ public record RestaurantCreateRequest(
 
         @NotBlank
         @JsonFormat(pattern = "HH:mm")
-        LocalTime breakStartTime,
+        LocalTime breakTimeStart,
 
         @NotBlank
         @JsonFormat(pattern = "HH:mm")
-        LocalTime breakEndTime,
+        LocalTime breakTimeEnd,
 
         @NotBlank
         String introduce,
@@ -54,8 +54,8 @@ public record RestaurantCreateRequest(
                 .location(location)
                 .openTime(openTime)
                 .closeTime(closeTime)
-                .breakStartTime(breakStartTime)
-                .breakEndTime(breakEndTime)
+                .breakStartTime(breakTimeStart)
+                .breakEndTime(breakTimeEnd)
                 .introduce(introduce)
                 .deposit(deposit)
                 .reservationInterval(reservationInterval)
