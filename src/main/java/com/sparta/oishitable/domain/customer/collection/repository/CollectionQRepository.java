@@ -9,5 +9,6 @@ import java.util.Optional;
 public interface CollectionQRepository {
 
     Optional<CollectionDetailResponse> findCollectionDetail(Long collectionId);
+
     List<CollectionInfoResponse> findAllByUserId(Long userId);
 }

@@ -17,7 +17,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/collections")
+@RequestMapping("/customer/api/collections")
 @RequiredArgsConstructor
 public class CollectionController {
 
@@ -25,13 +25,13 @@ public class CollectionController {
 
     @PostMapping
     public ResponseEntity<Void> createCollection(
-            @AuthenticationPrincipal CustomUserDetails user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody @Valid CollectionCreateRequest collectionCreateRequest
     ) {
-        Long collectionId = collectionService.createCollection(user.getId(), collectionCreateRequest);
-        URI redirectUri = UriBuilderUtil.create("/api/collections/{collectionId}", collectionId);
+        Long collectionId = collectionService.createCollection(userDetails.getId(), collectionCreateRequest);
+        URI location = UriBuilderUtil.create("/api/collections/{collectionId}", collectionId);
 
-        return ResponseEntity.created(redirectUri).build();
+        return ResponseEntity.created(location).build();
     }
 
     @GetMapping("/{collectionId}")
@@ -45,9 +45,9 @@ public class CollectionController {
 
     @GetMapping
     public ResponseEntity<List<CollectionInfoResponse>> findCollections(
-            @AuthenticationPrincipal CustomUserDetails user
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        List<CollectionInfoResponse> collections = collectionService.findCollections(user.getId());
+        List<CollectionInfoResponse> collections = collectionService.findCollections(userDetails.getId());
 
         return ResponseEntity.ok(collections);
     }
@@ -55,10 +55,10 @@ public class CollectionController {
     @PatchMapping("/{collectionId}")
     public ResponseEntity<Void> updateCollection(
             @PathVariable Long collectionId,
-            @AuthenticationPrincipal CustomUserDetails user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody @Valid CollectionUpdateRequest collectionUpdateRequest
     ) {
-        collectionService.updateCollection(user.getId(), collectionId, collectionUpdateRequest);
+        collectionService.updateCollection(userDetails.getId(), collectionId, collectionUpdateRequest);
 
         return ResponseEntity.noContent().build();
     }
@@ -66,9 +66,9 @@ public class CollectionController {
     @DeleteMapping("/{collectionId}")
     public ResponseEntity<Void> deleteCollection(
             @PathVariable Long collectionId,
-            @AuthenticationPrincipal CustomUserDetails user
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        collectionService.deleteCollection(user.getId(), collectionId);
+        collectionService.deleteCollection(userDetails.getId(), collectionId);
 
         return ResponseEntity.noContent().build();
     }

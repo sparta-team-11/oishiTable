@@ -1,12 +1,13 @@
 package com.sparta.oishitable.domain.customer.bookmark.service;
 
+import com.sparta.oishitable.domain.common.user.entity.User;
+import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.domain.customer.bookmark.entity.Bookmark;
 import com.sparta.oishitable.domain.customer.bookmark.repository.BookmarkRepository;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.repository.RestaurantRepository;
-import com.sparta.oishitable.domain.common.user.entity.User;
-import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.global.exception.ConflictException;
+import com.sparta.oishitable.global.exception.ForbiddenException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -43,10 +44,26 @@ public class BookmarkService {
     }
 
     @Transactional
-    public void deleteBookmark(Long userId, Long restaurantId) {
+    public void deleteBookmark(Long userId, Long bookmarkId) {
+        Bookmark bookmark = findById(bookmarkId);
+
+        if (!bookmark.getUser().getId().equals(userId)) {
+            throw new ForbiddenException(ErrorCode.USER_UNAUTHORIZED);
+        }
+
+        bookmarkRepository.delete(bookmark);
+    }
+
+    @Transactional
+    public void deleteBookmarkByUserIdAndRestaurantId(Long userId, Long restaurantId) {
         Bookmark bookmark = findByUserIdAndRestaurantId(userId, restaurantId);
 
         bookmarkRepository.delete(bookmark);
+    }
+
+    private Bookmark findById(Long bookmarkId) {
+        return bookmarkRepository.findById(bookmarkId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.BOOKMARK_NOT_FOUND));
     }
 
     private Bookmark findByUserIdAndRestaurantId(Long userId, Long restaurantId) {
