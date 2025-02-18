@@ -7,17 +7,20 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 public record ReservationFindResponse(
-    @NotNull
-    Long restaurantSeatId,
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @NotNull
-    LocalDateTime date,
-    @NotNull
-    Integer totalCount,
-    @NotNull
-    String seatTypeName,
-    @NotNull
-    ReservationStatus status,
-    @NotNull
-    boolean couponExist
-) {}
+        @NotNull
+        Long restaurantSeatId,
+
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        @NotNull
+        LocalDateTime date,
+
+        @NotNull
+        Integer totalCount,
+
+        @NotNull
+        String seatTypeName,
+
+        @NotNull
+        ReservationStatus status
+) {
+}

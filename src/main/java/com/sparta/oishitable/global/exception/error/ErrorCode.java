@@ -30,7 +30,9 @@ public enum ErrorCode {
 
     // RESTAURANT_SEAT_TYPE 관련 익셉션
     RESTAURANT_SEAT_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 레스토랑 좌석입니다."),
-    RESTAURANT_SEAT_TYPE_QUANTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "가게 좌석의 수량이 부족합니다"),
+    RESTAURANT_SEAT_TYPE_QUANTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "가게 좌석의 수량이 부족합니다."),
+    BELOW_MIN_GUEST_COUNT(HttpStatus.BAD_REQUEST, "좌석 유형에 필요한 최소 인원보다 적습니다."),
+    EXCEEDS_MAX_GUEST_COUNT(HttpStatus.BAD_REQUEST, "좌석 유형에 필요한 최대 인원보다 많습니다."),
 
 
     // 예약 관련 익셉션
