@@ -118,7 +118,7 @@ public class ReservationService {
 
         reservation.complete();
 
-        boolean couponProvided = (reservation.getCoupon() != null && reservation.getCoupon().getCouponExist());
+        boolean couponExist = (reservation.getCoupon() != null && reservation.getCoupon().getCouponExist());
 
         return new ReservationFindResponse(
                 reservation.getRestaurantSeat().getId(),
@@ -126,7 +126,7 @@ public class ReservationService {
                 reservation.getTotalCount(),
                 reservation.getRestaurantSeat().getSeatType().getName(),
                 reservation.getStatus(),
-                couponProvided
+                couponExist
         );
     }
 
@@ -136,7 +136,7 @@ public class ReservationService {
 
         return reservations.stream()
                 .map(reservation -> {
-                    boolean couponProvided = (reservation.getCoupon() != null && reservation.getCoupon().getCouponExist());
+                    boolean couponExist = (reservation.getCoupon() != null && reservation.getCoupon().getCouponExist());
 
                     return new ReservationFindResponse(
                             reservation.getRestaurantSeat().getId(),
@@ -144,7 +144,7 @@ public class ReservationService {
                             reservation.getTotalCount(),
                             reservation.getRestaurantSeat().getSeatType().getName(),
                             reservation.getStatus(),
-                            couponProvided
+                            couponExist
                             );
                 })
                 .collect(Collectors.toList());

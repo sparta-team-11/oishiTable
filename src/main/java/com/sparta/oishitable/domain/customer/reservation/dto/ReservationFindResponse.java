@@ -19,5 +19,5 @@ public record ReservationFindResponse(
     @NotNull
     ReservationStatus status,
     @NotNull
-    boolean couponProvided
+    boolean couponExist
 ) {}
