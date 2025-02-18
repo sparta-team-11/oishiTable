@@ -1,7 +1,7 @@
-package com.sparta.oishitable.domain.customer.comment.like.entity;
+package com.sparta.oishitable.domain.customer.post.like.entity;
 
 import com.sparta.oishitable.domain.common.user.entity.User;
-import com.sparta.oishitable.domain.customer.comment.entity.Comment;
+import com.sparta.oishitable.domain.customer.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -10,18 +10,18 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(
-        name = "comment_likes",
+        name = "post_likes",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"user_id", "comment_id"})
+                @UniqueConstraint(columnNames = {"user_id", "post_id"})
         }
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CommentLike {
+public class PostLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comment_like_id")
+    @Column(name = "post_like_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,13 +29,13 @@ public class CommentLike {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comment_id")
-    private Comment comment;
+    @JoinColumn(name = "post_id")
+    private Post post;
 
     @Builder
-    public CommentLike(Long id, User user, Comment comment) {
+    public PostLike(Long id, User user, Post post) {
         this.id = id;
         this.user = user;
-        this.comment = comment;
+        this.post = post;
     }
 }

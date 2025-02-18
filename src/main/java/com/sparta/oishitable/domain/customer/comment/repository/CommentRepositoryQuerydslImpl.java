@@ -9,6 +9,10 @@ import com.sparta.oishitable.domain.customer.comment.dto.response.CommentReplies
 import com.sparta.oishitable.domain.customer.comment.entity.Comment;
 import com.sparta.oishitable.domain.customer.comment.entity.QComment;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -62,17 +66,19 @@ public class CommentRepositoryQuerydslImpl implements CommentRepositoryQuerydsl 
     }
 
     @Override
-    public List<CommentRepliesResponse> findReplies(Long parentCommentId, Long cursorValue, int limit) {
+    public Page<CommentRepliesResponse> findReplies(Long parentCommentId, Pageable pageable) {
 
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (cursorValue != null) {
-            builder.and(comment.id.lt(cursorValue));
-        }
-
         builder.and(comment.parent.id.eq(parentCommentId));
 
-        return queryFactory
+        Long total = queryFactory
+                .select(comment.count())
+                .from(comment)
+                .where(builder)
+                .fetchOne();
+
+        List<CommentRepliesResponse> result = queryFactory
                 .select(
                         Projections.constructor(CommentRepliesResponse.class,
                                 comment.id,
@@ -90,8 +96,11 @@ public class CommentRepositoryQuerydslImpl implements CommentRepositoryQuerydsl 
                 .from(comment)
                 .where(builder)
                 .orderBy(comment.createdAt.desc())
-                .limit(limit)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
+
+        return new PageImpl<>(result, pageable, total);
     }
 
     @Override

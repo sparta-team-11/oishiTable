@@ -6,12 +6,14 @@ import com.sparta.oishitable.domain.customer.post.dto.response.FeedKeywordRespon
 import com.sparta.oishitable.domain.customer.post.dto.response.FeedRandomResponse;
 import com.sparta.oishitable.domain.customer.post.service.PostService;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
+import com.sparta.oishitable.global.util.UriBuilderUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.Random;
 
 @RestController
@@ -22,17 +24,19 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping
-    public ResponseEntity<Void> create(
+    public ResponseEntity<Void> createPost(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody @Valid PostCreateRequest request
     ) {
-        postService.create(userDetails.getId(), request);
+        Long postId = postService.createPost(userDetails.getId(), request);
 
-        return ResponseEntity.created(null).build();
+        URI location = UriBuilderUtil.create("/customer/api/posts/{postId}", postId);
+
+        return ResponseEntity.created(location).build();
     }
 
     @GetMapping
-    public ResponseEntity<FeedRandomResponse> readAllPosts(
+    public ResponseEntity<FeedRandomResponse> findPostsByRandom(
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) Long regionId,
             @RequestParam(required = false) Long cursorValue, // 마지막 행의 랜덤 값
@@ -42,7 +46,7 @@ public class PostController {
         // 커서값이 null 이거나 랜덤시드가 전달되지 않았으면 새로운 랜덤시드 생성
         int seed = (cursorValue == null || randomSeed == null) ? new Random().nextInt() : randomSeed;
 
-        FeedRandomResponse response = postService.getAllPosts(
+        FeedRandomResponse response = postService.findPostsByRandom(
                 userId,
                 regionId,
                 cursorValue,
@@ -53,14 +57,14 @@ public class PostController {
     }
 
     @GetMapping("/keyword")
-    public ResponseEntity<FeedKeywordResponse> readPostsByKeyword(
+    public ResponseEntity<FeedKeywordResponse> findPostsByKeyword(
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) Long regionId,
             @RequestParam(required = false) Long cursorValue,
             @RequestParam String keyword,
             @RequestParam(defaultValue = "10") int limit
     ) {
-        FeedKeywordResponse response = postService.getPostsByKeyword(
+        FeedKeywordResponse response = postService.findPostsByKeyword(
                 userId,
                 regionId,
                 cursorValue,
@@ -72,22 +76,22 @@ public class PostController {
     }
 
     @PatchMapping("/{postId}")
-    public ResponseEntity<Void> update(
+    public ResponseEntity<Void> updatePost(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long postId,
             @RequestBody @Valid PostUpdateRequest request
     ) {
-        postService.update(userDetails.getId(), postId, request);
+        postService.updatePost(userDetails.getId(), postId, request);
 
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{postId}")
-    public ResponseEntity<Void> delete(
+    public ResponseEntity<Void> deletePost(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long postId
     ) {
-        postService.delete(postId, userDetails.getId());
+        postService.deletePost(postId, userDetails.getId());
 
         return ResponseEntity.noContent().build();
     }

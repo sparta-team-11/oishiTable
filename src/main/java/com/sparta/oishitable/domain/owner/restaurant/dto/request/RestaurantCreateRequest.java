@@ -1,6 +1,7 @@
 package com.sparta.oishitable.domain.owner.restaurant.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurantseat.dto.request.RestaurantSeatCreateRequest;
 import jakarta.validation.constraints.NotBlank;
@@ -29,11 +30,11 @@ public record RestaurantCreateRequest(
 
         @NotBlank
         @JsonFormat(pattern = "HH:mm")
-        LocalTime breakStartTime,
+        LocalTime breakTimeStart,
 
         @NotBlank
         @JsonFormat(pattern = "HH:mm")
-        LocalTime breakEndTime,
+        LocalTime breakTimeEnd,
 
         @NotBlank
         String introduce,
@@ -48,17 +49,18 @@ public record RestaurantCreateRequest(
         List<RestaurantSeatCreateRequest> restaurantSeatCreateRequestList
 ) {
 
-    public Restaurant toEntity() {
+    public Restaurant toEntity(User owner) {
         return Restaurant.builder()
                 .name(name)
                 .location(location)
                 .openTime(openTime)
                 .closeTime(closeTime)
-                .breakStartTime(breakStartTime)
-                .breakEndTime(breakEndTime)
+                .breakTimeStart(breakTimeStart)
+                .breakTimeEnd(breakTimeEnd)
                 .introduce(introduce)
                 .deposit(deposit)
                 .reservationInterval(reservationInterval)
+                .owner(owner)
                 .build();
     }
 }

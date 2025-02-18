@@ -1,6 +1,7 @@
 package com.sparta.oishitable.domain.owner.restaurant.entity;
 
 import com.sparta.oishitable.domain.common.BaseEntity;
+import com.sparta.oishitable.domain.common.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -10,7 +11,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "restaurants")
+@Table(
+        name = "restaurants",
+        indexes = {
+                @Index(name = "idx_fk_owner_id", columnList = "owner_id")
+        })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Restaurant extends BaseEntity {
@@ -33,19 +38,23 @@ public class Restaurant extends BaseEntity {
     private LocalTime closeTime;
 
     @Column(nullable = false)
-    private LocalTime breakStartTime;
+    private LocalTime breakTimeStart;
 
     @Column(nullable = false)
-    private LocalTime breakEndTime;
+    private LocalTime breakTimeEnd;
 
     @Column(nullable = false)
     private String introduce;
 
     @Column(nullable = false)
-    private Integer deposit;
+    private int deposit;
 
     @Column(nullable = false)
     private LocalTime reservationInterval;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
 
     @Builder
     public Restaurant(
@@ -54,22 +63,24 @@ public class Restaurant extends BaseEntity {
             String location,
             LocalTime openTime,
             LocalTime closeTime,
-            LocalTime breakStartTime,
-            LocalTime breakEndTime,
+            LocalTime breakTimeStart,
+            LocalTime breakTimeEnd,
             String introduce,
-            Integer deposit,
-            LocalTime reservationInterval
+            int deposit,
+            LocalTime reservationInterval,
+            User owner
     ) {
         this.id = id;
         this.name = name;
         this.location = location;
         this.openTime = openTime;
         this.closeTime = closeTime;
-        this.breakStartTime = breakStartTime;
-        this.breakEndTime = breakEndTime;
+        this.breakTimeStart = breakTimeStart;
+        this.breakTimeEnd = breakTimeEnd;
         this.introduce = introduce;
         this.deposit = deposit;
         this.reservationInterval = reservationInterval;
+        this.owner = owner;
     }
 
     public void updateProfile(String name, String introduce, Integer deposit) {

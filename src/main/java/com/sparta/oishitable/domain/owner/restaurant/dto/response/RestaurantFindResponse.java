@@ -1,14 +1,14 @@
-package com.sparta.oishitable.domain.customer.restaurant.dto.response;
+package com.sparta.oishitable.domain.owner.restaurant.dto.response;
 
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
-import lombok.AccessLevel;
 import lombok.Builder;
 
 import java.time.LocalTime;
 
-@Builder(access = AccessLevel.PRIVATE)
-public record RestaurantResponse(
+@Builder
+public record RestaurantFindResponse(
         Long restaurantId,
+        Long ownerId,
         String name,
         String location,
         LocalTime openTime,
@@ -16,13 +16,14 @@ public record RestaurantResponse(
         LocalTime breakTimeStart,
         LocalTime breakTimeEnd,
         String introduce,
-        Integer deposit,
+        int deposit,
         LocalTime reservationInterval
 ) {
 
-    public static RestaurantResponse from(Restaurant restaurant) {
-        return RestaurantResponse.builder()
+    public static RestaurantFindResponse from(Restaurant restaurant) {
+        return RestaurantFindResponse.builder()
                 .restaurantId(restaurant.getId())
+                .ownerId(restaurant.getOwner().getId())
                 .name(restaurant.getName())
                 .location(restaurant.getLocation())
                 .openTime(restaurant.getOpenTime())
