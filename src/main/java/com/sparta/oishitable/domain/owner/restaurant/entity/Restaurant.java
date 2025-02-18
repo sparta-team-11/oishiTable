@@ -33,10 +33,10 @@ public class Restaurant extends BaseEntity {
     private LocalTime closeTime;
 
     @Column(nullable = false)
-    private LocalTime breakStartTime;
+    private LocalTime breakTimeStart;
 
     @Column(nullable = false)
-    private LocalTime breakEndTime;
+    private LocalTime breakTimeEnd;
 
     @Column(nullable = false)
     private String introduce;
@@ -54,8 +54,8 @@ public class Restaurant extends BaseEntity {
             String location,
             LocalTime openTime,
             LocalTime closeTime,
-            LocalTime breakStartTime,
-            LocalTime breakEndTime,
+            LocalTime breakTimeStart,
+            LocalTime breakTimeEnd,
             String introduce,
             Integer deposit,
             LocalTime reservationInterval
@@ -65,8 +65,8 @@ public class Restaurant extends BaseEntity {
         this.location = location;
         this.openTime = openTime;
         this.closeTime = closeTime;
-        this.breakStartTime = breakStartTime;
-        this.breakEndTime = breakEndTime;
+        this.breakTimeStart = breakTimeStart;
+        this.breakTimeEnd = breakTimeEnd;
         this.introduce = introduce;
         this.deposit = deposit;
         this.reservationInterval = reservationInterval;
