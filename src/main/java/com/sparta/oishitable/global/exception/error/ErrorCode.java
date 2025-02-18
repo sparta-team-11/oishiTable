@@ -14,14 +14,14 @@ public enum ErrorCode {
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
     INVALID_USER_ROLE(HttpStatus.BAD_REQUEST, "유효하지 않은 사용자 권한입니다."),
 
-    USER_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다"),
+    USER_UNAUTHORIZED(HttpStatus.FORBIDDEN, "접근 권한이 없습니다"),
 
     // 식당 관련 익셉션
     RESTAURANT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 식당 입니다."),
 
     // SeatType 관련 익셉션
     SEAT_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 좌석 타입 입니다."),
-    SEAT_TYPE_NAME_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 좌석 타입 이름 입니다."),
+    SEAT_TYPE_NAME_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 좌석 타입 이름 입니다."),
 
     // 팔로우 관련 익셉션
     CANNOT_FOLLOW_SELF(HttpStatus.BAD_REQUEST, "자기 자신을 팔로우 할 수 없습니다."),
@@ -29,14 +29,14 @@ public enum ErrorCode {
     FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, "팔로우 관계를 찾을 수 없습니다."),
 
     // RESTAURANT_SEAT_TYPE 관련 익셉션
-    RESTAURANT_SEAT_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 레스토랑 좌석입니다."),
-    RESTAURANT_SEAT_TYPE_QUANTITY_NOT_FOUND(HttpStatus.NOT_FOUND,"가게 좌석의 수량이 부족합니다"),
+    RESTAURANT_SEAT_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 레스토랑 좌석입니다."),
+    RESTAURANT_SEAT_TYPE_QUANTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "가게 좌석의 수량이 부족합니다"),
 
 
     // 예약 관련 익셉션
-    RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 예약 입니다."),
-    RESERVATION_COUPON_LIMIT_EXCEEDED(HttpStatus.NOT_FOUND,"할인 쿠폰 지급 이벤트가 끝났습니다."),
-    RESERVATION_CONFLICT(HttpStatus.NOT_FOUND,"예약 동시성 오류"),
+    RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 예약 입니다."),
+    RESERVATION_COUPON_LIMIT_EXCEEDED(HttpStatus.NOT_FOUND, "할인 쿠폰 지급 이벤트가 끝났습니다."),
+    RESERVATION_CONFLICT(HttpStatus.NOT_FOUND, "예약 동시성 오류"),
 
     // Security 관련 익셉션
     LOGIN_FAILED_EXCEPTION(HttpStatus.UNAUTHORIZED, "로그인에 실패하였습니다."),
@@ -67,7 +67,15 @@ public enum ErrorCode {
     // 좋아요 관련 익셉션
     LIKE_DUPLICATED(HttpStatus.BAD_REQUEST, "이미 좋아요를 누르셨습니다."),
 
-    LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요를 누르지 않으셨습니다");
+    LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요를 누르지 않으셨습니다"),
+
+    // 북마크 관련 익셉션
+    BOOKMARK_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 북마크입니다."),
+    BOOKMARK_ALREADY_EXISTS_RESTAURANT(HttpStatus.CONFLICT, "이미 북마크된 식당입니다."),
+
+    // 컬렉션 관련 익셉션
+    COLLECTION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 컬렉션입니다.")
+    ;
 
     private final HttpStatus status;
     private final String message;
