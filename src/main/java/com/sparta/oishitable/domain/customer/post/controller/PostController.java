@@ -36,7 +36,7 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<FeedRandomResponse> findAllPosts(
+    public ResponseEntity<FeedRandomResponse> findPostsByRandom(
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) Long regionId,
             @RequestParam(required = false) Long cursorValue, // 마지막 행의 랜덤 값
@@ -46,7 +46,7 @@ public class PostController {
         // 커서값이 null 이거나 랜덤시드가 전달되지 않았으면 새로운 랜덤시드 생성
         int seed = (cursorValue == null || randomSeed == null) ? new Random().nextInt() : randomSeed;
 
-        FeedRandomResponse response = postService.findAllPosts(
+        FeedRandomResponse response = postService.findPostsByRandom(
                 userId,
                 regionId,
                 cursorValue,
