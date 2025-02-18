@@ -1,6 +1,7 @@
 package com.sparta.oishitable.domain.owner.restaurant.entity;
 
 import com.sparta.oishitable.domain.common.BaseEntity;
+import com.sparta.oishitable.domain.common.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -10,7 +11,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "restaurants")
+@Table(
+        name = "restaurants",
+        indexes = {
+                @Index(name = "idx_fk_owner_id", columnList = "owner_id")
+        })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Restaurant extends BaseEntity {
@@ -47,6 +52,10 @@ public class Restaurant extends BaseEntity {
     @Column(nullable = false)
     private LocalTime reservationInterval;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
+
     @Builder
     public Restaurant(
             Long id,
@@ -58,7 +67,8 @@ public class Restaurant extends BaseEntity {
             LocalTime breakTimeEnd,
             String introduce,
             int deposit,
-            LocalTime reservationInterval
+            LocalTime reservationInterval,
+            User owner
     ) {
         this.id = id;
         this.name = name;
@@ -70,6 +80,7 @@ public class Restaurant extends BaseEntity {
         this.introduce = introduce;
         this.deposit = deposit;
         this.reservationInterval = reservationInterval;
+        this.owner = owner;
     }
 
     public void updateProfile(String name, String introduce, Integer deposit) {

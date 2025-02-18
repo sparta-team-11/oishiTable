@@ -1,5 +1,7 @@
 package com.sparta.oishitable.domain.owner.restaurant.service;
 
+import com.sparta.oishitable.domain.common.user.entity.User;
+import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.domain.owner.restaurant.dto.request.RestaurantCreateRequest;
 import com.sparta.oishitable.domain.owner.restaurant.dto.request.RestaurantProfileUpdateRequest;
 import com.sparta.oishitable.domain.owner.restaurant.dto.response.RestaurantFindResponse;
@@ -18,11 +20,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class OwnerRestaurantService {
 
     private final RestaurantRepository restaurantRepository;
+    private final UserRepository userRepository;
     private final RestaurantSeatService restaurantSeatService;
 
     @Transactional
     public Long createRestaurant(RestaurantCreateRequest restaurantCreateRequest) {
-        Restaurant restaurant = restaurantCreateRequest.toEntity();
+        User owner = userRepository.findById(restaurantCreateRequest.userId())
+                .orElseThrow(() -> new CustomRuntimeException(ErrorCode.USER_NOT_FOUND));
+
+        Restaurant restaurant = restaurantCreateRequest.toEntity(owner);
         Restaurant savedRestaurant = restaurantRepository.save(restaurant);
 
         restaurantSeatService.createAllRestaurantSeat(

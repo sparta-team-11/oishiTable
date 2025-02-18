@@ -8,6 +8,7 @@ import java.time.LocalTime;
 @Builder
 public record RestaurantFindResponse(
         Long restaurantId,
+        Long ownerId,
         String name,
         String location,
         LocalTime openTime,
@@ -22,6 +23,7 @@ public record RestaurantFindResponse(
     public static RestaurantFindResponse from(Restaurant restaurant) {
         return RestaurantFindResponse.builder()
                 .restaurantId(restaurant.getId())
+                .ownerId(restaurant.getOwner().getId())
                 .name(restaurant.getName())
                 .location(restaurant.getLocation())
                 .openTime(restaurant.getOpenTime())
