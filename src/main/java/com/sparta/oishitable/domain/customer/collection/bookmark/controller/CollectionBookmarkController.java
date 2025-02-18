@@ -19,6 +19,18 @@ public class CollectionBookmarkController {
 
     private final CollectionBookmarkService collectionBookmarkService;
 
+    @PostMapping("/{bookmarkId}")
+    public ResponseEntity<Void> createCollectionBookmark(
+            @PathVariable Long collectionId,
+            @PathVariable Long bookmarkId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        collectionBookmarkService.createCollectionBookmark(userDetails.getId(), collectionId, bookmarkId);
+        URI location = UriBuilderUtil.create("/api/customer/collections/{collectionId}", collectionId);
+
+        return ResponseEntity.created(location).build();
+    }
+
     @PostMapping
     public ResponseEntity<Void> createCollectionBookmark(
             @PathVariable Long collectionId,
