@@ -30,7 +30,7 @@ public class CommentService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void create(Long userId, CommentCreateRequest request) {
+    public Long create(Long userId, CommentCreateRequest request) {
         Post post = findPostById(request.postId());
         User user = findUserById(userId);
 
@@ -56,6 +56,8 @@ public class CommentService {
 
             commentRepository.save(comment);
 
+            return comment.getId();
+
         } else {
             // 게시글 댓글
             Comment comment = builder.build();
@@ -64,6 +66,8 @@ public class CommentService {
             post.addComment(comment);
 
             commentRepository.save(comment);
+
+            return comment.getId();
         }
     }
 

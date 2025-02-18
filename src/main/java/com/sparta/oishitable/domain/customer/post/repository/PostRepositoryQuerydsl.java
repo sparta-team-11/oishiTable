@@ -9,5 +9,5 @@ public interface PostRepositoryQuerydsl {
 
     List<PostRandomResponse> findAllPosts(Long userId, Long regionId, Long cursorValue, int limit, int randomSeed);
 
-    List<PostKeywordResponse> getPostsByKeyword(Long userId, Long regionId, Long cursorValue, String keyword, int limit);
+    List<PostKeywordResponse> findPostsByKeyword(Long userId, Long regionId, Long cursorValue, String keyword, int limit);
 }

@@ -66,7 +66,7 @@ public class PostRepositoryQuerydslImpl implements PostRepositoryQuerydsl {
     }
 
     @Override
-    public List<PostKeywordResponse> getPostsByKeyword(
+    public List<PostKeywordResponse> findPostsByKeyword(
             Long userId,
             Long regionId,
             Long cursorValue,
