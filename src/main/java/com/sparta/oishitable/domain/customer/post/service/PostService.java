@@ -1,7 +1,7 @@
 package com.sparta.oishitable.domain.customer.post.service;
 
-import com.sparta.oishitable.domain.customer.post.region.entity.Region;
-import com.sparta.oishitable.domain.customer.post.region.repository.RegionRepository;
+import com.sparta.oishitable.domain.common.user.entity.User;
+import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.domain.customer.post.dto.request.PostCreateRequest;
 import com.sparta.oishitable.domain.customer.post.dto.request.PostUpdateRequest;
 import com.sparta.oishitable.domain.customer.post.dto.response.FeedKeywordResponse;
@@ -9,10 +9,11 @@ import com.sparta.oishitable.domain.customer.post.dto.response.FeedRandomRespons
 import com.sparta.oishitable.domain.customer.post.dto.response.PostKeywordResponse;
 import com.sparta.oishitable.domain.customer.post.dto.response.PostRandomResponse;
 import com.sparta.oishitable.domain.customer.post.entity.Post;
+import com.sparta.oishitable.domain.customer.post.region.entity.Region;
+import com.sparta.oishitable.domain.customer.post.region.repository.RegionRepository;
 import com.sparta.oishitable.domain.customer.post.repository.PostRepository;
-import com.sparta.oishitable.domain.common.user.entity.User;
-import com.sparta.oishitable.domain.common.user.repository.UserRepository;
-import com.sparta.oishitable.global.exception.CustomRuntimeException;
+import com.sparta.oishitable.global.exception.ForbiddenException;
+import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ public class PostService {
 
 
     @Transactional
-    public void create(Long userId, PostCreateRequest request) {
+    public Long createPost(Long userId, PostCreateRequest request) {
         User user = findUserById(userId);
         Region region = findRegionById(request.regionId());
 
@@ -45,16 +46,17 @@ public class PostService {
                 .build();
 
         postRepository.save(post);
+        return post.getId();
     }
 
-    public FeedRandomResponse getAllPosts(
+    public FeedRandomResponse findPostsByRandom(
             Long userId,
             Long regionId,
             Long cursorValue,
             int limit,
             int randomSeed
     ) {
-        List<PostRandomResponse> posts = postRepository.findAllPosts(
+        List<PostRandomResponse> posts = postRepository.findPostsByRandom(
                 userId,
                 regionId,
                 cursorValue,
@@ -72,14 +74,14 @@ public class PostService {
         return new FeedRandomResponse(posts, randomSeed, nextCursor, hasMore);
     }
 
-    public FeedKeywordResponse getPostsByKeyword(
+    public FeedKeywordResponse findPostsByKeyword(
             Long userId,
             Long regionId,
             Long cursorValue,
             String keyword,
             int limit
     ) {
-        List<PostKeywordResponse> posts = postRepository.getPostsByKeyword(
+        List<PostKeywordResponse> posts = postRepository.findPostsByKeyword(
                 userId,
                 regionId,
                 cursorValue,
@@ -100,7 +102,7 @@ public class PostService {
     }
 
     @Transactional
-    public void update(Long userId, Long postId, PostUpdateRequest request) {
+    public void updatePost(Long userId, Long postId, PostUpdateRequest request) {
         Post post = findPostById(postId);
 
         isPostOwner(post.getUser().getId(), userId);
@@ -111,7 +113,7 @@ public class PostService {
     }
 
     @Transactional
-    public void delete(Long postId, Long userId) {
+    public void deletePost(Long postId, Long userId) {
         Post post = findPostById(postId);
 
         isPostOwner(post.getUser().getId(), userId);
@@ -123,22 +125,22 @@ public class PostService {
 
     private User findUserById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new CustomRuntimeException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 
     private Region findRegionById(Long userId) {
         return regionRepository.findById(userId)
-                .orElseThrow(() -> new CustomRuntimeException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 
     private Post findPostById(Long postId) {
         return postRepository.findById(postId)
-                .orElseThrow(() -> new CustomRuntimeException(ErrorCode.POST_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND));
     }
 
     private void isPostOwner(Long postUserId, Long userId) {
         if (!Objects.equals(postUserId, userId)) {
-            throw new CustomRuntimeException(ErrorCode.USER_UNAUTHORIZED);
+            throw new ForbiddenException(ErrorCode.USER_UNAUTHORIZED);
         }
     }
 }
