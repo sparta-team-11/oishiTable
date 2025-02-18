@@ -8,6 +8,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 import java.time.LocalDateTime;
 
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 @Table(name = "reservations")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicInsert
 public class Reservation extends BaseEntity {
 
     @Id
@@ -27,6 +30,7 @@ public class Reservation extends BaseEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @ColumnDefault("'RESERVED'")
     private ReservationStatus status;
 
     @Column(nullable = false)
@@ -40,14 +44,6 @@ public class Reservation extends BaseEntity {
     @JoinColumn(name = "restaurant_seat_id")
     private RestaurantSeat restaurantSeat;
 
-    @Version  // 낙관적 락
-    private int version;
-
-    private Integer discount = 0;
-
-    @Column(nullable = false)
-    private boolean couponExist = false; // 쿠폰 발급
-
     @Builder
     public Reservation(
             Long id,
@@ -55,9 +51,7 @@ public class Reservation extends BaseEntity {
             ReservationStatus status,
             Integer totalCount,
             User user,
-            RestaurantSeat restaurantSeat,
-            Integer discount,
-            boolean couponExist
+            RestaurantSeat restaurantSeat
     ) {
         this.id = id;
         this.date = date;
@@ -65,8 +59,6 @@ public class Reservation extends BaseEntity {
         this.totalCount = totalCount;
         this.user = user;
         this.restaurantSeat = restaurantSeat;
-        this.discount = discount;
-        this.couponExist = couponExist;
     }
 
     public void cancel() {
@@ -75,10 +67,5 @@ public class Reservation extends BaseEntity {
 
     public void complete() {
         this.status = ReservationStatus.COMPLETED;
-    }
-
-    public void discountCoupon(int discount) {
-        this.discount = discount;
-        this.couponExist = true;
     }
 }
