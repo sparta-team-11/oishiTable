@@ -13,9 +13,7 @@ import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,18 +67,7 @@ public class CommentService {
         }
     }
 
-    public Slice<CommentRepliesResponse> getReplies(Long parentCommentId, Long cursorValue, int limit) {
-        List<CommentRepliesResponse> replies = commentRepository.findReplies(
-                parentCommentId,
-                cursorValue,
-                limit);
-
-        boolean hasNext = replies.size() == limit;
-
-        return new SliceImpl<>(replies, PageRequest.of(0, limit), hasNext);
-    }
-
-    public Slice<CommentPostResponse> getPostComments(Long postId, Long cursorValue, int limit) {
+    public Slice<CommentPostResponse> findPostComments(Long postId, Long cursorValue, int limit) {
         List<CommentPostResponse> replies = commentRepository.findPostComments(
                 postId,
                 cursorValue,
@@ -89,6 +76,16 @@ public class CommentService {
         boolean hasNext = replies.size() == limit;
 
         return new SliceImpl<>(replies, PageRequest.of(0, limit), hasNext);
+    }
+
+    public Page<CommentRepliesResponse> findReplies(Long parentCommentId, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page - 1 , size);
+
+        return commentRepository.findReplies(
+                parentCommentId,
+                pageable
+        );
     }
 
     @Transactional
