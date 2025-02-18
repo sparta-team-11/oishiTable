@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -73,26 +72,15 @@ public class ReservationService {
 
         reservation.complete();
 
-        return new ReservationFindResponse(
-                reservation.getRestaurantSeat().getId(),
-                reservation.getDate(),
-                reservation.getTotalCount(),
-                reservation.getRestaurantSeat().getSeatType().getName(),
-                reservation.getStatus()
-        );
+        return ReservationFindResponse.from(reservation);
     }
 
     public List<ReservationFindResponse> findAllReservations(Long userId) {
-        List<Reservation> reservations = reservationRepository.findByUser_Id(userId);
+        List<Reservation> reservations = reservationRepository.findByUserId(userId);
 
         return reservations.stream()
-                .map(reservation -> new ReservationFindResponse(
-                        reservation.getRestaurantSeat().getId(),
-                        reservation.getDate(),
-                        reservation.getTotalCount(),
-                        reservation.getRestaurantSeat().getSeatType().getName(),
-                        reservation.getStatus()))
-                .collect(Collectors.toList());
+                .map(ReservationFindResponse::from)
+                .toList();
     }
 
     @Transactional

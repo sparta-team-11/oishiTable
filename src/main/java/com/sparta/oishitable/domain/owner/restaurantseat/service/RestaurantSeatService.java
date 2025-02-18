@@ -1,12 +1,10 @@
 package com.sparta.oishitable.domain.owner.restaurantseat.service;
 
-import com.sparta.oishitable.domain.admin.seatType.entity.SeatType;
 import com.sparta.oishitable.domain.admin.seatType.service.SeatTypeService;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurantseat.dto.request.RestaurantSeatCreateRequest;
 import com.sparta.oishitable.domain.owner.restaurantseat.entity.RestaurantSeat;
 import com.sparta.oishitable.domain.owner.restaurantseat.repository.RestaurantSeatRepository;
-import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
