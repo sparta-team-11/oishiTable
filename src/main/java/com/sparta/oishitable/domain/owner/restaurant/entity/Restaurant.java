@@ -57,7 +57,7 @@ public class Restaurant extends BaseEntity {
             LocalTime breakTimeStart,
             LocalTime breakTimeEnd,
             String introduce,
-            int deposit,
+            Integer deposit,
             LocalTime reservationInterval
     ) {
         this.id = id;
