@@ -2,6 +2,7 @@ package com.sparta.oishitable.domain.owner.restaurant.service;
 
 import com.sparta.oishitable.domain.owner.restaurant.dto.request.RestaurantCreateRequest;
 import com.sparta.oishitable.domain.owner.restaurant.dto.request.RestaurantProfileUpdateRequest;
+import com.sparta.oishitable.domain.owner.restaurant.dto.response.RestaurantFindResponse;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.repository.RestaurantRepository;
 import com.sparta.oishitable.domain.owner.restaurantseat.service.RestaurantSeatService;
@@ -32,8 +33,10 @@ public class OwnerRestaurantService {
         return savedRestaurant.getId();
     }
 
-    public Restaurant findRestaurant(Long restaurantId) {
-        return findById(restaurantId);
+    public RestaurantFindResponse findRestaurant(Long restaurantId) {
+        Restaurant restaurant = findById(restaurantId);
+
+        return RestaurantFindResponse.from(restaurant);
     }
 
     @Transactional

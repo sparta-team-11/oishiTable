@@ -2,7 +2,7 @@ package com.sparta.oishitable.domain.owner.restaurant.controller;
 
 import com.sparta.oishitable.domain.owner.restaurant.dto.request.RestaurantCreateRequest;
 import com.sparta.oishitable.domain.owner.restaurant.dto.request.RestaurantProfileUpdateRequest;
-import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
+import com.sparta.oishitable.domain.owner.restaurant.dto.response.RestaurantFindResponse;
 import com.sparta.oishitable.domain.owner.restaurant.service.OwnerRestaurantService;
 import com.sparta.oishitable.global.util.UriBuilderUtil;
 import jakarta.validation.Valid;
@@ -30,10 +30,10 @@ public class OwnerRestaurantController {
     }
 
     @GetMapping("/{restaurantId}")
-    public ResponseEntity<Restaurant> findRestaurant(
+    public ResponseEntity<RestaurantFindResponse> findRestaurant(
             @PathVariable Long restaurantId
     ) {
-        Restaurant restaurant = ownerRestaurantService.findRestaurant(restaurantId);
+        RestaurantFindResponse restaurant = ownerRestaurantService.findRestaurant(restaurantId);
 
         return ResponseEntity.ok(restaurant);
     }

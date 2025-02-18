@@ -42,7 +42,7 @@ public class Restaurant extends BaseEntity {
     private String introduce;
 
     @Column(nullable = false)
-    private Integer deposit;
+    private int deposit;
 
     @Column(nullable = false)
     private LocalTime reservationInterval;
