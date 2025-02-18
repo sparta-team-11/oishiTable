@@ -45,7 +45,7 @@ public class ReservationService {
 
         //가게 좌석의 수량과 비교한 후 자리가 없으면 에외
         if (restaurantSeat.getQuantity() <= reservedCount) {
-            throw new InvalidException(ErrorCode.RESTAURANT_SEAT_TYPE_QUANTITY_NOT_FOUND);
+            throw new InvalidException(ErrorCode.RESTAURANT_SEAT_NOT_AVAILABLE);
         }
 
         if (restaurantSeat.getMinGuestCount() > request.totalCount()) {
@@ -66,11 +66,9 @@ public class ReservationService {
         reservationRepository.save(reservation);
     }
 
-    public ReservationFindResponse findReservation(long reservationId) {
+    public ReservationFindResponse findReservation(Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorCode.RESERVATION_NOT_FOUND));
-
-        reservation.complete();
 
         return ReservationFindResponse.from(reservation);
     }
@@ -84,7 +82,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public void deleteReservation(long reservationId) {
+    public void deleteReservation(Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorCode.RESERVATION_NOT_FOUND));
 
