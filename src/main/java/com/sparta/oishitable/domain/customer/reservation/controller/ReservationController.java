@@ -31,7 +31,7 @@ public class ReservationController {
 
     @GetMapping("/{reservationId}")
     public ResponseEntity<ReservationFindResponse> findReservation(
-            @PathVariable long reservationId
+            @PathVariable Long reservationId
     ) {
         return new ResponseEntity<>(reservationService.findReservation(reservationId), HttpStatus.OK);
     }
@@ -47,7 +47,7 @@ public class ReservationController {
 
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<Void> deleteReservation(
-            @PathVariable long reservationId
+            @PathVariable Long reservationId
     ) {
         reservationService.deleteReservation(reservationId);
 

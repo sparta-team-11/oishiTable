@@ -6,12 +6,17 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 public record ReservationCreateRequest(
+        @NotNull
+        Long restaurantId,
+
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         @NotNull
         LocalDateTime date,
+
         @NotNull
         Integer totalCount,
-        @NotNull
-        String seatTypeName
-) {}
 
+        @NotNull
+        Long seatTypeId
+) {
+}
