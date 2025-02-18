@@ -35,7 +35,6 @@ public enum ErrorCode {
 
     // 예약 관련 익셉션
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 예약 입니다."),
-    RESERVATION_COUPON_LIMIT_EXCEEDED(HttpStatus.NOT_FOUND, "할인 쿠폰 지급 이벤트가 끝났습니다."),
     RESERVATION_CONFLICT(HttpStatus.NOT_FOUND, "예약 동시성 오류"),
 
     // Security 관련 익셉션

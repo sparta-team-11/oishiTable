@@ -13,5 +13,6 @@ public record ReservationCreateRequest(
         Integer totalCount,
         @NotNull
         String seatTypeName
+
 ) {}
 

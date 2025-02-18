@@ -2,6 +2,7 @@ package com.sparta.oishitable.domain.customer.reservation.entity;
 
 import com.sparta.oishitable.domain.common.BaseEntity;
 import com.sparta.oishitable.domain.common.user.entity.User;
+import com.sparta.oishitable.domain.customer.coupon.entity.Coupon;
 import com.sparta.oishitable.domain.owner.restaurantseat.entity.RestaurantSeat;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -40,13 +41,17 @@ public class Reservation extends BaseEntity {
     @JoinColumn(name = "restaurant_seat_id")
     private RestaurantSeat restaurantSeat;
 
+    @OneToOne
+    @JoinColumn(name = "coupon_id")
+    private Coupon coupon;
+
     @Version  // 낙관적 락
     private int version;
 
-    private Integer discount = 0;
-
-    @Column(nullable = false)
-    private boolean couponExist = false; // 쿠폰 발급
+//    private Integer discount = 0;
+//
+//    @Column(nullable = false)
+//    private boolean couponExist = false; // 쿠폰 발급
 
     @Builder
     public Reservation(
@@ -56,8 +61,7 @@ public class Reservation extends BaseEntity {
             Integer totalCount,
             User user,
             RestaurantSeat restaurantSeat,
-            Integer discount,
-            boolean couponExist
+            Coupon coupon
     ) {
         this.id = id;
         this.date = date;
@@ -65,8 +69,7 @@ public class Reservation extends BaseEntity {
         this.totalCount = totalCount;
         this.user = user;
         this.restaurantSeat = restaurantSeat;
-        this.discount = discount;
-        this.couponExist = couponExist;
+        this.coupon = coupon;
     }
 
     public void cancel() {
@@ -77,8 +80,12 @@ public class Reservation extends BaseEntity {
         this.status = ReservationStatus.COMPLETED;
     }
 
-    public void discountCoupon(int discount) {
-        this.discount = discount;
-        this.couponExist = true;
+    public Long getRestaurantId(){
+        return this.restaurantSeat.getRestaurant().getId();
     }
+
+//    public void discountCoupon(int discount) {
+//        this.discount = discount;
+//        this.couponExist = true;
+//    }
 }

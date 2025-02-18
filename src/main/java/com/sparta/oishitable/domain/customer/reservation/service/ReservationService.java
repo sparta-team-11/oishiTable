@@ -1,5 +1,7 @@
 package com.sparta.oishitable.domain.customer.reservation.service;
 
+import com.sparta.oishitable.domain.customer.coupon.entity.Coupon;
+import com.sparta.oishitable.domain.customer.coupon.repository.CouponRepository;
 import com.sparta.oishitable.domain.customer.reservation.dto.ReservationCreateRequest;
 import com.sparta.oishitable.domain.customer.reservation.dto.ReservationFindResponse;
 import com.sparta.oishitable.domain.customer.reservation.entity.Reservation;
@@ -32,11 +34,12 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final RestaurantSeatService restaurantSeatService;
     private final SeatTypeService seatTypeService;
+    private final CouponRepository couponRepository;
 
-    private static final int couponQuantity = 100;
+//    private static final int couponQuantity = 100;
 
     @Transactional
-    public void createReservationService(
+    public Long createReservationService(
             Long userId,
             ReservationCreateRequest request
     ) {
@@ -57,11 +60,37 @@ public class ReservationService {
             throw new CustomRuntimeException(ErrorCode.RESTAURANT_SEAT_TYPE_QUANTITY_NOT_FOUND);
         }
 
-//        Long couponProvided = reservationRepository.countByDiscount(10);
-        long couponProvided = reservationRepository.countByCouponExistTrue();
-        if (couponProvided >= couponQuantity) {
-            throw new CustomRuntimeException(ErrorCode.RESERVATION_COUPON_LIMIT_EXCEEDED);
+        //가게별로 쿠폰을 가져온다.
+        List<Coupon> listCoupons = couponRepository.findByRestaurantId(restaurantSeat.getRestaurant().getId());
+
+        Coupon eventCoupon = null;
+
+        //가게별로 쿠폰중에 Discount 쿠폰을 가져온다
+        for (Coupon availableCoupon : listCoupons) {
+            if (availableCoupon.getDiscount() > 0  && availableCoupon.getCouponProvided() > 0) {
+                eventCoupon = availableCoupon;
+                break;
+            }
         }
+
+        //eventCoupon
+        if (eventCoupon != null) {
+            long usedCouponCount = reservationRepository.countByUser_IdAndCouponIsNotNull(userId, eventCoupon.getId());
+            if (usedCouponCount > 0) {
+                eventCoupon = null;
+            }
+        }
+
+        if (eventCoupon != null) {
+            eventCoupon.setCouponProvided(eventCoupon.getCouponProvided() - 1);
+            couponRepository.save(eventCoupon);
+        }
+
+/*        eventCoupon.setCouponProvided(eventCoupon.getCouponProvided() - 1);
+
+        eventCoupon.setCouponExist(true);
+
+        couponRepository.save(eventCoupon);*/
 
         try {
             Reservation reservation = Reservation.builder()
@@ -70,30 +99,16 @@ public class ReservationService {
                     .status(ReservationStatus.RESERVED)
                     .user(user)
                     .restaurantSeat(restaurantSeat)
-                    .discount(10)
-                    .couponExist(true)
+                    .coupon(eventCoupon)
                     .build();
 
             reservationRepository.save(reservation);
+
+            return reservation.getId();
+
         } catch (OptimisticLockException e) {
             throw new CustomRuntimeException(ErrorCode.RESERVATION_CONFLICT);
         }
-
-/*        Reservation reservation = Reservation.builder()
-                .date(request.date())
-                .totalCount(request.totalCount())
-                .status(ReservationStatus.RESERVED)
-                .user(user)
-                .restaurantSeat(restaurantSeat)
-                .discount(10)
-                .couponExist(true)
-                .build();
-
-        reservationRepository.save(reservation);
-        reservation.discountCoupon(10);
-
-        reservationRepository.save(reservation);*/
-
 
     }
 
@@ -103,27 +118,35 @@ public class ReservationService {
 
         reservation.complete();
 
+        boolean couponProvided = (reservation.getCoupon() != null && reservation.getCoupon().getCouponExist());
+
         return new ReservationFindResponse(
                 reservation.getRestaurantSeat().getId(),
                 reservation.getDate(),
                 reservation.getTotalCount(),
                 reservation.getRestaurantSeat().getSeatType().getName(),
                 reservation.getStatus(),
-                reservation.isCouponExist()
+                couponProvided
         );
     }
 
     public List<ReservationFindResponse> findAllReservations(Long userId) {
         List<Reservation> reservations = reservationRepository.findByUser_Id(userId);
 
+
         return reservations.stream()
-                .map(reservation -> new ReservationFindResponse(
-                        reservation.getRestaurantSeat().getId(),
-                        reservation.getDate(),
-                        reservation.getTotalCount(),
-                        reservation.getRestaurantSeat().getSeatType().getName(),
-                        reservation.getStatus(),
-                        reservation.isCouponExist()))
+                .map(reservation -> {
+                    boolean couponProvided = (reservation.getCoupon() != null && reservation.getCoupon().getCouponExist());
+
+                    return new ReservationFindResponse(
+                            reservation.getRestaurantSeat().getId(),
+                            reservation.getDate(),
+                            reservation.getTotalCount(),
+                            reservation.getRestaurantSeat().getSeatType().getName(),
+                            reservation.getStatus(),
+                            couponProvided
+                            );
+                })
                 .collect(Collectors.toList());
     }
 
