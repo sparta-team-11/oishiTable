@@ -75,7 +75,7 @@ public class ReservationService {
 
         //eventCoupon
         if (eventCoupon != null) {
-            long usedCouponCount = reservationRepository.countByUser_IdAndCouponIsNotNull(userId, eventCoupon.getId());
+            long usedCouponCount = reservationRepository.countByUser_IdAndCouponIsNotNull(userId/*, eventCoupon.getId()*/);
             if (usedCouponCount > 0) {
                 eventCoupon = null;
             }

@@ -15,7 +15,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByUser_Id(Long userId);
 
-    Long countByUser_IdAndCouponIsNotNull(Long userId, Long couponId);
+    Long countByUser_IdAndCouponIsNotNull(Long userId/*, Long couponId*/);
 
 
 }
