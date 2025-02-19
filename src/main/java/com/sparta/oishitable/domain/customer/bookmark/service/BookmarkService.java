@@ -61,7 +61,7 @@ public class BookmarkService {
     @Transactional
     public void updateBookmarkMemo(Long userId, Long bookmarkId, BookmarkUpdateRequest bookmarkUpdateRequest) {
         Bookmark bookmark = findById(bookmarkId);
-        checkUserAuthority(userId, bookmark);
+        checkUserAuthority(userId, bookmark.getUser().getId());
 
         bookmark.updateMemo(bookmarkUpdateRequest.updateMemo());
     }
@@ -69,15 +69,9 @@ public class BookmarkService {
     @Transactional
     public void deleteBookmark(Long userId, Long bookmarkId) {
         Bookmark bookmark = findById(bookmarkId);
-        checkUserAuthority(userId, bookmark);
+        checkUserAuthority(userId, bookmark.getUser().getId());
 
         bookmarkRepository.delete(bookmark);
-    }
-
-    private static void checkUserAuthority(Long userId, Bookmark bookmark) {
-        if (!bookmark.getUser().getId().equals(userId)) {
-            throw new ForbiddenException(ErrorCode.USER_UNAUTHORIZED);
-        }
     }
 
     @Transactional
@@ -85,6 +79,12 @@ public class BookmarkService {
         Bookmark bookmark = findByUserIdAndRestaurantId(userId, restaurantId);
 
         bookmarkRepository.delete(bookmark);
+    }
+
+    private void checkUserAuthority(Long ownerId, Long userId) {
+        if (!ownerId.equals(userId)) {
+            throw new ForbiddenException(ErrorCode.USER_UNAUTHORIZED);
+        }
     }
 
     private Bookmark findById(Long bookmarkId) {
