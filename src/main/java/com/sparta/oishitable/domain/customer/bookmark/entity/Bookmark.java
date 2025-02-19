@@ -1,7 +1,7 @@
 package com.sparta.oishitable.domain.customer.bookmark.entity;
 
-import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.common.user.entity.User;
+import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -24,6 +24,9 @@ public class Bookmark {
     @Column(name = "bookmark_id")
     private Long id;
 
+    @Column(length = 100)
+    private String memo;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -33,8 +36,9 @@ public class Bookmark {
     private Restaurant restaurant;
 
     @Builder
-    public Bookmark(Long id, User user, Restaurant restaurant) {
+    public Bookmark(Long id, String memo, User user, Restaurant restaurant) {
         this.id = id;
+        this.memo = memo;
         this.user = user;
         this.restaurant = restaurant;
     }

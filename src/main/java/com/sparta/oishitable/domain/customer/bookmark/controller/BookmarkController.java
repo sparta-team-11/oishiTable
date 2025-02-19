@@ -2,6 +2,7 @@ package com.sparta.oishitable.domain.customer.bookmark.controller;
 
 import com.sparta.oishitable.domain.customer.bookmark.dto.request.BookmarkCreateRequest;
 import com.sparta.oishitable.domain.customer.bookmark.dto.request.BookmarkDeleteRequest;
+import com.sparta.oishitable.domain.customer.bookmark.dto.response.BookmarksFindResponse;
 import com.sparta.oishitable.domain.customer.bookmark.service.BookmarkService;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import com.sparta.oishitable.global.util.UriBuilderUtil;
@@ -26,9 +27,22 @@ public class BookmarkController {
             @RequestBody @Valid BookmarkCreateRequest bookmarkCreateReq
     ) {
         bookmarkService.createBookmark(userDetails.getId(), bookmarkCreateReq.restaurantId());
-        URI location = UriBuilderUtil.create("/customer/api/restaurants/{restaurantsId}", bookmarkCreateReq.restaurantId());
+
+        String path = "/customer/api/restaurants/{restaurantsId}";
+        URI location = UriBuilderUtil.create(path, bookmarkCreateReq.restaurantId());
 
         return ResponseEntity.created(location).build();
+    }
+
+    @GetMapping
+    public ResponseEntity<BookmarksFindResponse> findBookmarks(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        BookmarksFindResponse body = bookmarkService.findBookmarks(userDetails.getId(), page, size);
+
+        return ResponseEntity.ok(body);
     }
 
     @DeleteMapping("/{bookmarkId}")

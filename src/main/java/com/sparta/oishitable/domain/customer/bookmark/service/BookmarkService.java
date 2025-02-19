@@ -2,6 +2,8 @@ package com.sparta.oishitable.domain.customer.bookmark.service;
 
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
+import com.sparta.oishitable.domain.customer.bookmark.dto.response.BookmarkDetails;
+import com.sparta.oishitable.domain.customer.bookmark.dto.response.BookmarksFindResponse;
 import com.sparta.oishitable.domain.customer.bookmark.entity.Bookmark;
 import com.sparta.oishitable.domain.customer.bookmark.repository.BookmarkRepository;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
@@ -11,6 +13,9 @@ import com.sparta.oishitable.global.exception.ForbiddenException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +28,6 @@ public class BookmarkService {
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
 
-    @Transactional
     public void createBookmark(Long userId, Long restaurantId) {
         if (bookmarkRepository.existsByUserIdAndRestaurantId(userId, restaurantId)) {
             throw new ConflictException(ErrorCode.BOOKMARK_ALREADY_EXISTS_RESTAURANT);
@@ -41,6 +45,15 @@ public class BookmarkService {
                 .build();
 
         bookmarkRepository.save(bookmark);
+    }
+
+    public BookmarksFindResponse findBookmarks(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        Page<BookmarkDetails> bookmarkDetails
+                = bookmarkRepository.findBookmarkDetailsPaginationByUserId(userId, pageable);
+
+        return BookmarksFindResponse.from(bookmarkDetails);
     }
 
     @Transactional
