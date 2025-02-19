@@ -41,9 +41,9 @@ public class ReservationController {
 
     @GetMapping
     public ResponseEntity<List<ReservationFindResponse>> findReservations(
-            @RequestParam Long userId
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        return ResponseEntity.ok(reservationService.findReservations(userId));
+        return ResponseEntity.ok(reservationService.findReservations(userDetails.getId()));
     }
 
     @DeleteMapping("/{reservationId}")
