@@ -20,7 +20,7 @@ public class CollectionBookmarkQRepositoryImpl implements CollectionBookmarkQRep
         return Optional.ofNullable(queryFactory
                 .selectFrom(collectionBookmark)
                 .where(collectionBookmark.id.eq(collectionBookmarkId))
-                .innerJoin(collectionBookmark.bookmark, bookmark)
+                .innerJoin(collectionBookmark.bookmark, bookmark).fetchJoin()
                 .fetchOne());
     }
 
