@@ -25,12 +25,13 @@ public class Coupon {
     private Boolean couponUsed;
 
     @ManyToOne
-    @Column(name = "restaurant_id", nullable = false)
+    @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
     @ManyToOne
-    @Column(name =  "user_id", nullable = false)
+    @JoinColumn(name =  "user_id", nullable = false)
     private User user;
+
 
     @Builder
     public Coupon(
