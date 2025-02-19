@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/api/customer/collections/{collectionId}/bookmarks")
+@RequestMapping("/customer/api/collections/{collectionId}/bookmarks")
 @RequiredArgsConstructor
 public class CollectionBookmarkController {
 

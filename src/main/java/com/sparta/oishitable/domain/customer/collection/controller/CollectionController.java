@@ -17,7 +17,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/customer/collections")
+@RequestMapping("/customer/api/collections")
 @RequiredArgsConstructor
 public class CollectionController {
 
