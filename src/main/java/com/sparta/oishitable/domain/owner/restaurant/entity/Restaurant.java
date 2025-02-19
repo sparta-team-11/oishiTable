@@ -56,6 +56,15 @@ public class Restaurant extends BaseEntity {
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
+    @Column(nullable = false)
+    private String address;
+
+    @Column(nullable = false)
+    private Double latitude;
+
+    @Column(nullable = false)
+    private Double longitude;
+
     @Builder
     public Restaurant(
             Long id,
@@ -68,7 +77,10 @@ public class Restaurant extends BaseEntity {
             String introduce,
             int deposit,
             LocalTime reservationInterval,
-            User owner
+            User owner,
+            String address,
+            Double latitude,
+            Double longitude
     ) {
         this.id = id;
         this.name = name;
@@ -81,6 +93,9 @@ public class Restaurant extends BaseEntity {
         this.deposit = deposit;
         this.reservationInterval = reservationInterval;
         this.owner = owner;
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public void updateProfile(String name, String introduce, Integer deposit) {
