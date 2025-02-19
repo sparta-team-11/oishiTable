@@ -9,7 +9,7 @@ import com.sparta.oishitable.domain.customer.reservation.repository.ReservationR
 import com.sparta.oishitable.domain.owner.restaurantseat.entity.RestaurantSeat;
 import com.sparta.oishitable.domain.owner.restaurantseat.service.RestaurantSeatService;
 import com.sparta.oishitable.global.aop.annotation.DistributedLock;
-import com.sparta.oishitable.global.exception.CustomRuntimeException;
+import com.sparta.oishitable.global.exception.ForbiddenException;
 import com.sparta.oishitable.global.exception.InvalidException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
@@ -28,10 +28,7 @@ public class ReservationService {
     private final RestaurantSeatService restaurantSeatService;
 
     @DistributedLock(key = "'reservation:' + #request.restaurantId + ':' + #formattedDate")
-    public Long createReservation(
-            Long userId,
-            ReservationCreateRequest request
-    ) {
+    public Long createReservation(Long userId, ReservationCreateRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
@@ -70,15 +67,14 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public ReservationFindResponse findReservation(Long reservationId) {
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new CustomRuntimeException(ErrorCode.RESERVATION_NOT_FOUND));
+        Reservation reservation = findReservationById(reservationId);
 
         return ReservationFindResponse.from(reservation);
     }
 
     @Transactional(readOnly = true)
     public List<ReservationFindResponse> findReservations(Long userId) {
-        List<Reservation> reservations = reservationRepository.findByUserId(userId);
+        List<Reservation> reservations = reservationRepository.findByUserIdOrderByCreatedAtDesc(userId);
 
         return reservations.stream()
                 .map(ReservationFindResponse::from)
@@ -86,10 +82,23 @@ public class ReservationService {
     }
 
     @Transactional
-    public void deleteReservation(Long reservationId) {
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new CustomRuntimeException(ErrorCode.RESERVATION_NOT_FOUND));
+    public void deleteReservation(Long userId, Long reservationId) {
+        Reservation reservation = findReservedReservationById(reservationId);
+
+        if (reservation.getUser().getId().equals(userId)) {
+            throw new ForbiddenException(ErrorCode.USER_UNAUTHORIZED);
+        }
 
         reservation.cancel();
+    }
+
+    private Reservation findReservationById(Long reservationId) {
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.RESERVATION_NOT_FOUND));
+    }
+
+    private Reservation findReservedReservationById(Long reservationId) {
+        return reservationRepository.findReservedReservationById(reservationId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.RESERVED_RESERVATION_NOT_FOUND));
     }
 }
