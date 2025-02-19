@@ -25,20 +25,6 @@ public class CollectionBookmarkQRepositoryImpl implements CollectionBookmarkQRep
     }
 
     @Override
-    public boolean existsByCollectionIdAndBookmarkId(Long collectionId, Long bookmarkId) {
-        Integer result = queryFactory
-                .selectOne()
-                .from(collectionBookmark)
-                .where(
-                        collectionBookmark.collection.id.eq(collectionId),
-                        collectionBookmark.bookmark.id.eq(bookmarkId)
-                )
-                .fetchFirst();
-
-        return result != null;
-    }
-
-    @Override
     public boolean existsByCollectionIdAndBookmarkIds(Long collectionId, List<Long> bookmarkIds) {
         Integer result = queryFactory
                 .selectOne()

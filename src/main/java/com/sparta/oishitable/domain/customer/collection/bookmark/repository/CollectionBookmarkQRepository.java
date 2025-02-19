@@ -9,7 +9,5 @@ public interface CollectionBookmarkQRepository {
 
     Optional<CollectionBookmark> findByCollectionBookmarkId(Long collectionBookmarkId);
 
-    boolean existsByCollectionIdAndBookmarkId(Long collectionId, Long bookmarkId);
-
     boolean existsByCollectionIdAndBookmarkIds(Long collectionId, List<Long> bookmarkIds);
 }

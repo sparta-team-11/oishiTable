@@ -2,12 +2,13 @@ package com.sparta.oishitable.domain.customer.collection.bookmark.service;
 
 import com.sparta.oishitable.domain.customer.bookmark.entity.Bookmark;
 import com.sparta.oishitable.domain.customer.bookmark.repository.BookmarkRepository;
-import com.sparta.oishitable.domain.customer.collection.bookmark.dto.request.BookmarkIdRequest;
 import com.sparta.oishitable.domain.customer.collection.bookmark.dto.request.CollectionBookmarkCreateRequest;
+import com.sparta.oishitable.domain.customer.collection.bookmark.dto.request.CollectionBookmarksCreateRequest;
 import com.sparta.oishitable.domain.customer.collection.bookmark.entity.CollectionBookmark;
 import com.sparta.oishitable.domain.customer.collection.bookmark.repository.CollectionBookmarkRepository;
 import com.sparta.oishitable.domain.customer.collection.entity.Collection;
 import com.sparta.oishitable.domain.customer.collection.repository.CollectionRepository;
+import com.sparta.oishitable.global.exception.BadRequest;
 import com.sparta.oishitable.global.exception.ConflictException;
 import com.sparta.oishitable.global.exception.ForbiddenException;
 import com.sparta.oishitable.global.exception.NotFoundException;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,36 +31,12 @@ public class CollectionBookmarkService {
     private final BookmarkRepository bookmarkRepository;
 
     @Transactional
-    public void createCollectionBookmark(Long userId, Long collectionId, Long bookmarkId) {
-        if (collectionBookmarkRepository.existsByCollectionIdAndBookmarkId(collectionId, bookmarkId)) {
-            throw new ConflictException(ErrorCode.ALREADY_EXISTS_BOOKMARK_IN_COLLECTION);
-        }
-
-        Collection collection = collectionRepository.findById(collectionId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.COLLECTION_NOT_FOUND));
-
-        checkUserAuthority(collection.getUser().getId(), userId);
-
-        Bookmark bookmark = bookmarkRepository.findById(bookmarkId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.BOOKMARK_NOT_FOUND));
-
-        checkUserAuthority(bookmark.getUser().getId(), userId);
-
-        CollectionBookmark collectionBookmark = CollectionBookmark.builder()
-                .collection(collection)
-                .bookmark(bookmark)
-                .build();
-
-        collectionBookmarkRepository.save(collectionBookmark);
-    }
-
-    @Transactional
     public void createCollectionBookmarks(
             Long userId,
-            Long collectionId, CollectionBookmarkCreateRequest collectionBookmarkCreateRequest
+            Long collectionId, CollectionBookmarksCreateRequest collectionBookmarkCreateRequest
     ) {
         List<Long> bookmarkIds = collectionBookmarkCreateRequest.bookmarks().stream()
-                .map(BookmarkIdRequest::bookmarkId)
+                .map(CollectionBookmarkCreateRequest::bookmarkId)
                 .toList();
 
         if (collectionBookmarkRepository.existsByCollectionIdAndBookmarkIds(collectionId, bookmarkIds)) {
@@ -93,13 +72,21 @@ public class CollectionBookmarkService {
     }
 
     @Transactional
-    public void deleteCollectionBookmark(Long userId, Long collectionBookmarkId) {
-        CollectionBookmark collectionBookmark = collectionBookmarkRepository.findByCollectionBookmarkId(collectionBookmarkId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.BOOKMARK_NOT_FOUND));
+    public void deleteCollectionBookmark(Long userId, Long collectionId, Long collectionBookmarkId) {
+        CollectionBookmark collectionBookmark = findById(collectionBookmarkId);
+
+        if (!collectionBookmark.getCollection().getId().equals(collectionId)) {
+            throw new BadRequest(ErrorCode.INVALID_ACCESS_BOOKMARK_IN_COLLECTION);
+        }
 
         checkUserAuthority(collectionBookmark.getBookmark().getUser().getId(), userId);
 
         collectionBookmarkRepository.delete(collectionBookmark);
+    }
+
+    private CollectionBookmark findById(Long collectionBookmarkId) {
+        return collectionBookmarkRepository.findByCollectionBookmarkId(collectionBookmarkId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.BOOKMARK_NOT_FOUND));
     }
 
     private void checkUserAuthority(Long recordOwnerId, Long userId) {

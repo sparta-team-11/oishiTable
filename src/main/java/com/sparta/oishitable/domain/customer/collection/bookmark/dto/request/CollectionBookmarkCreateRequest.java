@@ -1,8 +1,9 @@
 package com.sparta.oishitable.domain.customer.collection.bookmark.dto.request;
 
-import java.util.List;
+import jakarta.validation.constraints.NotNull;
 
 public record CollectionBookmarkCreateRequest(
-        List<BookmarkIdRequest> bookmarks
+        @NotNull
+        Long bookmarkId
 ) {
 }
