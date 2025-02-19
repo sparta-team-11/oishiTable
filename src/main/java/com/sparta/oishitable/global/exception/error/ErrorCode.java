@@ -34,6 +34,8 @@ public enum ErrorCode {
     BELOW_MIN_GUEST_COUNT(HttpStatus.BAD_REQUEST, "좌석 유형에 필요한 최소 인원보다 적습니다."),
     EXCEEDS_MAX_GUEST_COUNT(HttpStatus.BAD_REQUEST, "좌석 유형에 필요한 최대 인원보다 많습니다."),
 
+    // 분산락 관련 익셉션
+    LOCK_TIMEOUT(HttpStatus.REQUEST_TIMEOUT, "락 획득 시간이 초과되었습니다."),
 
     // 예약 관련 익셉션
     RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 예약 입니다."),

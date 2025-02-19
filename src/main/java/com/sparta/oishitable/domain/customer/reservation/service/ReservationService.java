@@ -8,6 +8,7 @@ import com.sparta.oishitable.domain.customer.reservation.entity.Reservation;
 import com.sparta.oishitable.domain.customer.reservation.repository.ReservationRepository;
 import com.sparta.oishitable.domain.owner.restaurantseat.entity.RestaurantSeat;
 import com.sparta.oishitable.domain.owner.restaurantseat.service.RestaurantSeatService;
+import com.sparta.oishitable.global.aop.annotation.DistributedLock;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.InvalidException;
 import com.sparta.oishitable.global.exception.NotFoundException;
@@ -19,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ReservationService {
 
@@ -27,8 +27,8 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final RestaurantSeatService restaurantSeatService;
 
-    @Transactional
-    public void createReservationService(
+    @DistributedLock(key = "'reservation:' + #request.restaurantId + ':' + #formattedDate")
+    public Long createReservation(
             Long userId,
             ReservationCreateRequest request
     ) {
@@ -64,8 +64,11 @@ public class ReservationService {
                 .build();
 
         reservationRepository.save(reservation);
+
+        return reservation.getId();
     }
 
+    @Transactional(readOnly = true)
     public ReservationFindResponse findReservation(Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorCode.RESERVATION_NOT_FOUND));
@@ -73,7 +76,8 @@ public class ReservationService {
         return ReservationFindResponse.from(reservation);
     }
 
-    public List<ReservationFindResponse> findAllReservations(Long userId) {
+    @Transactional(readOnly = true)
+    public List<ReservationFindResponse> findReservations(Long userId) {
         List<Reservation> reservations = reservationRepository.findByUserId(userId);
 
         return reservations.stream()
