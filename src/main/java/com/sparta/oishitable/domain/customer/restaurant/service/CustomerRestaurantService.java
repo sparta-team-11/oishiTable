@@ -21,7 +21,7 @@ public class CustomerRestaurantService {
 
     private static final double EARTH_RADIUS = 6371;
 
-    public Page<RestaurantListResponse> getRestaurants(int page, int size) {
+    public Page<RestaurantListResponse> findRestaurants(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
 
         Page<Restaurant> restaurants = restaurantRepository.findAll(pageable);
@@ -29,7 +29,7 @@ public class CustomerRestaurantService {
         return restaurants.map(RestaurantListResponse::from);
     }
 
-    public RestaurantResponse getRestaurant(Long restaurantId) {
+    public RestaurantResponse findRestaurant(Long restaurantId) {
         Restaurant restaurant = findById(restaurantId);
 
         return RestaurantResponse.from(restaurant);

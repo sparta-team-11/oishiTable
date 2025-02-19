@@ -20,19 +20,19 @@ public class CustomerRestaurantController {
     private final CustomerRestaurantService customerRestaurantService;
 
     @GetMapping
-    public ResponseEntity<Page<RestaurantListResponse>> readRestaurants(
+    public ResponseEntity<Page<RestaurantListResponse>> findRestaurants(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        Page<RestaurantListResponse> restaurants = customerRestaurantService.getRestaurants(page,
+        Page<RestaurantListResponse> restaurants = customerRestaurantService.findRestaurants(page,
                 size);
         return ResponseEntity.ok(restaurants);
     }
 
     @GetMapping("/{restaurantId}")
-    public ResponseEntity<RestaurantResponse> readRestaurant(@PathVariable Long restaurantId) {
+    public ResponseEntity<RestaurantResponse> findRestaurant(@PathVariable Long restaurantId) {
 
-        RestaurantResponse restaurant = customerRestaurantService.getRestaurant(restaurantId);
+        RestaurantResponse restaurant = customerRestaurantService.findRestaurant(restaurantId);
 
         return ResponseEntity.ok(restaurant);
     }
