@@ -40,7 +40,7 @@ public class RedissonLockAspect {
             boolean available = lock.tryLock(waitTime, leaseTime, timeUnit);
 
             if (!available) {
-                throw new DistributedLockException(ErrorCode.LOCK_TIMEOUT);
+                throw new DistributedLockException(ErrorCode.LOCK_ACQUISITION_FAILED);
             }
 
             return joinPoint.proceed();
