@@ -11,11 +11,11 @@ import com.sparta.oishitable.domain.customer.post.repository.PostRepository;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
+import com.sparta.oishitable.global.exception.ForbiddenException;
+import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +32,7 @@ public class CommentService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void create(Long userId, CommentCreateRequest request) {
+    public Long create(Long userId, CommentCreateRequest request) {
         Post post = findPostById(request.postId());
         User user = findUserById(userId);
 
@@ -58,6 +58,8 @@ public class CommentService {
 
             commentRepository.save(comment);
 
+            return comment.getId();
+
         } else {
             // 게시글 댓글
             Comment comment = builder.build();
@@ -66,21 +68,12 @@ public class CommentService {
             post.addComment(comment);
 
             commentRepository.save(comment);
+
+            return comment.getId();
         }
     }
 
-    public Slice<CommentRepliesResponse> getReplies(Long parentCommentId, Long cursorValue, int limit) {
-        List<CommentRepliesResponse> replies = commentRepository.findReplies(
-                parentCommentId,
-                cursorValue,
-                limit);
-
-        boolean hasNext = replies.size() == limit;
-
-        return new SliceImpl<>(replies, PageRequest.of(0, limit), hasNext);
-    }
-
-    public Slice<CommentPostResponse> getPostComments(Long postId, Long cursorValue, int limit) {
+    public Slice<CommentPostResponse> findPostComments(Long postId, Long cursorValue, int limit) {
         List<CommentPostResponse> replies = commentRepository.findPostComments(
                 postId,
                 cursorValue,
@@ -89,6 +82,16 @@ public class CommentService {
         boolean hasNext = replies.size() == limit;
 
         return new SliceImpl<>(replies, PageRequest.of(0, limit), hasNext);
+    }
+
+    public Page<CommentRepliesResponse> findReplies(Long parentCommentId, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page - 1 , size);
+
+        return commentRepository.findReplies(
+                parentCommentId,
+                pageable
+        );
     }
 
     @Transactional
@@ -114,22 +117,22 @@ public class CommentService {
 
     private User findUserById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new CustomRuntimeException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 
     private Post findPostById(Long postId) {
         return postRepository.findById(postId)
-                .orElseThrow(() -> new CustomRuntimeException(ErrorCode.POST_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND));
     }
 
     private Comment findCommentById(Long commentId) {
         return commentRepository.findById(commentId)
-                .orElseThrow(() -> new CustomRuntimeException(ErrorCode.COMMENT_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.COMMENT_NOT_FOUND));
     }
 
     private void isCommentOwner(Long commentUserId, Long userId) {
         if (!Objects.equals(commentUserId, userId)) {
-            throw new CustomRuntimeException(ErrorCode.USER_UNAUTHORIZED);
+            throw new ForbiddenException(ErrorCode.USER_UNAUTHORIZED);
         }
     }
 }

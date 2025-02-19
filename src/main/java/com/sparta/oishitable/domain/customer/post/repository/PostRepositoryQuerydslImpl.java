@@ -19,7 +19,7 @@ public class PostRepositoryQuerydslImpl implements PostRepositoryQuerydsl {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<PostRandomResponse> findAllPosts(
+    public List<PostRandomResponse> findPostsByRandom(
             Long userId,
             Long regionId,
             Long cursorValue,
@@ -66,7 +66,7 @@ public class PostRepositoryQuerydslImpl implements PostRepositoryQuerydsl {
     }
 
     @Override
-    public List<PostKeywordResponse> getPostsByKeyword(
+    public List<PostKeywordResponse> findPostsByKeyword(
             Long userId,
             Long regionId,
             Long cursorValue,

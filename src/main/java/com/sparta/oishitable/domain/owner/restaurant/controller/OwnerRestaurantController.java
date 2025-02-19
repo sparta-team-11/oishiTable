@@ -2,11 +2,15 @@ package com.sparta.oishitable.domain.owner.restaurant.controller;
 
 import com.sparta.oishitable.domain.owner.restaurant.dto.request.RestaurantCreateRequest;
 import com.sparta.oishitable.domain.owner.restaurant.dto.request.RestaurantProfileUpdateRequest;
+import com.sparta.oishitable.domain.owner.restaurant.dto.response.RestaurantFindResponse;
 import com.sparta.oishitable.domain.owner.restaurant.service.OwnerRestaurantService;
+import com.sparta.oishitable.global.util.UriBuilderUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/owner/api/restaurants")
@@ -19,9 +23,19 @@ public class OwnerRestaurantController {
     public ResponseEntity<Void> createRestaurant(
             @RequestBody @Valid RestaurantCreateRequest restaurantCreateRequest
     ) {
-        ownerRestaurantService.createRestaurant(restaurantCreateRequest);
+        Long restaurantId = ownerRestaurantService.createRestaurant(restaurantCreateRequest);
+        URI location = UriBuilderUtil.create("/owner/api/restaurants/{restaurantId}", restaurantId);
 
-        return ResponseEntity.created(null).build();
+        return ResponseEntity.created(location).build();
+    }
+
+    @GetMapping("/{restaurantId}")
+    public ResponseEntity<RestaurantFindResponse> findRestaurant(
+            @PathVariable Long restaurantId
+    ) {
+        RestaurantFindResponse restaurant = ownerRestaurantService.findRestaurant(restaurantId);
+
+        return ResponseEntity.ok(restaurant);
     }
 
     @PatchMapping("/{restaurantId}")

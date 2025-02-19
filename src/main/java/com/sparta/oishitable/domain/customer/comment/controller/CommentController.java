@@ -6,12 +6,16 @@ import com.sparta.oishitable.domain.customer.comment.dto.response.CommentPostRes
 import com.sparta.oishitable.domain.customer.comment.dto.response.CommentRepliesResponse;
 import com.sparta.oishitable.domain.customer.comment.service.CommentService;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
+import com.sparta.oishitable.global.util.UriBuilderUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/customer/api/posts/comments")
@@ -26,35 +30,36 @@ public class CommentController {
             @RequestBody @Valid CommentCreateRequest request
 
     ) {
-        commentService.create(userDetails.getId(), request);
+        Long commentId = commentService.create(userDetails.getId(), request);
+        URI location = UriBuilderUtil.create("/customer/api/restaurants/{restaurantsId}", commentId);
 
-        return ResponseEntity.created(null).build();
+        return ResponseEntity.created(location).build();
     }
 
     @GetMapping
-    public ResponseEntity<Slice<CommentPostResponse>> readPostComments(
+    public ResponseEntity<Slice<CommentPostResponse>> findPostComments(
             @RequestParam Long postId,
             @RequestParam(required = false) Long cursorValue,
             @RequestParam(defaultValue = "10") int limit
     ) {
-        Slice<CommentPostResponse> comments = commentService.getPostComments(postId, cursorValue, limit);
+        Slice<CommentPostResponse> comments = commentService.findPostComments(postId, cursorValue, limit);
 
         return ResponseEntity.ok(comments);
     }
 
     @GetMapping("/replies")
-    public ResponseEntity<Slice<CommentRepliesResponse>> readReplies(
+    public ResponseEntity<Page<CommentRepliesResponse>> findReplies(
             @RequestParam Long commentId,
-            @RequestParam(required = false) Long cursorValue,
-            @RequestParam(defaultValue = "10") int limit
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
     ) {
-        Slice<CommentRepliesResponse> replies = commentService.getReplies(commentId, cursorValue, limit);
+        Page<CommentRepliesResponse> replies = commentService.findReplies(commentId, page, size);
 
         return ResponseEntity.ok(replies);
     }
 
     @PatchMapping("/{commentId}")
-    public ResponseEntity<Void> update(
+    public ResponseEntity<Void> updateComments(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long commentId,
             @RequestBody @Valid CommentUpdateRequest request
@@ -65,7 +70,7 @@ public class CommentController {
     }
 
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<Void> delete(
+    public ResponseEntity<Void> deleteComments(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long commentId
     ) {
