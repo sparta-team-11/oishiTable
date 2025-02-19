@@ -5,6 +5,7 @@ import com.sparta.oishitable.domain.customer.reservation.entity.Reservation;
 import com.sparta.oishitable.domain.customer.reservation.entity.ReservationStatus;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static com.sparta.oishitable.domain.customer.reservation.entity.QReservation.reservation;
@@ -15,6 +16,20 @@ public class ReservationRepositoryQuerydslImpl implements ReservationRepositoryQ
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
+    public long countReservedReservationByRestaurantSeatAndDate(Long restaurantSeatId, LocalDateTime date) {
+        return Optional.ofNullable(jpaQueryFactory.select(reservation.count())
+                        .from(reservation)
+                        .where(
+                                reservation.restaurantSeat.id.eq(restaurantSeatId),
+                                reservation.date.eq(date),
+                                reservation.status.eq(ReservationStatus.RESERVED)
+                        )
+                        .fetchOne()
+                )
+                .orElse(0L);
+    }
+
+    @Override
     public Optional<Reservation> findReservedReservationById(Long reservationId) {
         return Optional.ofNullable(
                 jpaQueryFactory.selectFrom(reservation)
@@ -22,6 +37,7 @@ public class ReservationRepositoryQuerydslImpl implements ReservationRepositoryQ
                                 reservation.id.eq(reservationId),
                                 reservation.status.eq(ReservationStatus.RESERVED)
                         )
-                        .fetchOne());
+                        .fetchOne()
+        );
     }
 }

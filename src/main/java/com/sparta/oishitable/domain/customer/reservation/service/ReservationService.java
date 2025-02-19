@@ -38,7 +38,9 @@ public class ReservationService {
         );
 
         //같은 날짜에 같은 좌석에 예약되있는 건 전부를 조회
-        int reservedCount = reservationRepository.countByRestaurantSeatAndDate(restaurantSeat, request.date());
+        long reservedCount = reservationRepository.countReservedReservationByRestaurantSeatAndDate(
+                restaurantSeat.getId(), request.date()
+        );
 
         //가게 좌석의 수량과 비교한 후 자리가 없으면 에외
         if (restaurantSeat.getQuantity() <= reservedCount) {
