@@ -6,7 +6,7 @@ import lombok.Builder;
 
 @Builder(access = AccessLevel.PRIVATE)
 public record NearbyRestaurantResponse(
-        Long id,
+        Long restaurantId,
         String name,
         String address,
         Double latitude,
@@ -16,7 +16,7 @@ public record NearbyRestaurantResponse(
 
     public static NearbyRestaurantResponse from(Restaurant restaurant, Double distance) {
         return NearbyRestaurantResponse.builder()
-                .id(restaurant.getId())
+                .restaurantId(restaurant.getId())
                 .name(restaurant.getName())
                 .address(restaurant.getAddress())
                 .latitude(restaurant.getLatitude())
