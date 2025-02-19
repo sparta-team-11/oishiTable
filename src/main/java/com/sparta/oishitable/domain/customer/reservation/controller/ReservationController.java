@@ -4,13 +4,14 @@ import com.sparta.oishitable.domain.customer.reservation.dto.ReservationCreateRe
 import com.sparta.oishitable.domain.customer.reservation.dto.ReservationFindResponse;
 import com.sparta.oishitable.domain.customer.reservation.service.ReservationService;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
+import com.sparta.oishitable.global.util.UriBuilderUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -24,25 +25,25 @@ public class ReservationController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody @Valid ReservationCreateRequest request
     ) {
-        reservationService.createReservationService(userDetails.getId(), request);
+        Long reservationId = reservationService.createReservation(userDetails.getId(), request);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        URI location = UriBuilderUtil.create("/customer/api/reservations/{reservationId}", reservationId);
+
+        return ResponseEntity.created(location).build();
     }
 
     @GetMapping("/{reservationId}")
     public ResponseEntity<ReservationFindResponse> findReservation(
             @PathVariable Long reservationId
     ) {
-        return new ResponseEntity<>(reservationService.findReservation(reservationId), HttpStatus.OK);
+        return ResponseEntity.ok(reservationService.findReservation(reservationId));
     }
 
     @GetMapping
-    public ResponseEntity<List<ReservationFindResponse>> findAllReservations(
+    public ResponseEntity<List<ReservationFindResponse>> findReservations(
             @RequestParam Long userId
     ) {
-        List<ReservationFindResponse> reservationResponses = reservationService.findAllReservations(userId);
-
-        return new ResponseEntity<>(reservationResponses, HttpStatus.OK);
+        return ResponseEntity.ok(reservationService.findReservations(userId));
     }
 
     @DeleteMapping("/{reservationId}")
@@ -51,7 +52,7 @@ public class ReservationController {
     ) {
         reservationService.deleteReservation(reservationId);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.noContent().build();
     }
 }
 
