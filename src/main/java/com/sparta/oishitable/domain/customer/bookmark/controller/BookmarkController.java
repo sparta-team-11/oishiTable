@@ -2,6 +2,7 @@ package com.sparta.oishitable.domain.customer.bookmark.controller;
 
 import com.sparta.oishitable.domain.customer.bookmark.dto.request.BookmarkCreateRequest;
 import com.sparta.oishitable.domain.customer.bookmark.dto.request.BookmarkDeleteRequest;
+import com.sparta.oishitable.domain.customer.bookmark.dto.request.BookmarkUpdateRequest;
 import com.sparta.oishitable.domain.customer.bookmark.dto.response.BookmarksFindResponse;
 import com.sparta.oishitable.domain.customer.bookmark.service.BookmarkService;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
@@ -36,19 +37,30 @@ public class BookmarkController {
 
     @GetMapping
     public ResponseEntity<BookmarksFindResponse> findBookmarks(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         BookmarksFindResponse body = bookmarkService.findBookmarks(userDetails.getId(), page, size);
 
         return ResponseEntity.ok(body);
     }
 
+    @PatchMapping("/{bookmarkId}")
+    public ResponseEntity<Void> updateBookmark(
+            @PathVariable Long bookmarkId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody BookmarkUpdateRequest bookmarkUpdateRequest
+    ) {
+        bookmarkService.updateBookmarkMemo(userDetails.getId(), bookmarkId, bookmarkUpdateRequest);
+
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/{bookmarkId}")
     public ResponseEntity<Void> deleteBookmark(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @PathVariable Long bookmarkId
+            @PathVariable Long bookmarkId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         bookmarkService.deleteBookmark(userDetails.getId(), bookmarkId);
 

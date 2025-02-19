@@ -2,6 +2,7 @@ package com.sparta.oishitable.domain.customer.bookmark.service;
 
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
+import com.sparta.oishitable.domain.customer.bookmark.dto.request.BookmarkUpdateRequest;
 import com.sparta.oishitable.domain.customer.bookmark.dto.response.BookmarkDetails;
 import com.sparta.oishitable.domain.customer.bookmark.dto.response.BookmarksFindResponse;
 import com.sparta.oishitable.domain.customer.bookmark.entity.Bookmark;
@@ -28,6 +29,7 @@ public class BookmarkService {
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public void createBookmark(Long userId, Long restaurantId) {
         if (bookmarkRepository.existsByUserIdAndRestaurantId(userId, restaurantId)) {
             throw new ConflictException(ErrorCode.BOOKMARK_ALREADY_EXISTS_RESTAURANT);
@@ -57,14 +59,25 @@ public class BookmarkService {
     }
 
     @Transactional
+    public void updateBookmarkMemo(Long userId, Long bookmarkId, BookmarkUpdateRequest bookmarkUpdateRequest) {
+        Bookmark bookmark = findById(bookmarkId);
+        checkUserAuthority(userId, bookmark);
+
+        bookmark.updateMemo(bookmarkUpdateRequest.updateMemo());
+    }
+
+    @Transactional
     public void deleteBookmark(Long userId, Long bookmarkId) {
         Bookmark bookmark = findById(bookmarkId);
+        checkUserAuthority(userId, bookmark);
 
+        bookmarkRepository.delete(bookmark);
+    }
+
+    private static void checkUserAuthority(Long userId, Bookmark bookmark) {
         if (!bookmark.getUser().getId().equals(userId)) {
             throw new ForbiddenException(ErrorCode.USER_UNAUTHORIZED);
         }
-
-        bookmarkRepository.delete(bookmark);
     }
 
     @Transactional

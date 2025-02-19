@@ -42,4 +42,8 @@ public class Bookmark {
         this.user = user;
         this.restaurant = restaurant;
     }
+
+    public void updateMemo(String updateMemo) {
+        this.memo = updateMemo;
+    }
 }
