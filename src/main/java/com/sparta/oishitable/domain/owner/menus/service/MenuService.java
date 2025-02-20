@@ -2,6 +2,7 @@ package com.sparta.oishitable.domain.owner.menus.service;
 
 import com.sparta.oishitable.domain.auth.service.AuthService;
 import com.sparta.oishitable.domain.owner.menus.dto.request.MenuCreateRequest;
+import com.sparta.oishitable.domain.owner.menus.dto.response.MenuFindResponse;
 import com.sparta.oishitable.domain.owner.menus.entity.Menu;
 import com.sparta.oishitable.domain.owner.menus.repository.MenuRepository;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
@@ -14,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MenuService {
 
@@ -22,6 +22,7 @@ public class MenuService {
     private final OwnerRestaurantService restaurantService;
     private final MenuRepository menuRepository;
 
+    @Transactional
     public void createMenu(Long userId, Long restaurantId, List<@Valid MenuCreateRequest> request) {
         Restaurant restaurant = restaurantService.findById(restaurantId);
 
@@ -32,5 +33,11 @@ public class MenuService {
                 .toList();
 
         menuRepository.saveAll(menus);
+    }
+
+    public MenuFindResponse findMenus(Long restaurantId) {
+        List<Menu> menus = menuRepository.findAllByRestaurantId(restaurantId);
+
+        return MenuFindResponse.from(menus);
     }
 }
