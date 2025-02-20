@@ -18,6 +18,7 @@ public class NotificationScheduler {
     private final NotificationRepository notificationRepository;
     private final NotificationService notificationService;
 
+    // 5분마다 현재 시간이 전송해야하는 시간을 지난 것들 메일 보내기
     @Scheduled(cron = "0 */5 * * * ?")
     public void processDueNotifications() {
         LocalDateTime now = LocalDateTime.now();
