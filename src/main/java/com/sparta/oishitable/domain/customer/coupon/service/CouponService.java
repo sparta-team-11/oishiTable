@@ -117,7 +117,13 @@ public class CouponService {
     public CouponResponse findUserCoupon(Long userId, Long couponId) {
         UserCoupon userCoupon = userCouponRepository.findByUserIdAndCouponId(userId, couponId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.COUPON_NOT_FOUND));
-        userCoupon.getCoupon().setCouponUsed(true);
+
+        Coupon coupon = userCoupon.getCoupon();
+
+        coupon.setCouponUsed(true);
+
+        couponRepository.save(coupon);
+
         return CouponResponse.from(userCoupon.getCoupon());
 
     }
