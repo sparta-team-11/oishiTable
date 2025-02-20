@@ -11,15 +11,15 @@ public class BookmarkDetails {
     private final String bookmarkMemo;
     private final String restaurantName;
     private final String restaurantIntroduction;
-    private final String restaurantLocation;
+    private final String restaurantAddress;
 
     @QueryProjection
-    public BookmarkDetails(Long bookmarkId, Long restaurantId, String bookmarkMemo, String restaurantName, String restaurantIntroduction, String restaurantLocation) {
+    public BookmarkDetails(Long bookmarkId, Long restaurantId, String bookmarkMemo, String restaurantName, String restaurantIntroduction, String restaurantAddress) {
         this.bookmarkId = bookmarkId;
         this.restaurantId = restaurantId;
         this.bookmarkMemo = bookmarkMemo;
         this.restaurantName = restaurantName;
         this.restaurantIntroduction = restaurantIntroduction;
-        this.restaurantLocation = restaurantLocation;
+        this.restaurantAddress = restaurantAddress;
     }
 }

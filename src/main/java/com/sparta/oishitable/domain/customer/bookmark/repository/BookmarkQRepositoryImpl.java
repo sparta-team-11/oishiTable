@@ -57,15 +57,14 @@ public class BookmarkQRepositoryImpl implements BookmarkQRepository {
     @Override
     public Page<BookmarkDetails> findBookmarkDetailsPaginationByUserId(Long userId, Pageable pageable) {
         List<BookmarkDetails> records = queryFactory
-                .select(
-                        new QBookmarkDetails(
-                                bookmark.id,
-                                bookmark.restaurant.id,
-                                bookmark.memo,
-                                restaurant.name,
-                                restaurant.introduce,
-                                restaurant.location
-                        ))
+                .select(new QBookmarkDetails(
+                        bookmark.id,
+                        bookmark.restaurant.id,
+                        bookmark.memo,
+                        restaurant.name,
+                        restaurant.introduce,
+                        restaurant.address
+                ))
                 .from(bookmark)
                 .innerJoin(bookmark.restaurant, restaurant)
                 .where(bookmark.user.id.eq(userId))

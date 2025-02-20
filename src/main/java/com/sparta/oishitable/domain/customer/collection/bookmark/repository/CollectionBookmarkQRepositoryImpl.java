@@ -54,7 +54,7 @@ public class CollectionBookmarkQRepositoryImpl implements CollectionBookmarkQRep
                         bookmark.memo,
                         restaurant.name,
                         restaurant.introduce,
-                        restaurant.location
+                        restaurant.address
                 ))
                 .from(collectionBookmark)
                 .innerJoin(collectionBookmark.bookmark, bookmark)
