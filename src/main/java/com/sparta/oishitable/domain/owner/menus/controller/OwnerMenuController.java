@@ -1,6 +1,7 @@
 package com.sparta.oishitable.domain.owner.menus.controller;
 
 import com.sparta.oishitable.domain.owner.menus.dto.request.MenuCreateRequest;
+import com.sparta.oishitable.domain.owner.menus.dto.request.MenuUpdateRequest;
 import com.sparta.oishitable.domain.owner.menus.service.MenuService;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import com.sparta.oishitable.global.util.UriBuilderUtil;
@@ -31,5 +32,17 @@ public class OwnerMenuController {
         URI location = UriBuilderUtil.create("/owner/api/restaurants/{restaurantId}", restaurantId);
 
         return ResponseEntity.created(location).build();
+    }
+
+    @PatchMapping("/{menuId}")
+    public ResponseEntity<Void> updateMenu(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long restaurantId,
+            @PathVariable Long menuId,
+            @RequestBody @Valid MenuUpdateRequest request
+    ) {
+        menuService.updateMenu(userDetails.getId(), restaurantId, menuId, request);
+
+        return ResponseEntity.ok().build();
     }
 }

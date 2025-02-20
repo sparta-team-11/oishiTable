@@ -2,6 +2,7 @@ package com.sparta.oishitable.domain.owner.menus.dto.request;
 
 import com.sparta.oishitable.domain.owner.menus.entity.Menu;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -11,6 +12,7 @@ public record MenuCreateRequest(
         String menuName,
 
         @NotNull
+        @Min(0)
         Integer menuPrice,
 
         @Size(max = 100)

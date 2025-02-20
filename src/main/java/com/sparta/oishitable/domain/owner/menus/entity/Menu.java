@@ -43,4 +43,32 @@ public class Menu {
         this.description = description;
         this.restaurant = restaurant;
     }
+
+    public void update(
+            String name,
+            Integer price,
+            String description
+    ) {
+        updateName(name);
+        updatePrice(price);
+        updateDescription(description);
+    }
+
+    private void updateName(String name) {
+        if (name != null) {
+            this.name = name;
+        }
+    }
+
+    private void updatePrice(Integer price) {
+        if (price != null) {
+            this.price = price;
+        }
+    }
+
+    private void updateDescription(String description) {
+        if (description != null) {
+            this.description = description;
+        }
+    }
 }

@@ -2,6 +2,7 @@ package com.sparta.oishitable.domain.owner.menus.service;
 
 import com.sparta.oishitable.domain.auth.service.AuthService;
 import com.sparta.oishitable.domain.owner.menus.dto.request.MenuCreateRequest;
+import com.sparta.oishitable.domain.owner.menus.dto.request.MenuUpdateRequest;
 import com.sparta.oishitable.domain.owner.menus.dto.response.MenuDetailResponse;
 import com.sparta.oishitable.domain.owner.menus.dto.response.MenuFindResponse;
 import com.sparta.oishitable.domain.owner.menus.entity.Menu;
@@ -49,6 +50,16 @@ public class MenuService {
 
         return MenuDetailResponse.from(menu);
     }
+
+    @Transactional
+    public void updateMenu(Long userId, Long restaurantId, Long menuId, MenuUpdateRequest request) {
+        Menu menu = findMenuByRestaurantIdAndId(restaurantId, menuId);
+
+        authService.checkAuthenticationUser(menu.getRestaurant().getOwner().getId(), userId);
+
+        menu.update(request.menuName(), menu.getPrice(), menu.getDescription());
+    }
+
 
     private Menu findMenuByRestaurantIdAndId(Long restaurantId, Long menuId) {
         return menuRepository.findByRestaurantIdAndId(restaurantId, menuId)
