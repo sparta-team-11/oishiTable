@@ -45,5 +45,9 @@ public class Coupon {
         this.restaurant = restaurant;
     }
 
+    public void setCouponUsed(Boolean couponUsed){
+        this.couponUsed = couponUsed;
+    }
+
 
 }

@@ -22,4 +22,12 @@ public class UserCouponController {
     public ResponseEntity<List<CouponResponse>> findUserCoupons(@PathVariable Long userId) {
         return ResponseEntity.ok(couponService.findUserCoupons(userId));
     }
+
+    @GetMapping("/{couponId}")
+    public ResponseEntity<CouponResponse> findUserCoupon(
+            @PathVariable Long userId,
+            @PathVariable Long couponId
+            ) {
+        return ResponseEntity.ok(couponService.findUserCoupon(userId, couponId));
+    }
 }

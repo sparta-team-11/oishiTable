@@ -16,29 +16,23 @@ public record CouponResponse(
         @NotNull
         Long restaurantId
 
-//        @NotNull
-//        Long userId
 ) {
 
-        public static CouponResponse from(Coupon coupon)
-        {
-                return new CouponResponse(
-                        coupon.getId(),
-                        coupon.getDiscount(),
-                        coupon.getCouponUsed(),
-                        coupon.getRestaurant().getId()
-//                        coupon.getUser() != null ? coupon.getUser().getId() : null
-//                        null
-                );
-        }
+    public static CouponResponse from(Coupon coupon) {
+        return new CouponResponse(
+                coupon.getId(),
+                coupon.getDiscount(),
+                coupon.getCouponUsed(),
+                coupon.getRestaurant().getId()
+        );
+    }
 
-        public static CouponResponse from(Coupon coupon, Long userId) {
-                return new CouponResponse(
-                        coupon.getId(),
-                        coupon.getDiscount(),
-                        coupon.getCouponUsed(),
-                        coupon.getRestaurant().getId()
-//                        userId // userId는 이제 인자로 받아 처리
-                );
-        }
+    public static CouponResponse from(Coupon coupon, Long userId) {
+        return new CouponResponse(
+                coupon.getId(),
+                coupon.getDiscount(),
+                coupon.getCouponUsed(),
+                coupon.getRestaurant().getId()
+        );
+    }
 }

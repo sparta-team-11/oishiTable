@@ -1,6 +1,7 @@
 package com.sparta.oishitable.domain.customer.coupon.controller;
 
 //import com.sparta.oishitable.domain.customer.coupon.dto.CouponAssignRequest;
+
 import com.sparta.oishitable.domain.customer.coupon.dto.CouponCreateRequest;
 import com.sparta.oishitable.domain.customer.coupon.dto.CouponResponse;
 import com.sparta.oishitable.domain.customer.coupon.service.CouponService;
@@ -38,16 +39,6 @@ public class OwnerCouponController {
     public ResponseEntity<List<CouponResponse>> findCoupons(@PathVariable Long restaurantId) {
         return ResponseEntity.ok(couponService.findCoupons(restaurantId));
     }
-
-//    @PostMapping("/{couponId}/assign")
-//    public ResponseEntity<CouponResponse> assignCoupon(
-//            @PathVariable Long restaurantId,
-//            @PathVariable Long couponId,
-//            @RequestBody CouponAssignRequest request,
-//            @AuthenticationPrincipal CustomUserDetails userDetails
-//    ) {
-//        return ResponseEntity.ok(couponService.assignCoupon(userDetails.getId(), request));
-//    }
 
     @DeleteMapping("/{couponId}")
     public ResponseEntity<Void> deleteCoupon(

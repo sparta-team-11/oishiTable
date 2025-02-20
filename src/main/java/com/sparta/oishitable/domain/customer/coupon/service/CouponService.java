@@ -2,7 +2,6 @@ package com.sparta.oishitable.domain.customer.coupon.service;
 
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
-//import com.sparta.oishitable.domain.customer.coupon.dto.CouponAssignRequest;
 import com.sparta.oishitable.domain.customer.coupon.dto.CouponCreateRequest;
 import com.sparta.oishitable.domain.customer.coupon.dto.CouponResponse;
 import com.sparta.oishitable.domain.customer.coupon.entity.Coupon;
@@ -13,9 +12,7 @@ import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.repository.RestaurantRepository;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.NotFoundException;
-import com.sparta.oishitable.global.exception.UnauthorizedException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
-import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -116,4 +113,13 @@ public class CouponService {
                 .map(userCoupon -> CouponResponse.from(userCoupon.getCoupon()))
                 .collect(Collectors.toList());
     }
+
+    public CouponResponse findUserCoupon(Long userId, Long couponId) {
+        UserCoupon userCoupon = userCouponRepository.findByUserIdAndCouponId(userId, couponId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.COUPON_NOT_FOUND));
+        userCoupon.getCoupon().setCouponUsed(true);
+        return CouponResponse.from(userCoupon.getCoupon());
+
+    }
+
 }
