@@ -8,6 +8,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "Coupons")
@@ -28,26 +31,19 @@ public class Coupon {
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
-    @ManyToOne
-    @JoinColumn(name =  "user_id", nullable = false)
-    private User user;
-
+    @OneToMany(mappedBy = "coupon", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserCoupon> userCoupons = new ArrayList<>();
 
     @Builder
     public Coupon(
             Integer discount,
             Boolean couponUsed,
-            Restaurant restaurant,
-            User user
+            Restaurant restaurant
     ) {
         this.discount = discount;
         this.couponUsed = couponUsed;
         this.restaurant = restaurant;
-        this.user = user;
     }
 
-    public void assignUser(User user) {
-        this.user = user;
-    }
 
 }

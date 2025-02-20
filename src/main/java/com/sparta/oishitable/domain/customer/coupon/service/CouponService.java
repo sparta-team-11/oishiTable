@@ -2,11 +2,13 @@ package com.sparta.oishitable.domain.customer.coupon.service;
 
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
-import com.sparta.oishitable.domain.customer.coupon.dto.CouponAssignRequest;
+//import com.sparta.oishitable.domain.customer.coupon.dto.CouponAssignRequest;
 import com.sparta.oishitable.domain.customer.coupon.dto.CouponCreateRequest;
 import com.sparta.oishitable.domain.customer.coupon.dto.CouponResponse;
 import com.sparta.oishitable.domain.customer.coupon.entity.Coupon;
+import com.sparta.oishitable.domain.customer.coupon.entity.UserCoupon;
 import com.sparta.oishitable.domain.customer.coupon.repository.CouponRepository;
+import com.sparta.oishitable.domain.customer.coupon.repository.UserCouponRepository;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.repository.RestaurantRepository;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
@@ -28,6 +30,7 @@ public class CouponService {
     private final CouponRepository couponRepository;
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
+    private final UserCouponRepository userCouponRepository;
 
     @Transactional
     public CouponResponse createCoupon(
@@ -43,7 +46,7 @@ public class CouponService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.RESTAURANT_NOT_FOUND));
 
         // 인증된 사용자 ID와 요청된 userId가 동일한지 확인
-        if (!userId.equals(request.restaurantId())) {
+        if (!userId.equals(request.userId())) {
             throw new CustomRuntimeException(ErrorCode.AUTHORIZATION_EXCEPTION);
         }
 
@@ -51,10 +54,17 @@ public class CouponService {
                 .discount(request.discount())
                 .couponUsed(false)
                 .restaurant(restaurant)
-                .user(user)
+//                .user(user)
                 .build();
 
         Coupon savedCoupon = couponRepository.save(createCoupon);
+
+        UserCoupon userCoupon = UserCoupon.builder()
+                .user(user)
+                .coupon(savedCoupon)
+                .build();
+
+        userCouponRepository.save(userCoupon);
 
         return CouponResponse.from(savedCoupon);
 
@@ -67,7 +77,7 @@ public class CouponService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
+/*    @Transactional
     public CouponResponse assignCoupon(
             Long userId,
             CouponAssignRequest request
@@ -88,7 +98,7 @@ public class CouponService {
 
         return CouponResponse.from(coupon);
 
-    }
+    }*/
 
     @Transactional
     public void deleteCoupon(
@@ -101,9 +111,9 @@ public class CouponService {
     }
 
     public List<CouponResponse> findUserCoupons(Long userId) {
-        List<Coupon> coupons = couponRepository.findByUserId(userId);
-        return coupons.stream()
-                .map(CouponResponse::from)
+        List<UserCoupon> usercoupons = userCouponRepository.findByUserId(userId);
+        return usercoupons.stream()
+                .map(userCoupon -> CouponResponse.from(userCoupon.getCoupon()))
                 .collect(Collectors.toList());
     }
 }

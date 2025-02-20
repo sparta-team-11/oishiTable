@@ -14,19 +14,31 @@ public record CouponResponse(
         Boolean couponUsed,
 
         @NotNull
-        Long restaurantId,
+        Long restaurantId
 
-        @NotNull
-        Long userId
+//        @NotNull
+//        Long userId
 ) {
 
-        public static CouponResponse from(Coupon coupon) {
+        public static CouponResponse from(Coupon coupon)
+        {
                 return new CouponResponse(
                         coupon.getId(),
                         coupon.getDiscount(),
                         coupon.getCouponUsed(),
-                        coupon.getRestaurant().getId(),
-                        coupon.getUser() != null ? coupon.getUser().getId() : null
+                        coupon.getRestaurant().getId()
+//                        coupon.getUser() != null ? coupon.getUser().getId() : null
+//                        null
+                );
+        }
+
+        public static CouponResponse from(Coupon coupon, Long userId) {
+                return new CouponResponse(
+                        coupon.getId(),
+                        coupon.getDiscount(),
+                        coupon.getCouponUsed(),
+                        coupon.getRestaurant().getId()
+//                        userId // userId는 이제 인자로 받아 처리
                 );
         }
 }

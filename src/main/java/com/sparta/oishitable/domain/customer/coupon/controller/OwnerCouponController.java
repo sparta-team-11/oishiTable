@@ -1,6 +1,6 @@
 package com.sparta.oishitable.domain.customer.coupon.controller;
 
-import com.sparta.oishitable.domain.customer.coupon.dto.CouponAssignRequest;
+//import com.sparta.oishitable.domain.customer.coupon.dto.CouponAssignRequest;
 import com.sparta.oishitable.domain.customer.coupon.dto.CouponCreateRequest;
 import com.sparta.oishitable.domain.customer.coupon.dto.CouponResponse;
 import com.sparta.oishitable.domain.customer.coupon.service.CouponService;
@@ -28,7 +28,7 @@ public class OwnerCouponController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
 
-        CouponResponse response = couponService.createCoupon(userDetails.getId(),restaurantId, request);
+        CouponResponse response = couponService.createCoupon(userDetails.getId(), restaurantId, request);
         URI location = UriBuilderUtil.create("/owner/api/restaurants/{restaurantId}", response.restaurantId());
 
         return ResponseEntity.created(location).body(response);
@@ -39,15 +39,15 @@ public class OwnerCouponController {
         return ResponseEntity.ok(couponService.findCoupons(restaurantId));
     }
 
-    @PostMapping("/{couponId}/assign")
-    public ResponseEntity<CouponResponse> assignCoupon(
-            @PathVariable Long restaurantId,
-            @PathVariable Long couponId,
-            @RequestBody CouponAssignRequest request,
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ) {
-        return ResponseEntity.ok(couponService.assignCoupon(userDetails.getId(),request));
-    }
+//    @PostMapping("/{couponId}/assign")
+//    public ResponseEntity<CouponResponse> assignCoupon(
+//            @PathVariable Long restaurantId,
+//            @PathVariable Long couponId,
+//            @RequestBody CouponAssignRequest request,
+//            @AuthenticationPrincipal CustomUserDetails userDetails
+//    ) {
+//        return ResponseEntity.ok(couponService.assignCoupon(userDetails.getId(), request));
+//    }
 
     @DeleteMapping("/{couponId}")
     public ResponseEntity<Void> deleteCoupon(
@@ -57,12 +57,5 @@ public class OwnerCouponController {
         couponService.deleteCoupon(couponId);
         return ResponseEntity.noContent().build();
     }
-
-    //    @GetMapping("/{userId}")
-//    public ResponseEntity<List<CouponResponse>> findUserCoupons(@PathVariable Long userId) {
-//        return ResponseEntity.ok(couponService.findUserCoupons(userId));
-//    }
-    // 이 부분은 /api/owner/restaurants 이 경로에 맞지 않다고 생각했습니다 유저가 정보를 얻어와야 하니까
-
 
 }
