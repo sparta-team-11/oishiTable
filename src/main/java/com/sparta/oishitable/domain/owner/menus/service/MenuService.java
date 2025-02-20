@@ -39,12 +39,14 @@ public class MenuService {
         menuRepository.saveAll(menus);
     }
 
+    @Transactional(readOnly = true)
     public MenuFindResponse findMenus(Long restaurantId) {
         List<Menu> menus = menuRepository.findAllByRestaurantId(restaurantId);
 
         return MenuFindResponse.from(menus);
     }
 
+    @Transactional(readOnly = true)
     public MenuDetailResponse findMenu(Long restaurantId, Long menuId) {
         Menu menu = findMenuByRestaurantIdAndId(restaurantId, menuId);
 
@@ -60,6 +62,14 @@ public class MenuService {
         menu.update(request.menuName(), menu.getPrice(), menu.getDescription());
     }
 
+    @Transactional
+    public void deleteMenu(Long userId, Long restaurantId, Long menuId) {
+        Menu menu = findMenuByRestaurantIdAndId(restaurantId, menuId);
+
+        authService.checkAuthenticationUser(menu.getRestaurant().getOwner().getId(), userId);
+
+        menuRepository.delete(menu);
+    }
 
     private Menu findMenuByRestaurantIdAndId(Long restaurantId, Long menuId) {
         return menuRepository.findByRestaurantIdAndId(restaurantId, menuId)

@@ -45,4 +45,15 @@ public class OwnerMenuController {
 
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/{menuId}")
+    public ResponseEntity<Void> deleteMenu(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long restaurantId,
+            @PathVariable Long menuId
+    ) {
+        menuService.deleteMenu(userDetails.getId(), restaurantId, menuId);
+
+        return ResponseEntity.noContent().build();
+    }
 }
