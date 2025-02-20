@@ -11,6 +11,7 @@ import java.util.List;
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
 
+    // 알림 미전송 된 것 중 보내야 하는 알림 조회
     @Query("SELECT n FROM Notification n WHERE n.isSent = false AND n.scheduledTime <= :currentTime")
     List<Notification> findDueNotifications(@Param("currentTime") LocalDateTime currentTime);
 }
