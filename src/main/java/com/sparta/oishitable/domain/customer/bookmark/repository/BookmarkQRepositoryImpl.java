@@ -1,5 +1,6 @@
 package com.sparta.oishitable.domain.customer.bookmark.repository;
 
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.oishitable.domain.customer.bookmark.dto.response.BookmarkDetails;
 import com.sparta.oishitable.domain.customer.bookmark.dto.response.QBookmarkDetails;
@@ -72,12 +73,11 @@ public class BookmarkQRepositoryImpl implements BookmarkQRepository {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        Long count = queryFactory
+        JPAQuery<Long> count = queryFactory
                 .select(bookmark.count())
                 .from(bookmark)
-                .where(bookmark.user.id.eq(userId))
-                .fetchOne();
+                .where(bookmark.user.id.eq(userId));
 
-        return PageableExecutionUtils.getPage(records, pageable, () -> count);
+        return PageableExecutionUtils.getPage(records, pageable, count::fetchOne);
     }
 }

@@ -1,7 +1,7 @@
 package com.sparta.oishitable.domain.customer.collection.bookmark.controller;
 
-import com.sparta.oishitable.domain.customer.collection.bookmark.dto.request.CollectionBookmarkCreateRequest;
 import com.sparta.oishitable.domain.customer.collection.bookmark.dto.request.CollectionBookmarksCreateRequest;
+import com.sparta.oishitable.domain.customer.collection.bookmark.dto.response.CollectionBookmarksFindResponse;
 import com.sparta.oishitable.domain.customer.collection.bookmark.service.CollectionBookmarkService;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import com.sparta.oishitable.global.util.UriBuilderUtil;
@@ -31,6 +31,18 @@ public class CollectionBookmarkController {
         URI location = UriBuilderUtil.create("/api/customer/collections/{collectionId}", collectionId);
 
         return ResponseEntity.created(location).build();
+    }
+
+    @GetMapping
+    public ResponseEntity<CollectionBookmarksFindResponse> findBookmarks(
+            @PathVariable Long collectionId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        CollectionBookmarksFindResponse body
+                = collectionBookmarkService.findCollectionBookmarks(collectionId, page, size);
+
+        return ResponseEntity.ok(body);
     }
 
     @DeleteMapping("/{collectionBookmarkId}")

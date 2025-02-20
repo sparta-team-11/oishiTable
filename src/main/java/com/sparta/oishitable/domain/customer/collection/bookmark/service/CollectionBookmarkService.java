@@ -1,9 +1,11 @@
 package com.sparta.oishitable.domain.customer.collection.bookmark.service;
 
+import com.sparta.oishitable.domain.customer.bookmark.dto.response.BookmarkDetails;
 import com.sparta.oishitable.domain.customer.bookmark.entity.Bookmark;
 import com.sparta.oishitable.domain.customer.bookmark.repository.BookmarkRepository;
 import com.sparta.oishitable.domain.customer.collection.bookmark.dto.request.CollectionBookmarkCreateRequest;
 import com.sparta.oishitable.domain.customer.collection.bookmark.dto.request.CollectionBookmarksCreateRequest;
+import com.sparta.oishitable.domain.customer.collection.bookmark.dto.response.CollectionBookmarksFindResponse;
 import com.sparta.oishitable.domain.customer.collection.bookmark.entity.CollectionBookmark;
 import com.sparta.oishitable.domain.customer.collection.bookmark.repository.CollectionBookmarkRepository;
 import com.sparta.oishitable.domain.customer.collection.entity.Collection;
@@ -14,6 +16,9 @@ import com.sparta.oishitable.global.exception.ForbiddenException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +38,8 @@ public class CollectionBookmarkService {
     @Transactional
     public void createCollectionBookmarks(
             Long userId,
-            Long collectionId, CollectionBookmarksCreateRequest collectionBookmarkCreateRequest
+            Long collectionId,
+            CollectionBookmarksCreateRequest collectionBookmarkCreateRequest
     ) {
         List<Long> bookmarkIds = collectionBookmarkCreateRequest.bookmarks().stream()
                 .map(CollectionBookmarkCreateRequest::bookmarkId)
@@ -69,6 +75,15 @@ public class CollectionBookmarkService {
                 .toList();
 
         collectionBookmarkRepository.saveAll(collectionBookmarks);
+    }
+
+    public CollectionBookmarksFindResponse findCollectionBookmarks(Long collectionId, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        Page<BookmarkDetails> bookmarkDetails
+                = collectionBookmarkRepository.findBookmarkDetailsPaginationByCollectionId(collectionId, pageable);
+
+        return CollectionBookmarksFindResponse.from(bookmarkDetails);
     }
 
     @Transactional
