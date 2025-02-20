@@ -24,7 +24,7 @@ public class Menu {
     @Column(nullable = false)
     private Integer price;
 
-    @Column(nullable = false)
+    @Column(length = 100)
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,13 +33,11 @@ public class Menu {
 
     @Builder
     public Menu(
-            Long id,
             String name,
             Integer price,
             String description,
             Restaurant restaurant
     ) {
-        this.id = id;
         this.name = name;
         this.price = price;
         this.description = description;
