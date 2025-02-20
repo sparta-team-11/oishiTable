@@ -27,6 +27,9 @@ public class Notification extends BaseEntity {
     @Column(nullable = false)
     private String message;
 
+    private String email;
+
+    // 알림 보내야할 시간
     @Column(nullable = false)
     private LocalDateTime scheduledTime;
 
@@ -34,9 +37,10 @@ public class Notification extends BaseEntity {
     private boolean isSent;
 
     @Builder
-    public Notification(Long userId, String message, LocalDateTime scheduledTime) {
+    public Notification(Long userId, String message, String email, LocalDateTime scheduledTime) {
         this.userId = userId;
         this.message = message;
+        this.email = email;
         this.scheduledTime = scheduledTime;
     }
 
