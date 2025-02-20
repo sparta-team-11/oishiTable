@@ -1,5 +1,6 @@
 package com.sparta.oishitable.domain.owner.menus.controller;
 
+import com.sparta.oishitable.domain.owner.menus.dto.response.MenuDetailResponse;
 import com.sparta.oishitable.domain.owner.menus.dto.response.MenuFindResponse;
 import com.sparta.oishitable.domain.owner.menus.service.MenuService;
 import lombok.RequiredArgsConstructor;
@@ -21,5 +22,13 @@ public class MenuController {
             @PathVariable Long restaurantId
     ) {
         return ResponseEntity.ok(menuService.findMenus(restaurantId));
+    }
+
+    @GetMapping("/{menuId}")
+    public ResponseEntity<MenuDetailResponse> findMenu(
+            @PathVariable Long restaurantId,
+            @PathVariable Long menuId
+    ) {
+        return ResponseEntity.ok(menuService.findMenu(restaurantId, menuId));
     }
 }

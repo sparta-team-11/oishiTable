@@ -2,11 +2,14 @@ package com.sparta.oishitable.domain.owner.menus.service;
 
 import com.sparta.oishitable.domain.auth.service.AuthService;
 import com.sparta.oishitable.domain.owner.menus.dto.request.MenuCreateRequest;
+import com.sparta.oishitable.domain.owner.menus.dto.response.MenuDetailResponse;
 import com.sparta.oishitable.domain.owner.menus.dto.response.MenuFindResponse;
 import com.sparta.oishitable.domain.owner.menus.entity.Menu;
 import com.sparta.oishitable.domain.owner.menus.repository.MenuRepository;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.service.OwnerRestaurantService;
+import com.sparta.oishitable.global.exception.NotFoundException;
+import com.sparta.oishitable.global.exception.error.ErrorCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -39,5 +42,16 @@ public class MenuService {
         List<Menu> menus = menuRepository.findAllByRestaurantId(restaurantId);
 
         return MenuFindResponse.from(menus);
+    }
+
+    public MenuDetailResponse findMenu(Long restaurantId, Long menuId) {
+        Menu menu = findMenuByRestaurantIdAndId(restaurantId, menuId);
+
+        return MenuDetailResponse.from(menu);
+    }
+
+    private Menu findMenuByRestaurantIdAndId(Long restaurantId, Long menuId) {
+        return menuRepository.findByRestaurantIdAndId(restaurantId, menuId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MENU_NOT_FOUND));
     }
 }
