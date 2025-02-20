@@ -19,13 +19,15 @@ public class NotificationService {
 
         SimpleMailMessage message = new SimpleMailMessage();
 
+        // 메일 발신자, 수신자, 제목 , 내용 설정
         message.setFrom(SENDER);
-        message.setTo("gkdl4239@gmail.com"); // 실제 환경에서는 사용자 이메일 주소로 대체
+        message.setTo(notification.getEmail());
         message.setSubject("오이시 테이블 예약 알림");
         message.setText(notification.getMessage());
         mailSender.send(message);
 
         notification.updateSent();
+        // 영속성 컨텍스트에 관리 안되므로 save 로 변경사항 저장
         notificationRepository.save(notification);
     }
 }
