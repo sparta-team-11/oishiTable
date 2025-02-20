@@ -7,6 +7,8 @@ import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import com.sparta.oishitable.global.util.UriBuilderUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -36,12 +38,11 @@ public class CollectionBookmarkController {
     @GetMapping
     public ResponseEntity<CollectionBookmarksFindResponse> findBookmarks(
             @PathVariable Long collectionId,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @PageableDefault Pageable pageable,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         CollectionBookmarksFindResponse body
-                = collectionBookmarkService.findCollectionBookmarks(userDetails.getId(), collectionId, page, size);
+                = collectionBookmarkService.findCollectionBookmarks(userDetails.getId(), collectionId, pageable);
 
         return ResponseEntity.ok(body);
     }

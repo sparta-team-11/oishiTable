@@ -74,14 +74,12 @@ public class CollectionBookmarkService {
         collectionBookmarkRepository.saveAll(collectionBookmarks);
     }
 
-    public CollectionBookmarksFindResponse findCollectionBookmarks(Long userId, Long collectionId, int page, int size) {
+    public CollectionBookmarksFindResponse findCollectionBookmarks(Long userId, Long collectionId, Pageable pageable) {
         Collection collection = findCollectionById(collectionId);
 
         if (!collection.isPublic()) {
             checkUserAuthority(collection.getUser().getId(), userId);
         }
-
-        Pageable pageable = PageRequest.of(page - 1, size);
 
         Page<BookmarkDetails> bookmarkDetails
                 = collectionBookmarkRepository.findBookmarkDetailsPaginationByCollectionId(collectionId, pageable);

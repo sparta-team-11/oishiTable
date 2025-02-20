@@ -49,9 +49,7 @@ public class BookmarkService {
         bookmarkRepository.save(bookmark);
     }
 
-    public BookmarksFindResponse findBookmarks(Long userId, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
-
+    public BookmarksFindResponse findBookmarks(Long userId, Pageable pageable) {
         Page<BookmarkDetails> bookmarkDetails
                 = bookmarkRepository.findBookmarkDetailsPaginationByUserId(userId, pageable);
 
