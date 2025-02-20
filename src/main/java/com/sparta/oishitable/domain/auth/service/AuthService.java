@@ -90,7 +90,7 @@ public class AuthService {
         return AuthLoginResponse.of(newAccessToken, newRefreshToken);
     }
 
-    public void checkAuthenticationUser(Long userId, Long loginUserId) {
+    public void checkUserAuthority(Long userId, Long loginUserId) {
         if (!userId.equals(loginUserId)) {
             throw new ForbiddenException(ErrorCode.USER_UNAUTHORIZED);
         }
