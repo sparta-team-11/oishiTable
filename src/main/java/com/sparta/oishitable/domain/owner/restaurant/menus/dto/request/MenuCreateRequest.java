@@ -1,6 +1,6 @@
-package com.sparta.oishitable.domain.owner.menus.dto.request;
+package com.sparta.oishitable.domain.owner.restaurant.menus.dto.request;
 
-import com.sparta.oishitable.domain.owner.menus.entity.Menu;
+import com.sparta.oishitable.domain.owner.restaurant.menus.entity.Menu;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

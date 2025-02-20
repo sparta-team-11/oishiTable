@@ -1,4 +1,4 @@
-package com.sparta.oishitable.domain.owner.menus.entity;
+package com.sparta.oishitable.domain.owner.restaurant.menus.entity;
 
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import jakarta.persistence.*;

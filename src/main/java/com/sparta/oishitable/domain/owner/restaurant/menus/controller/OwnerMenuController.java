@@ -1,8 +1,8 @@
-package com.sparta.oishitable.domain.owner.menus.controller;
+package com.sparta.oishitable.domain.owner.restaurant.menus.controller;
 
-import com.sparta.oishitable.domain.owner.menus.dto.request.MenuCreateRequest;
-import com.sparta.oishitable.domain.owner.menus.dto.request.MenuUpdateRequest;
-import com.sparta.oishitable.domain.owner.menus.service.MenuService;
+import com.sparta.oishitable.domain.owner.restaurant.menus.dto.request.MenuCreateRequest;
+import com.sparta.oishitable.domain.owner.restaurant.menus.dto.request.MenuUpdateRequest;
+import com.sparta.oishitable.domain.owner.restaurant.menus.service.MenuService;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import com.sparta.oishitable.global.util.UriBuilderUtil;
 import jakarta.validation.Valid;

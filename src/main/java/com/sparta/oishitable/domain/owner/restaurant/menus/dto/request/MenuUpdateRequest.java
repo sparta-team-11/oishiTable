@@ -1,4 +1,4 @@
-package com.sparta.oishitable.domain.owner.menus.dto.request;
+package com.sparta.oishitable.domain.owner.restaurant.menus.dto.request;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;

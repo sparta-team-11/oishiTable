@@ -1,6 +1,6 @@
-package com.sparta.oishitable.domain.owner.menus.dto.response;
+package com.sparta.oishitable.domain.owner.restaurant.menus.dto.response;
 
-import com.sparta.oishitable.domain.owner.menus.entity.Menu;
+import com.sparta.oishitable.domain.owner.restaurant.menus.entity.Menu;
 import lombok.AccessLevel;
 import lombok.Builder;
 

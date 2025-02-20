@@ -1,8 +1,8 @@
-package com.sparta.oishitable.domain.owner.menus.controller;
+package com.sparta.oishitable.domain.owner.restaurant.menus.controller;
 
-import com.sparta.oishitable.domain.owner.menus.dto.response.MenuDetailResponse;
-import com.sparta.oishitable.domain.owner.menus.dto.response.MenuFindResponse;
-import com.sparta.oishitable.domain.owner.menus.service.MenuService;
+import com.sparta.oishitable.domain.owner.restaurant.menus.dto.response.MenuDetailResponse;
+import com.sparta.oishitable.domain.owner.restaurant.menus.dto.response.MenuFindResponse;
+import com.sparta.oishitable.domain.owner.restaurant.menus.service.MenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,6 +1,6 @@
-package com.sparta.oishitable.domain.owner.menus.repository;
+package com.sparta.oishitable.domain.owner.restaurant.menus.repository;
 
-import com.sparta.oishitable.domain.owner.menus.entity.Menu;
+import com.sparta.oishitable.domain.owner.restaurant.menus.entity.Menu;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
