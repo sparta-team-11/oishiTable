@@ -23,8 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -49,8 +47,7 @@ public class CollectionBookmarkService {
             throw new ConflictException(ErrorCode.ALREADY_EXISTS_BOOKMARK_IN_COLLECTION);
         }
 
-        Collection collection = collectionRepository.findById(collectionId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.COLLECTION_NOT_FOUND));
+        Collection collection = findCollectionById(collectionId);
 
         checkUserAuthority(collection.getUser().getId(), userId);
 
@@ -77,7 +74,13 @@ public class CollectionBookmarkService {
         collectionBookmarkRepository.saveAll(collectionBookmarks);
     }
 
-    public CollectionBookmarksFindResponse findCollectionBookmarks(Long collectionId, int page, int size) {
+    public CollectionBookmarksFindResponse findCollectionBookmarks(Long userId, Long collectionId, int page, int size) {
+        Collection collection = findCollectionById(collectionId);
+
+        if (!collection.isPublic()) {
+            checkUserAuthority(collection.getUser().getId(), userId);
+        }
+
         Pageable pageable = PageRequest.of(page - 1, size);
 
         Page<BookmarkDetails> bookmarkDetails
@@ -102,6 +105,11 @@ public class CollectionBookmarkService {
     private CollectionBookmark findById(Long collectionBookmarkId) {
         return collectionBookmarkRepository.findByCollectionBookmarkId(collectionBookmarkId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.BOOKMARK_NOT_FOUND));
+    }
+
+    private Collection findCollectionById(Long collectionId) {
+        return collectionRepository.findById(collectionId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.COLLECTION_NOT_FOUND));
     }
 
     private void checkUserAuthority(Long recordOwnerId, Long userId) {

@@ -37,10 +37,11 @@ public class CollectionBookmarkController {
     public ResponseEntity<CollectionBookmarksFindResponse> findBookmarks(
             @PathVariable Long collectionId,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         CollectionBookmarksFindResponse body
-                = collectionBookmarkService.findCollectionBookmarks(collectionId, page, size);
+                = collectionBookmarkService.findCollectionBookmarks(userDetails.getId(), collectionId, page, size);
 
         return ResponseEntity.ok(body);
     }
