@@ -54,6 +54,10 @@ dependencies {
 
     // mailSender
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // RabbitMQ TODO : 사용시 풀 것
+//    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+
 }
 
 tasks.named('test') {
