@@ -2,6 +2,7 @@ package com.sparta.oishitable.domain.admin.seatType.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,4 +19,9 @@ public class SeatType {
 
     @Column(nullable = false)
     private String name;
+
+    @Builder
+    public SeatType(String name) {
+        this.name = name;
+    }
 }
