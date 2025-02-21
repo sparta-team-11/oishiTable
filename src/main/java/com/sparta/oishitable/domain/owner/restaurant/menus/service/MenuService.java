@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.IntSummaryStatistics;
 import java.util.List;
 
 @Service
@@ -36,6 +37,16 @@ public class MenuService {
                 .toList();
 
         menuRepository.saveAll(menus);
+
+        // min, max, sum 등 통계 정보를 한번에 연산
+        IntSummaryStatistics summaryStatistics = menus.stream()
+                .mapToInt(Menu::getPrice)
+                .summaryStatistics();
+
+        int minPrice = ceilToNearestTenThousand(summaryStatistics.getMin());
+        int maxPrice = ceilToNearestTenThousand(summaryStatistics.getMax());
+
+        restaurant.update(minPrice, maxPrice);
     }
 
     @Transactional(readOnly = true)
@@ -73,5 +84,9 @@ public class MenuService {
     private Menu findMenuByMenuIdAndRestaurantId(Long restaurantId, Long menuId) {
         return menuRepository.findByIdAndRestaurantId(menuId, restaurantId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MENU_NOT_FOUND));
+    }
+
+    private int ceilToNearestTenThousand(int price) {
+        return (int) Math.ceil(price / 10000.0) * 10000;
     }
 }
