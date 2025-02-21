@@ -8,6 +8,7 @@ import com.sparta.oishitable.domain.auth.dto.response.AuthSignupResponse;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.global.exception.DuplicatedResourceException;
+import com.sparta.oishitable.global.exception.ForbiddenException;
 import com.sparta.oishitable.global.exception.InvalidException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
@@ -87,5 +88,11 @@ public class AuthService {
         redisRepository.setDataWithExpire(userId, newRefreshToken, DURATION);
 
         return AuthLoginResponse.of(newAccessToken, newRefreshToken);
+    }
+
+    public void checkUserAuthority(Long userId, Long loginUserId) {
+        if (!userId.equals(loginUserId)) {
+            throw new ForbiddenException(ErrorCode.USER_UNAUTHORIZED);
+        }
     }
 }
