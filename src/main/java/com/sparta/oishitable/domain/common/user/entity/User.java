@@ -1,11 +1,15 @@
 package com.sparta.oishitable.domain.common.user.entity;
 
 import com.sparta.oishitable.domain.common.BaseEntity;
+import com.sparta.oishitable.domain.customer.coupon.entity.UserCoupon;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -31,6 +35,9 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private UserRole role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserCoupon> userCoupons = new ArrayList<>();
 
     @Builder
     public User(

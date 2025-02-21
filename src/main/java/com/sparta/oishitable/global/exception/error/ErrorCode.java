@@ -70,7 +70,6 @@ public enum ErrorCode {
 
     // 좋아요 관련 익셉션
     LIKE_DUPLICATED(HttpStatus.BAD_REQUEST, "이미 좋아요를 누르셨습니다."),
-
     LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요를 누르지 않으셨습니다"),
 
     // 북마크 관련 익셉션
@@ -85,6 +84,13 @@ public enum ErrorCode {
     // 메뉴 관련 익셉션
     MENU_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 메뉴입니다."),
 
+    // 쿠폰 관련 익셉션
+    COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 쿠폰입니다."),
+    COUPON_ALREADY_USED(HttpStatus.CONFLICT,"이미 사용한 쿠폰입니다."),
+    COUPON_ALREADY_DOWNLOAD(HttpStatus.CONFLICT,"이미 다운로드한 쿠폰입니다."),
+    ;
+
+    // 알림 관련 익셉션
     EMAIL_SENDING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "메일 전송에 실패했습니다.");
 
     private final HttpStatus status;
