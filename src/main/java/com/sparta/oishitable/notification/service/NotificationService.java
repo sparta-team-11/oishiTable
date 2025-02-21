@@ -7,6 +7,7 @@ import com.sparta.oishitable.domain.customer.reservation.repository.ReservationR
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import com.sparta.oishitable.notification.entity.Notification;
+import com.sparta.oishitable.notification.entity.NotificationType;
 import com.sparta.oishitable.notification.event.ReservationEvent;
 import com.sparta.oishitable.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
@@ -42,24 +43,23 @@ public class NotificationService {
         User user = findUserById(event.userId());
         Reservation reservation = findReservationById(event.reservationId());
 
-        if (type == NotificationType.CONFIRMATION) {
-
-            scheduledTime = LocalDateTime.now();
-
-            headerMessage = "예약이 확정되었습니다.";
-
-        } else if (type == NotificationType.REMINDER) {
-
-            scheduledTime = reservation.getDate().minusHours(hoursBefore);
-
-            if (!scheduledTime.isAfter(LocalDateTime.now())) {
-                return; // 이미 예약 시간이 지난 경우 생성하지 않음.
+        switch (type) {
+            case CONFIRMATION ->
+            {
+                scheduledTime = LocalDateTime.now();
+                headerMessage = "예약이 확정되었습니다.";
             }
+            case REMINDER ->
+            {
+                scheduledTime = reservation.getDate().minusHours(hoursBefore);
 
-            headerMessage = (hoursBefore == 24 ? "하루 전 알림:" : hoursBefore + "시간 전 알림:");
+                if (!scheduledTime.isAfter(LocalDateTime.now())) {
+                    return; // 이미 예약 시간이 지난 경우 생성하지 않음.
+                }
 
-        } else {
-            throw new IllegalArgumentException("알 수 없는 알림 타입: " + type);
+                headerMessage = (hoursBefore == 24 ? "하루 전 알림:" : hoursBefore + "시간 전 알림:");
+            }
+            default -> throw new IllegalArgumentException("알 수 없는 알림 타입: " + type);
         }
 
         Notification notification = Notification.builder()
@@ -92,9 +92,5 @@ public class NotificationService {
     private Reservation findReservationById(Long reservationId) {
         return reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.RESERVATION_NOT_FOUND));
-    }
-
-    private enum NotificationType {
-        CONFIRMATION, REMINDER
     }
 }
