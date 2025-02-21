@@ -32,14 +32,15 @@ public class CommentLikeService {
             CommentLike commentLike = findCommentLikeByCommentAndUser(comment, user);
 
             commentLikeRepository.delete(commentLike);
+        } else {
+
+            CommentLike commentLike = CommentLike.builder()
+                    .comment(comment)
+                    .user(user)
+                    .build();
+
+            commentLikeRepository.save(commentLike);
         }
-
-        CommentLike commentLike = CommentLike.builder()
-                .comment(comment)
-                .user(user)
-                .build();
-
-        commentLikeRepository.save(commentLike);
     }
 
     private CommentLike findCommentLikeByCommentAndUser(Comment comment, User user) {

@@ -1,4 +1,4 @@
-package com.sparta.oishitable.domain.owner.menus.entity;
+package com.sparta.oishitable.domain.owner.restaurant.menus.entity;
 
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import jakarta.persistence.*;
@@ -24,7 +24,7 @@ public class Menu {
     @Column(nullable = false)
     private Integer price;
 
-    @Column(nullable = false)
+    @Column(length = 100)
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,16 +33,42 @@ public class Menu {
 
     @Builder
     public Menu(
-            Long id,
             String name,
             Integer price,
             String description,
             Restaurant restaurant
     ) {
-        this.id = id;
         this.name = name;
         this.price = price;
         this.description = description;
         this.restaurant = restaurant;
+    }
+
+    public void update(
+            String name,
+            Integer price,
+            String description
+    ) {
+        updateName(name);
+        updatePrice(price);
+        updateDescription(description);
+    }
+
+    private void updateName(String name) {
+        if (name != null) {
+            this.name = name;
+        }
+    }
+
+    private void updatePrice(Integer price) {
+        if (price != null) {
+            this.price = price;
+        }
+    }
+
+    private void updateDescription(String description) {
+        if (description != null) {
+            this.description = description;
+        }
     }
 }

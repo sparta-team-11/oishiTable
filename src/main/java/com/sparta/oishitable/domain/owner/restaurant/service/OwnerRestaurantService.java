@@ -73,7 +73,7 @@ public class OwnerRestaurantService {
         restaurantRepository.delete(restaurant);
     }
 
-    private Restaurant findById(Long restaurantId) {
+    public Restaurant findById(Long restaurantId) {
         return restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorCode.RESTAURANT_NOT_FOUND));
     }
