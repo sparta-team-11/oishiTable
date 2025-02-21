@@ -83,7 +83,9 @@ public enum ErrorCode {
     INVALID_ACCESS_BOOKMARK_IN_COLLECTION(HttpStatus.BAD_REQUEST, "잘못된 컬렉션 내 북마크에 대한 접근입니다."),
 
     // 메뉴 관련 익셉션
-    MENU_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 메뉴입니다.");
+    MENU_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 메뉴입니다."),
+
+    EMAIL_SENDING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "메일 전송에 실패했습니다.");
 
     private final HttpStatus status;
     private final String message;

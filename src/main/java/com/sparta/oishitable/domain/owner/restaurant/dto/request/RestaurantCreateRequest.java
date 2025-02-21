@@ -20,19 +20,19 @@ public record RestaurantCreateRequest(
         @NotBlank
         String location,
 
-        @NotBlank
+        @NotNull
         @JsonFormat(pattern = "HH:mm")
         LocalTime openTime,
 
-        @NotBlank
+        @NotNull
         @JsonFormat(pattern = "HH:mm")
         LocalTime closeTime,
 
-        @NotBlank
+        @NotNull
         @JsonFormat(pattern = "HH:mm")
         LocalTime breakTimeStart,
 
-        @NotBlank
+        @NotNull
         @JsonFormat(pattern = "HH:mm")
         LocalTime breakTimeEnd,
 
@@ -42,9 +42,15 @@ public record RestaurantCreateRequest(
         @NotNull
         Integer deposit,
 
-        @NotBlank
+        @NotNull
         @JsonFormat(pattern = "HH:mm")
         LocalTime reservationInterval,
+
+        @NotNull
+        Double latitude,
+
+        @NotNull
+        Double longitude,
 
         List<RestaurantSeatCreateRequest> restaurantSeatCreateRequestList
 ) {
@@ -60,6 +66,8 @@ public record RestaurantCreateRequest(
                 .introduce(introduce)
                 .deposit(deposit)
                 .reservationInterval(reservationInterval)
+                .latitude(latitude)
+                .longitude(longitude)
                 .owner(owner)
                 .build();
     }

@@ -13,13 +13,11 @@ import com.sparta.oishitable.global.exception.ForbiddenException;
 import com.sparta.oishitable.global.exception.InvalidException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
-import com.sparta.oishitable.notification.entity.Notification;
-import com.sparta.oishitable.notification.repository.NotificationRepository;
+import com.sparta.oishitable.notification.event.ReservationEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -29,7 +27,6 @@ public class ReservationService {
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
     private final RestaurantSeatService restaurantSeatService;
-    private final NotificationRepository notificationRepository;
 
     @DistributedLock(key = "'reservation:' + #request.restaurantId + ':' + #formattedDate")
     public Long createReservation(Long userId, ReservationCreateRequest request) {
@@ -68,17 +65,9 @@ public class ReservationService {
 
         reservationRepository.save(reservation);
 
-        Notification notification = Notification.builder()
-                .userId(reservation.getUser().getId())
-                .message("예약이 확정되었습니다. 예약 ID: " + reservation.getId() + "\n예약 시간: " + reservation.getDate())
-                .email(user.getEmail())
-                .scheduledTime(LocalDateTime.now())
-                .build();
-
-        notificationRepository.save(notification);
-
-        reservationReminder(reservation,user, 24);
-        reservationReminder(reservation,user, 1);
+        // 예약 생성 후 이벤트 발행
+        ReservationEvent event = new ReservationEvent(reservation.getId(), user.getId());
+//        eventProducer.sendReservationEvent(event);
 
         return reservation.getId();
     }
@@ -118,24 +107,5 @@ public class ReservationService {
     private Reservation findReservedReservationById(Long reservationId) {
         return reservationRepository.findReservedReservationById(reservationId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.RESERVED_RESERVATION_NOT_FOUND));
-    }
-
-    private void reservationReminder(Reservation reservation, User user, int hoursBefore) {
-
-        LocalDateTime reminderTime = reservation.getDate().minusHours(hoursBefore);
-
-        if (reminderTime.isAfter(LocalDateTime.now())) {
-
-            String when = hoursBefore == 24 ? "하루 전 알림: " : hoursBefore + "시간 전 알림: ";
-
-            Notification notification = Notification.builder()
-                    .userId(reservation.getUser().getId())
-                    .message("예약 " + when + "예약 시간은 " + reservation.getDate() + " 입니다.")
-                    .email(user.getEmail())
-                    .scheduledTime(reminderTime)
-                    .build();
-
-            notificationRepository.save(notification);
-        }
     }
 }
