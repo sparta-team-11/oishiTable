@@ -80,7 +80,13 @@ public enum ErrorCode {
     // 컬렉션 관련 익셉션
     COLLECTION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 컬렉션입니다."),
     ALREADY_EXISTS_BOOKMARK_IN_COLLECTION(HttpStatus.CONFLICT, "이미 해당 컬렉션 내에 저장된 북마크입니다."),
-    INVALID_ACCESS_BOOKMARK_IN_COLLECTION(HttpStatus.BAD_REQUEST, "잘못된 컬렉션 내 북마크에 대한 접근입니다.");
+    INVALID_ACCESS_BOOKMARK_IN_COLLECTION(HttpStatus.BAD_REQUEST, "잘못된 컬렉션 내 북마크에 대한 접근입니다."),
+
+    // Geocoding 관련 익셉션
+    GEOCODING_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Geocoding API 호출 중 오류가 발생했습니다."),
+    GEOCODING_CLIENT_ERROR(HttpStatus.BAD_REQUEST, "Geocoding API 클라이언트 오류가 발생했습니다."),
+    GEOCODING_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Geocoding API 서버 오류가 발생했습니다."),
+    GEOCODING_NO_RESULT(HttpStatus.NOT_FOUND, "Geocoding API 결과가 없습니다.");
 
     private final HttpStatus status;
     private final String message;

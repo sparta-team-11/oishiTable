@@ -5,10 +5,12 @@ import com.sparta.oishitable.domain.owner.restaurant.dto.request.RestaurantProfi
 import com.sparta.oishitable.domain.owner.restaurant.dto.response.RestaurantFindResponse;
 import com.sparta.oishitable.domain.owner.restaurant.service.OwnerRestaurantService;
 import com.sparta.oishitable.global.util.UriBuilderUtil;
+import com.sparta.oishitable.global.util.geocode.GeocodingResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
@@ -55,5 +57,12 @@ public class OwnerRestaurantController {
         ownerRestaurantService.deleteRestaurant(restaurantId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/geocode")
+    public Mono<ResponseEntity<GeocodingResponse.Document>> findCoordinates(@RequestParam String address) {
+        return ownerRestaurantService.findCoordinates(address)
+                .map(document -> ResponseEntity.ok(document))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 }

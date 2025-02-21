@@ -42,8 +42,8 @@ public class CustomerRestaurantController {
             @RequestParam Double lat,
             @RequestParam Double lng,
             @RequestParam Double radius,
-            @PageableDefault(size = 10, sort = "name") Pageable pageable) {
-
+            @PageableDefault(size = 10, sort = "name") Pageable pageable
+    ) {
         Page<NearbyRestaurantResponse> restaurants = customerRestaurantService.findNearbyRestaurants(lat, lng, radius, pageable);
 
         return ResponseEntity.ok(restaurants);

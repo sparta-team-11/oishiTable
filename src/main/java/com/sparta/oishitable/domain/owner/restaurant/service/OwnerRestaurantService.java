@@ -10,25 +10,34 @@ import com.sparta.oishitable.domain.owner.restaurant.repository.RestaurantReposi
 import com.sparta.oishitable.domain.owner.restaurantseat.service.RestaurantSeatService;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
+import com.sparta.oishitable.global.util.geocode.GeocodingClient;
+import com.sparta.oishitable.global.util.geocode.GeocodingResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Slf4j
 public class OwnerRestaurantService {
 
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
     private final RestaurantSeatService restaurantSeatService;
+    private final GeocodingClient geocodingClient;
 
     @Transactional
     public Long createRestaurant(RestaurantCreateRequest restaurantCreateRequest) {
         User owner = userRepository.findById(restaurantCreateRequest.userId())
                 .orElseThrow(() -> new CustomRuntimeException(ErrorCode.USER_NOT_FOUND));
 
-        Restaurant restaurant = restaurantCreateRequest.toEntity(owner);
+        Mono<GeocodingResponse.Document> coordinatesResult = findCoordinates(restaurantCreateRequest.address());
+        GeocodingResponse.Document coordinates = coordinatesResult.block();
+
+        Restaurant restaurant = restaurantCreateRequest.toEntity(owner, coordinates.latitude(), coordinates.longitude());
         Restaurant savedRestaurant = restaurantRepository.save(restaurant);
 
         restaurantSeatService.createAllRestaurantSeat(
@@ -67,5 +76,20 @@ public class OwnerRestaurantService {
     private Restaurant findById(Long restaurantId) {
         return restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorCode.RESTAURANT_NOT_FOUND));
+    }
+
+    public Mono<GeocodingResponse.Document> findCoordinates(String address) {
+        return geocodingClient.findGeocoding(address)
+                .flatMap(geocodingResponse -> {
+                    if (geocodingResponse != null && geocodingResponse.hasResult()) {
+                        return Mono.just(geocodingResponse.findFirstResult().orElse(null));
+                    } else {
+                        return Mono.error(new CustomRuntimeException(ErrorCode.GEOCODING_NO_RESULT));
+                    }
+                })
+                .onErrorResume(e -> {
+                    log.error("Error while finding coordinates: {}", e.getMessage());
+                    return Mono.error(new CustomRuntimeException(ErrorCode.GEOCODING_API_ERROR));
+                });
     }
 }
