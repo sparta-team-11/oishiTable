@@ -38,15 +38,7 @@ public class MenuService {
 
         menuRepository.saveAll(menus);
 
-        // min, max, sum 등 통계 정보를 한번에 연산
-        IntSummaryStatistics summaryStatistics = menus.stream()
-                .mapToInt(Menu::getPrice)
-                .summaryStatistics();
-
-        int minPrice = ceilToNearestTenThousand(summaryStatistics.getMin());
-        int maxPrice = ceilToNearestTenThousand(summaryStatistics.getMax());
-
-        restaurant.update(minPrice, maxPrice);
+        calculateRestaurantPriceRange(restaurant, menus);
     }
 
     @Transactional(readOnly = true)
@@ -69,7 +61,13 @@ public class MenuService {
 
         authService.checkUserAuthority(menu.getRestaurant().getOwner().getId(), userId);
 
-        menu.update(request.menuName(), menu.getPrice(), menu.getDescription());
+        menu.update(request.menuName(), request.menuPrice(), request.menuDescription());
+
+        Restaurant restaurant = menu.getRestaurant();
+
+        restaurant.initializePrice();
+
+        calculateRestaurantPriceRange(restaurant, restaurant.getMenus());
     }
 
     @Transactional
@@ -79,11 +77,34 @@ public class MenuService {
         authService.checkUserAuthority(menu.getRestaurant().getOwner().getId(), userId);
 
         menuRepository.delete(menu);
+
+        Restaurant restaurant = menu.getRestaurant();
+        restaurant.removeMenu(menu);
+
+        restaurant.initializePrice();
+
+        calculateRestaurantPriceRange(restaurant, restaurant.getMenus());
     }
 
-    private Menu findMenuByMenuIdAndRestaurantId(Long restaurantId, Long menuId) {
+    private Menu findMenuByMenuIdAndRestaurantId(Long menuId, Long restaurantId) {
         return menuRepository.findByIdAndRestaurantId(menuId, restaurantId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MENU_NOT_FOUND));
+    }
+
+    private void calculateRestaurantPriceRange(Restaurant restaurant, List<Menu> menus) {
+        // min, max, sum 등 통계 정보를 한번에 연산
+        IntSummaryStatistics summaryStatistics = menus.stream()
+                .mapToInt(Menu::getPrice)
+                .summaryStatistics();
+
+        updateRestaurantPrice(restaurant, summaryStatistics.getMin(), summaryStatistics.getMax());
+    }
+
+    private void updateRestaurantPrice(Restaurant restaurant, int min, int max) {
+        int minPrice = ceilToNearestTenThousand(min);
+        int maxPrice = ceilToNearestTenThousand(max);
+
+        restaurant.updatePrice(minPrice, maxPrice);
     }
 
     private int ceilToNearestTenThousand(int price) {

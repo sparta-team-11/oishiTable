@@ -2,6 +2,7 @@ package com.sparta.oishitable.domain.owner.restaurant.entity;
 
 import com.sparta.oishitable.domain.common.BaseEntity;
 import com.sparta.oishitable.domain.common.user.entity.User;
+import com.sparta.oishitable.domain.owner.restaurant.menus.entity.Menu;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -9,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(
@@ -65,9 +68,14 @@ public class Restaurant extends BaseEntity {
     @Column(nullable = false)
     private Double longitude;
 
+    private Integer minPrice;
+    private Integer maxPrice;
+
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Menu> menus = new ArrayList<>();
+
     @Builder
     public Restaurant(
-            Long id,
             String name,
             String location,
             LocalTime openTime,
@@ -80,9 +88,10 @@ public class Restaurant extends BaseEntity {
             User owner,
             String address,
             Double latitude,
-            Double longitude
+            Double longitude,
+            Integer minPrice,
+            Integer maxPrice
     ) {
-        this.id = id;
         this.name = name;
         this.location = location;
         this.openTime = openTime;
@@ -96,11 +105,43 @@ public class Restaurant extends BaseEntity {
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.minPrice = minPrice;
+        this.maxPrice = maxPrice;
     }
 
     public void updateProfile(String name, String introduce, Integer deposit) {
         this.name = name;
         this.introduce = introduce;
         this.deposit = deposit;
+    }
+
+    public void updatePrice(int minPrice, int maxPrice) {
+        updateMinPrice(minPrice);
+        updateMaxPrice(maxPrice);
+    }
+
+    public void addMenus(List<Menu> menus) {
+        this.menus.addAll(menus);
+    }
+
+    public void removeMenu(Menu menu) {
+        this.menus.remove(menu);
+    }
+
+    private void updateMinPrice(int minPrice) {
+        if (this.minPrice > minPrice) {
+            this.minPrice = minPrice;
+        }
+    }
+
+    private void updateMaxPrice(int maxPrice) {
+        if (this.maxPrice < maxPrice) {
+            this.maxPrice = maxPrice;
+        }
+    }
+
+    public void initializePrice() {
+        this.maxPrice = 0;
+        this.minPrice = Integer.MAX_VALUE;
     }
 }
