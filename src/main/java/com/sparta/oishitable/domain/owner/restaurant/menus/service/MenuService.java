@@ -1,13 +1,13 @@
 package com.sparta.oishitable.domain.owner.restaurant.menus.service;
 
 import com.sparta.oishitable.domain.auth.service.AuthService;
+import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.menus.dto.request.MenuCreateRequest;
 import com.sparta.oishitable.domain.owner.restaurant.menus.dto.request.MenuUpdateRequest;
 import com.sparta.oishitable.domain.owner.restaurant.menus.dto.response.MenuDetailResponse;
 import com.sparta.oishitable.domain.owner.restaurant.menus.dto.response.MenuFindResponse;
 import com.sparta.oishitable.domain.owner.restaurant.menus.entity.Menu;
 import com.sparta.oishitable.domain.owner.restaurant.menus.repository.MenuRepository;
-import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.service.OwnerRestaurantService;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
@@ -47,14 +47,14 @@ public class MenuService {
 
     @Transactional(readOnly = true)
     public MenuDetailResponse findMenu(Long restaurantId, Long menuId) {
-        Menu menu = findMenuByRestaurantIdAndId(restaurantId, menuId);
+        Menu menu = findMenuByMenuIdAndRestaurantId(menuId, restaurantId);
 
         return MenuDetailResponse.from(menu);
     }
 
     @Transactional
     public void updateMenu(Long userId, Long restaurantId, Long menuId, MenuUpdateRequest request) {
-        Menu menu = findMenuByRestaurantIdAndId(restaurantId, menuId);
+        Menu menu = findMenuByMenuIdAndRestaurantId(menuId, restaurantId);
 
         authService.checkUserAuthority(menu.getRestaurant().getOwner().getId(), userId);
 
@@ -63,15 +63,15 @@ public class MenuService {
 
     @Transactional
     public void deleteMenu(Long userId, Long restaurantId, Long menuId) {
-        Menu menu = findMenuByRestaurantIdAndId(restaurantId, menuId);
+        Menu menu = findMenuByMenuIdAndRestaurantId(menuId, restaurantId);
 
         authService.checkUserAuthority(menu.getRestaurant().getOwner().getId(), userId);
 
         menuRepository.delete(menu);
     }
 
-    private Menu findMenuByRestaurantIdAndId(Long restaurantId, Long menuId) {
-        return menuRepository.findByRestaurantIdAndId(restaurantId, menuId)
+    private Menu findMenuByMenuIdAndRestaurantId(Long restaurantId, Long menuId) {
+        return menuRepository.findByIdAndRestaurantId(menuId, restaurantId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MENU_NOT_FOUND));
     }
 }
