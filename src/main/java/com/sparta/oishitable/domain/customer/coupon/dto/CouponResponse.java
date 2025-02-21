@@ -11,9 +11,6 @@ public record CouponResponse(
         Integer discount,
 
         @NotNull
-        Boolean couponUsed,
-
-        @NotNull
         Long restaurantId
 
 ) {
@@ -22,7 +19,6 @@ public record CouponResponse(
         return new CouponResponse(
                 coupon.getId(),
                 coupon.getDiscount(),
-                coupon.getCouponUsed(),
                 coupon.getRestaurant().getId()
         );
     }
@@ -31,7 +27,6 @@ public record CouponResponse(
         return new CouponResponse(
                 coupon.getId(),
                 coupon.getDiscount(),
-                coupon.getCouponUsed(),
                 coupon.getRestaurant().getId()
         );
     }

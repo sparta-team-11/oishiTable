@@ -15,6 +15,9 @@ public class UserCoupon {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "coupon_used", nullable = false)
+    private Boolean couponUsed = false;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -24,10 +27,15 @@ public class UserCoupon {
     private Coupon coupon;
 
     @Builder
-    public UserCoupon(Long id, User user, Coupon coupon) {
+    public UserCoupon(Long id, Boolean couponUsed, User user, Coupon coupon) {
         this.id = id;
+        this.couponUsed = couponUsed;
         this.user = user;
         this.coupon = coupon;
+    }
+
+    public void setCouponUsed(Boolean couponUsed) {
+        this.couponUsed = couponUsed;
     }
 
 

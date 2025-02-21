@@ -1,10 +1,8 @@
 package com.sparta.oishitable.domain.customer.coupon.controller;
 
-//import com.sparta.oishitable.domain.customer.coupon.dto.CouponAssignRequest;
-
 import com.sparta.oishitable.domain.customer.coupon.dto.CouponCreateRequest;
 import com.sparta.oishitable.domain.customer.coupon.dto.CouponResponse;
-import com.sparta.oishitable.domain.customer.coupon.service.CouponService;
+import com.sparta.oishitable.domain.customer.coupon.service.OwnerCouponService;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import com.sparta.oishitable.global.util.UriBuilderUtil;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OwnerCouponController {
 
-    private final CouponService couponService;
+    private final OwnerCouponService ownerCouponService;
 
     @PostMapping
     public ResponseEntity<CouponResponse> createCoupon(
@@ -28,8 +26,10 @@ public class OwnerCouponController {
             @RequestBody CouponCreateRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
+        System.out.println(" 컨트롤러에서 받은 userId: " + userDetails.getId());
 
-        CouponResponse response = couponService.createCoupon(userDetails.getId(), restaurantId, request);
+        CouponResponse response = ownerCouponService.createCoupon(userDetails.getId(), restaurantId, request);
+
         URI location = UriBuilderUtil.create("/owner/api/restaurants/{restaurantId}", response.restaurantId());
 
         return ResponseEntity.created(location).body(response);
@@ -37,15 +37,17 @@ public class OwnerCouponController {
 
     @GetMapping
     public ResponseEntity<List<CouponResponse>> findCoupons(@PathVariable Long restaurantId) {
-        return ResponseEntity.ok(couponService.findCoupons(restaurantId));
+        return ResponseEntity.ok(ownerCouponService.findCoupons(restaurantId));
     }
 
     @DeleteMapping("/{couponId}")
     public ResponseEntity<Void> deleteCoupon(
             @PathVariable Long restaurantId,
-            @PathVariable Long couponId
+            @PathVariable Long couponId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+
     ) {
-        couponService.deleteCoupon(couponId);
+        ownerCouponService.deleteCoupon(restaurantId,couponId,userDetails.getId());
         return ResponseEntity.noContent().build();
     }
 

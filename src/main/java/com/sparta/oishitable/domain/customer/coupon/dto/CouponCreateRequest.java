@@ -7,8 +7,6 @@ public record CouponCreateRequest(
         Long restaurantId,
 
         @NotNull
-        Integer discount,
+        Integer discount
 
-        @NotNull
-        Long userId
 ) {}

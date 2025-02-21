@@ -1,13 +1,12 @@
 package com.sparta.oishitable.domain.customer.coupon.controller;
 
-import com.sparta.oishitable.domain.customer.coupon.dto.CouponResponse;
-import com.sparta.oishitable.domain.customer.coupon.service.CouponService;
+import com.sparta.oishitable.domain.customer.coupon.dto.UserCouponResponse;
+import com.sparta.oishitable.domain.customer.coupon.service.UserCouponService;
+import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -16,18 +15,37 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserCouponController {
 
-    private final CouponService couponService;
+    private final UserCouponService usercouponService;
+
+    @PostMapping("/{couponId}/download")
+    public ResponseEntity<UserCouponResponse> downloadCoupon(
+            @PathVariable Long userId,
+            @PathVariable Long couponId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+
+    ) {
+
+        return ResponseEntity.ok(usercouponService.downloadCoupon(userDetails.getId(),couponId));
+    }
 
     @GetMapping
-    public ResponseEntity<List<CouponResponse>> findUserCoupons(@PathVariable Long userId) {
-        return ResponseEntity.ok(couponService.findUserCoupons(userId));
+    public ResponseEntity<List<UserCouponResponse>> findUserCoupons(
+            @PathVariable Long userId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+
+    ) {
+        return ResponseEntity.ok(usercouponService.findUserCoupons(userDetails.getId()));
     }
 
-    @GetMapping("/{couponId}")
-    public ResponseEntity<CouponResponse> findUserCoupon(
+    @PostMapping("/{couponId}/use")
+    public ResponseEntity<UserCouponResponse> useCoupon(
             @PathVariable Long userId,
-            @PathVariable Long couponId
-            ) {
-        return ResponseEntity.ok(couponService.findUserCoupon(userId, couponId));
+            @PathVariable Long couponId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+
+    ) {
+
+        return ResponseEntity.ok(usercouponService.useCoupon(userDetails.getId(), couponId));
     }
+
 }

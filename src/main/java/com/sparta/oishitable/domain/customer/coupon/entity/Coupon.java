@@ -1,6 +1,5 @@
 package com.sparta.oishitable.domain.customer.coupon.entity;
 
-import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -13,7 +12,7 @@ import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Coupons")
+@Table(name = "coupons")
 @Getter
 
 public class Coupon {
@@ -23,9 +22,6 @@ public class Coupon {
 
     @Column(name = "discount", nullable = false)
     private Integer discount;
-
-    @Column(name = "coupon_used", nullable = false)
-    private Boolean couponUsed;
 
     @ManyToOne
     @JoinColumn(name = "restaurant_id", nullable = false)
@@ -37,16 +33,10 @@ public class Coupon {
     @Builder
     public Coupon(
             Integer discount,
-            Boolean couponUsed,
             Restaurant restaurant
     ) {
         this.discount = discount;
-        this.couponUsed = couponUsed;
         this.restaurant = restaurant;
-    }
-
-    public void setCouponUsed(Boolean couponUsed){
-        this.couponUsed = couponUsed;
     }
 
 
