@@ -12,6 +12,7 @@ import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,7 +34,7 @@ public class UserCouponService {
 
 
         if (userCouponRepository.findByUserIdAndCouponId(userId, couponId).isPresent()) {
-            throw new NotFoundException(ErrorCode.COUPON_ALREADY_DOWNLOAD);
+            throw new CustomRuntimeException(ErrorCode.COUPON_ALREADY_DOWNLOAD);
         }
 
         UserCoupon userCoupon = UserCoupon.builder()
@@ -49,12 +50,17 @@ public class UserCouponService {
     }
 
     public List<UserCouponResponse> findUserCoupons(Long userId) {
-        List<UserCoupon> usercoupons = userCouponRepository.findByUserId(userId);
+        List<UserCoupon> usercoupons = userCouponRepository.findByUserId(userId)
+                .stream()
+                .filter(userCoupon -> !userCoupon.getCouponUsed())
+                .collect(Collectors.toList());
+
         return usercoupons.stream()
                 .map(UserCouponResponse::from)
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public UserCouponResponse useCoupon(Long userId, Long couponId) {
         UserCoupon userCoupon = userCouponRepository.findByUserIdAndCouponId(userId, couponId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.COUPON_NOT_FOUND));
@@ -64,8 +70,6 @@ public class UserCouponService {
         }
 
         userCoupon.setCouponUsed(true);
-
-        userCouponRepository.save(userCoupon);
 
         return UserCouponResponse.from(userCoupon);
 

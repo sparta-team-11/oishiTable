@@ -19,7 +19,6 @@ public class UserCouponController {
 
     @PostMapping("/{couponId}/download")
     public ResponseEntity<UserCouponResponse> downloadCoupon(
-            @PathVariable Long userId,
             @PathVariable Long couponId,
             @AuthenticationPrincipal CustomUserDetails userDetails
 
@@ -30,7 +29,6 @@ public class UserCouponController {
 
     @GetMapping
     public ResponseEntity<List<UserCouponResponse>> findUserCoupons(
-            @PathVariable Long userId,
             @AuthenticationPrincipal CustomUserDetails userDetails
 
     ) {
@@ -39,7 +37,6 @@ public class UserCouponController {
 
     @PostMapping("/{couponId}/use")
     public ResponseEntity<UserCouponResponse> useCoupon(
-            @PathVariable Long userId,
             @PathVariable Long couponId,
             @AuthenticationPrincipal CustomUserDetails userDetails
 

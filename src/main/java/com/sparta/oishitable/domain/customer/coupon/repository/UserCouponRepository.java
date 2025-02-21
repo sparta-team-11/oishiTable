@@ -14,4 +14,5 @@ public interface UserCouponRepository extends JpaRepository<UserCoupon, Long> {
     Optional<UserCoupon> findByIdAndCouponUsedFalse(Long couponId);
 
 
+
 }
