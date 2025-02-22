@@ -8,7 +8,7 @@ import lombok.Builder;
 public record NearbyRestaurantResponse(
         Long restaurantId,
         String name,
-        String address,
+        String location,
         Double latitude,
         Double longitude,
         Double distance
@@ -18,7 +18,7 @@ public record NearbyRestaurantResponse(
         return NearbyRestaurantResponse.builder()
                 .restaurantId(restaurant.getId())
                 .name(restaurant.getName())
-                .address(restaurant.getAddress())
+                .location(restaurant.getLocation())
                 .latitude(restaurant.getLatitude())
                 .longitude(restaurant.getLongitude())
                 .distance(distance)

@@ -13,6 +13,7 @@ import com.sparta.oishitable.global.exception.ForbiddenException;
 import com.sparta.oishitable.global.exception.InvalidException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
+import com.sparta.oishitable.notification.event.ReservationEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,6 +64,10 @@ public class ReservationService {
                 .build();
 
         reservationRepository.save(reservation);
+
+        // 예약 생성 후 이벤트 발행
+        ReservationEvent event = new ReservationEvent(reservation.getId(), user.getId());
+//        eventProducer.sendReservationEvent(event);
 
         return reservation.getId();
     }

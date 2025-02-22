@@ -60,9 +60,6 @@ public class Restaurant extends BaseEntity {
     private User owner;
 
     @Column(nullable = false)
-    private String address;
-
-    @Column(nullable = false)
     private Double latitude;
 
     @Column(nullable = false)
@@ -77,7 +74,6 @@ public class Restaurant extends BaseEntity {
     @Builder
     public Restaurant(
             String name,
-            String location,
             LocalTime openTime,
             LocalTime closeTime,
             LocalTime breakTimeStart,
@@ -86,12 +82,11 @@ public class Restaurant extends BaseEntity {
             int deposit,
             LocalTime reservationInterval,
             User owner,
-            String address,
+            String location,
             Double latitude,
             Double longitude
     ) {
         this.name = name;
-        this.location = location;
         this.openTime = openTime;
         this.closeTime = closeTime;
         this.breakTimeStart = breakTimeStart;
@@ -100,7 +95,7 @@ public class Restaurant extends BaseEntity {
         this.deposit = deposit;
         this.reservationInterval = reservationInterval;
         this.owner = owner;
-        this.address = address;
+        this.location = location;
         this.latitude = latitude;
         this.longitude = longitude;
         initializePrice();
