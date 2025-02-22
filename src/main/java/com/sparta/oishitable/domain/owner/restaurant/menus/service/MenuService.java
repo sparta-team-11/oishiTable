@@ -63,14 +63,14 @@ public class MenuService {
         authService.checkUserAuthority(restaurant.getOwner().getId(), userId);
 
         int oldPrice = ceilToNearestTenThousand(menu.getPrice());
-        int newPrice = ceilToNearestTenThousand(request.menuPrice());
+        int newPrice = request.menuPrice();
 
-        menu.update(request.menuName(), request.menuPrice(), request.menuDescription());
+        menu.update(request.menuName(), newPrice, request.menuDescription());
 
         if (restaurant.getMinPrice() == oldPrice || restaurant.getMaxPrice() == oldPrice) {
             calculateRestaurantPriceRange(restaurant, restaurant.getMenus());
         } else {
-            restaurant.updatePrice(newPrice, newPrice);
+            updateRestaurantPrice(restaurant, newPrice, newPrice);
         }
     }
 
