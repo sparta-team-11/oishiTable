@@ -88,9 +88,7 @@ public class Restaurant extends BaseEntity {
             User owner,
             String address,
             Double latitude,
-            Double longitude,
-            Integer minPrice,
-            Integer maxPrice
+            Double longitude
     ) {
         this.name = name;
         this.location = location;
@@ -105,8 +103,7 @@ public class Restaurant extends BaseEntity {
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.minPrice = minPrice;
-        this.maxPrice = maxPrice;
+        initializePrice();
     }
 
     public void updateProfile(String name, String introduce, Integer deposit) {
@@ -118,10 +115,6 @@ public class Restaurant extends BaseEntity {
     public void updatePrice(int minPrice, int maxPrice) {
         updateMinPrice(minPrice);
         updateMaxPrice(maxPrice);
-    }
-
-    public void addMenus(List<Menu> menus) {
-        this.menus.addAll(menus);
     }
 
     public void removeMenu(Menu menu) {

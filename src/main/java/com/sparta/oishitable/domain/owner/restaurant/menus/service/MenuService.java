@@ -58,32 +58,37 @@ public class MenuService {
     @Transactional
     public void updateMenu(Long userId, Long restaurantId, Long menuId, MenuUpdateRequest request) {
         Menu menu = findMenuByMenuIdAndRestaurantId(menuId, restaurantId);
+        Restaurant restaurant = menu.getRestaurant();
 
-        authService.checkUserAuthority(menu.getRestaurant().getOwner().getId(), userId);
+        authService.checkUserAuthority(restaurant.getOwner().getId(), userId);
+
+        int oldPrice = ceilToNearestTenThousand(menu.getPrice());
+        int newPrice = ceilToNearestTenThousand(request.menuPrice());
 
         menu.update(request.menuName(), request.menuPrice(), request.menuDescription());
 
-        Restaurant restaurant = menu.getRestaurant();
-
-        restaurant.initializePrice();
-
-        calculateRestaurantPriceRange(restaurant, restaurant.getMenus());
+        if (restaurant.getMinPrice() == oldPrice || restaurant.getMaxPrice() == oldPrice) {
+            calculateRestaurantPriceRange(restaurant, restaurant.getMenus());
+        } else {
+            restaurant.updatePrice(newPrice, newPrice);
+        }
     }
 
     @Transactional
     public void deleteMenu(Long userId, Long restaurantId, Long menuId) {
         Menu menu = findMenuByMenuIdAndRestaurantId(menuId, restaurantId);
+        Restaurant restaurant = menu.getRestaurant();
 
-        authService.checkUserAuthority(menu.getRestaurant().getOwner().getId(), userId);
+        authService.checkUserAuthority(restaurant.getOwner().getId(), userId);
+
+        int deletedPrice = ceilToNearestTenThousand(menu.getPrice());
 
         menuRepository.delete(menu);
-
-        Restaurant restaurant = menu.getRestaurant();
         restaurant.removeMenu(menu);
 
-        restaurant.initializePrice();
-
-        calculateRestaurantPriceRange(restaurant, restaurant.getMenus());
+        if (restaurant.getMinPrice() == deletedPrice || restaurant.getMaxPrice() == deletedPrice) {
+            calculateRestaurantPriceRange(restaurant, restaurant.getMenus());
+        }
     }
 
     private Menu findMenuByMenuIdAndRestaurantId(Long menuId, Long restaurantId) {
