@@ -4,7 +4,7 @@ import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 
 @Getter
-public final class RestaurantSimpleResponse {
+public class RestaurantSimpleResponse {
     private final Long restaurantId;
     private final String restaurantName;
     private final String location;
