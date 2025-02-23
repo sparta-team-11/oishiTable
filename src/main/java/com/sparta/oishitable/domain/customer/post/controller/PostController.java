@@ -42,7 +42,7 @@ public class PostController {
             @RequestParam(required = false) Long regionId,
             @RequestParam(required = false) Long cursorValue, // 마지막 행의 랜덤 값
             @RequestParam(required = false) Integer randomSeed, // 클라이언트가 전달하는 이전 랜덤 시드값
-            @RequestParam(defaultValue = "10") int limit
+            @RequestParam(defaultValue = "11") int limit
     ) {
         // 커서값이 null 이거나 랜덤시드가 전달되지 않았으면 새로운 랜덤시드 생성
         int seed = (cursorValue == null || randomSeed == null) ? new Random().nextInt() : randomSeed;
@@ -63,7 +63,7 @@ public class PostController {
             @RequestParam(required = false) Long regionId,
             @RequestParam(required = false) Long cursorValue,
             @RequestParam String keyword,
-            @RequestParam(defaultValue = "10") int limit
+            @RequestParam(defaultValue = "11") int limit
     ) {
         Slice<PostKeywordResponse> response = postService.findPostsByKeyword(
                 userId,
