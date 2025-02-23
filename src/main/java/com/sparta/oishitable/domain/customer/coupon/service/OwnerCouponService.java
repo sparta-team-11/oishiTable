@@ -1,12 +1,11 @@
 package com.sparta.oishitable.domain.customer.coupon.service;
 
-import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.domain.customer.coupon.dto.CouponCreateRequest;
 import com.sparta.oishitable.domain.customer.coupon.dto.CouponResponse;
 import com.sparta.oishitable.domain.customer.coupon.entity.Coupon;
 import com.sparta.oishitable.domain.customer.coupon.repository.CouponRepository;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
-import com.sparta.oishitable.domain.owner.restaurant.repository.RestaurantRepository;
+import com.sparta.oishitable.domain.owner.restaurant.repository.OwnerRestaurantRepository;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
@@ -22,7 +21,7 @@ import java.util.stream.Collectors;
 public class OwnerCouponService {
 
     private final CouponRepository couponRepository;
-    private final RestaurantRepository restaurantRepository;
+    private final OwnerRestaurantRepository restaurantRepository;
 
     @Transactional
     public CouponResponse createCoupon(

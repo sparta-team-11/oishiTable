@@ -18,7 +18,7 @@ public record RestaurantCreateRequest(
         String name,
 
         @NotBlank
-        String location,
+        String address,
 
         @NotNull
         @JsonFormat(pattern = "HH:mm")
@@ -58,7 +58,7 @@ public record RestaurantCreateRequest(
     public Restaurant toEntity(User owner) {
         return Restaurant.builder()
                 .name(name)
-                .location(location)
+                .address(address)
                 .openTime(openTime)
                 .closeTime(closeTime)
                 .breakTimeStart(breakTimeStart)

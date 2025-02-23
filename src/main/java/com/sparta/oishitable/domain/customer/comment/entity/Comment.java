@@ -66,11 +66,6 @@ public class Comment extends BaseEntity {
         reply.setParent(this);
     }
 
-    public void removeReply(Comment reply) {
-        replies.remove(reply);
-        reply.setParent(null);
-    }
-
     public void update(String content) {
         this.content = content;
     }

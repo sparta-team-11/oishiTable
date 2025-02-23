@@ -2,13 +2,14 @@ package com.sparta.oishitable.domain.customer.post.controller;
 
 import com.sparta.oishitable.domain.customer.post.dto.request.PostCreateRequest;
 import com.sparta.oishitable.domain.customer.post.dto.request.PostUpdateRequest;
-import com.sparta.oishitable.domain.customer.post.dto.response.FeedKeywordResponse;
-import com.sparta.oishitable.domain.customer.post.dto.response.FeedRandomResponse;
+import com.sparta.oishitable.domain.customer.post.dto.response.PostKeywordResponse;
+import com.sparta.oishitable.domain.customer.post.dto.response.PostRandomResponse;
 import com.sparta.oishitable.domain.customer.post.service.PostService;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import com.sparta.oishitable.global.util.UriBuilderUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -36,18 +37,18 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<FeedRandomResponse> findPostsByRandom(
-            @RequestParam(required = false) Long userId,
+    public ResponseEntity<Slice<PostRandomResponse>> findPostsByRandom(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(required = false) Long regionId,
             @RequestParam(required = false) Long cursorValue, // 마지막 행의 랜덤 값
             @RequestParam(required = false) Integer randomSeed, // 클라이언트가 전달하는 이전 랜덤 시드값
-            @RequestParam(defaultValue = "10") int limit
+            @RequestParam(defaultValue = "11") int limit
     ) {
         // 커서값이 null 이거나 랜덤시드가 전달되지 않았으면 새로운 랜덤시드 생성
         int seed = (cursorValue == null || randomSeed == null) ? new Random().nextInt() : randomSeed;
 
-        FeedRandomResponse response = postService.findPostsByRandom(
-                userId,
+        Slice<PostRandomResponse> response = postService.findPostsByRandom(
+                userDetails.getId(),
                 regionId,
                 cursorValue,
                 limit,
@@ -57,14 +58,14 @@ public class PostController {
     }
 
     @GetMapping("/keyword")
-    public ResponseEntity<FeedKeywordResponse> findPostsByKeyword(
+    public ResponseEntity<Slice<PostKeywordResponse>> findPostsByKeyword(
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) Long regionId,
             @RequestParam(required = false) Long cursorValue,
             @RequestParam String keyword,
-            @RequestParam(defaultValue = "10") int limit
+            @RequestParam(defaultValue = "11") int limit
     ) {
-        FeedKeywordResponse response = postService.findPostsByKeyword(
+        Slice<PostKeywordResponse> response = postService.findPostsByKeyword(
                 userId,
                 regionId,
                 cursorValue,

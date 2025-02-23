@@ -6,9 +6,10 @@ import com.sparta.oishitable.domain.owner.restaurant.dto.request.RestaurantCreat
 import com.sparta.oishitable.domain.owner.restaurant.dto.request.RestaurantProfileUpdateRequest;
 import com.sparta.oishitable.domain.owner.restaurant.dto.response.RestaurantFindResponse;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
-import com.sparta.oishitable.domain.owner.restaurant.repository.RestaurantRepository;
+import com.sparta.oishitable.domain.owner.restaurant.repository.OwnerRestaurantRepository;
 import com.sparta.oishitable.domain.owner.restaurantseat.service.RestaurantSeatService;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
+import com.sparta.oishitable.global.exception.InvalidException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class OwnerRestaurantService {
 
-    private final RestaurantRepository restaurantRepository;
+    private final OwnerRestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
     private final RestaurantSeatService restaurantSeatService;
 
