@@ -10,7 +10,7 @@ import java.time.LocalTime;
 public record RestaurantResponse(
         Long restaurantId,
         String name,
-        String location,
+        String address,
         LocalTime openTime,
         LocalTime closeTime,
         LocalTime breakTimeStart,
@@ -24,7 +24,7 @@ public record RestaurantResponse(
         return RestaurantResponse.builder()
                 .restaurantId(restaurant.getId())
                 .name(restaurant.getName())
-                .location(restaurant.getLocation())
+                .address(restaurant.getAddress())
                 .openTime(restaurant.getOpenTime())
                 .closeTime(restaurant.getCloseTime())
                 .breakTimeStart(restaurant.getBreakTimeStart())
