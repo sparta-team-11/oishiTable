@@ -24,7 +24,7 @@ public class CustomerRestaurantController {
     public ResponseEntity<Slice<RestaurantSimpleResponse>> findRestaurants(
             @PageableDefault Pageable pageable,
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String location,
+            @RequestParam(required = false) String address,
             @RequestParam(required = false) Integer minPrice,
             @RequestParam(required = false) Integer maxPrice,
             @RequestParam(required = false) String seatTypeName
@@ -32,7 +32,7 @@ public class CustomerRestaurantController {
         Slice<RestaurantSimpleResponse> response = customerRestaurantService.findRestaurants(
                 pageable,
                 keyword,
-                location,
+                address,
                 minPrice,
                 maxPrice,
                 seatTypeName

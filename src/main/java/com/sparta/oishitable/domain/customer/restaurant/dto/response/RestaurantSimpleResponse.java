@@ -7,16 +7,16 @@ import lombok.Getter;
 public class RestaurantSimpleResponse {
     private final Long restaurantId;
     private final String restaurantName;
-    private final String location;
+    private final String address;
 
     @QueryProjection
     public RestaurantSimpleResponse(
             Long restaurantId,
             String restaurantName,
-            String location
+            String address
     ) {
         this.restaurantId = restaurantId;
         this.restaurantName = restaurantName;
-        this.location = location;
+        this.address = address;
     }
 }

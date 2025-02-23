@@ -25,7 +25,7 @@ public class CustomerRestaurantRepositoryQuerydslImpl implements CustomerRestaur
     public Slice<RestaurantSimpleResponse> findRestaurantsByFilters(
             Pageable pageable,
             String keyword,
-            String location,
+            String address,
             Integer minPrice,
             Integer maxPrice,
             String seatTypeName
@@ -36,8 +36,8 @@ public class CustomerRestaurantRepositoryQuerydslImpl implements CustomerRestaur
             builder.and(restaurant.name.containsIgnoreCase(keyword).or(menu.name.containsIgnoreCase(keyword)));
         }
 
-        if (location != null) {
-            builder.and(restaurant.location.contains(location));
+        if (address != null) {
+            builder.and(restaurant.address.contains(address));
         }
 
         if (minPrice != null && maxPrice != null) {
@@ -52,7 +52,7 @@ public class CustomerRestaurantRepositoryQuerydslImpl implements CustomerRestaur
                         new QRestaurantSimpleResponse(
                                 restaurant.id,
                                 restaurant.name,
-                                restaurant.location
+                                restaurant.address
                         )
                 )
                 .from(restaurant)

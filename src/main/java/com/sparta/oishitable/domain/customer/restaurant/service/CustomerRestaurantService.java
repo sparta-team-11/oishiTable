@@ -24,13 +24,13 @@ public class CustomerRestaurantService {
     public Slice<RestaurantSimpleResponse> findRestaurants(
             Pageable pageable,
             String keyword,
-            String location,
+            String address,
             Integer minPrice,
             Integer maxPrice,
             String seatTypeName
     ) {
         return restaurantRepository.findRestaurantsByFilters(
-                pageable, keyword, location, minPrice, maxPrice, seatTypeName
+                pageable, keyword, address, minPrice, maxPrice, seatTypeName
         );
     }
 
