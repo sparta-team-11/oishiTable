@@ -40,7 +40,7 @@ public class CustomerRestaurantRepositoryQuerydslImpl implements CustomerRestaur
             builder.and(restaurant.location.contains(location));
         }
 
-        if (minPrice != null || maxPrice != null) {
+        if (minPrice != null && maxPrice != null) {
             builder.and(restaurant.minPrice.loe(maxPrice)).and(restaurant.maxPrice.goe(minPrice));
         }
 
