@@ -7,15 +7,14 @@ import com.sparta.oishitable.domain.customer.bookmark.dto.response.BookmarkDetai
 import com.sparta.oishitable.domain.customer.bookmark.dto.response.BookmarksFindResponse;
 import com.sparta.oishitable.domain.customer.bookmark.entity.Bookmark;
 import com.sparta.oishitable.domain.customer.bookmark.repository.BookmarkRepository;
+import com.sparta.oishitable.domain.customer.restaurant.repository.CustomerRestaurantRepository;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
-import com.sparta.oishitable.domain.owner.restaurant.repository.RestaurantRepository;
 import com.sparta.oishitable.global.exception.ConflictException;
 import com.sparta.oishitable.global.exception.ForbiddenException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
-    private final RestaurantRepository restaurantRepository;
+    private final CustomerRestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
 
     @Transactional
