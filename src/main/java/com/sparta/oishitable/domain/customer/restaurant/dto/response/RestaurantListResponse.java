@@ -8,14 +8,14 @@ import lombok.Builder;
 public record RestaurantListResponse(
         Long restaurantId,
         String name,
-        String location
+        String address
 ) {
 
     public static RestaurantListResponse from(Restaurant restaurant) {
         return RestaurantListResponse.builder()
                 .restaurantId(restaurant.getId())
                 .name(restaurant.getName())
-                .location(restaurant.getLocation())
+                .address(restaurant.getAddress())
                 .build();
     }
 }

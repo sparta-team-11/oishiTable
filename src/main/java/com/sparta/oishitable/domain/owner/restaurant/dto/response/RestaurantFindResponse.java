@@ -10,7 +10,7 @@ public record RestaurantFindResponse(
         Long restaurantId,
         Long ownerId,
         String name,
-        String location,
+        String address,
         LocalTime openTime,
         LocalTime closeTime,
         LocalTime breakTimeStart,
@@ -25,7 +25,7 @@ public record RestaurantFindResponse(
                 .restaurantId(restaurant.getId())
                 .ownerId(restaurant.getOwner().getId())
                 .name(restaurant.getName())
-                .location(restaurant.getLocation())
+                .address(restaurant.getAddress())
                 .openTime(restaurant.getOpenTime())
                 .closeTime(restaurant.getCloseTime())
                 .breakTimeStart(restaurant.getBreakTimeStart())
