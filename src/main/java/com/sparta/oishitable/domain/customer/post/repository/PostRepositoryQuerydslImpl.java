@@ -1,12 +1,17 @@
 package com.sparta.oishitable.domain.customer.post.repository;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sparta.oishitable.domain.customer.follow.entity.QFollow;
 import com.sparta.oishitable.domain.customer.post.dto.response.PostKeywordResponse;
 import com.sparta.oishitable.domain.customer.post.dto.response.PostRandomResponse;
+import com.sparta.oishitable.domain.customer.post.dto.response.QPostKeywordResponse;
+import com.sparta.oishitable.domain.customer.post.dto.response.QPostRandomResponse;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -44,9 +49,21 @@ public class PostRepositoryQuerydslImpl implements PostRepositoryQuerydsl {
             builder.and(randomValue.gt(cursorValue));
         }
 
+        QFollow follow = QFollow.follow;
+
+         JPQLQuery<Long> followedUserSubQuery = JPAExpressions
+                .select(follow.following.id)
+                .from(follow)
+                .where(follow.follower.id.eq(userId));
+
+        // 팔로우한 사용자의 게시글은 0, 그 외는 1을 부여
+        NumberExpression<Integer> followOrder = new CaseBuilder()
+                .when(post.user.id.in(followedUserSubQuery)).then(0)
+                .otherwise(1);
+
         return queryFactory
                 .select(
-                        Projections.constructor(PostRandomResponse.class,
+                        new QPostRandomResponse(
                                 post.id,
                                 post.user.id,
                                 post.region.id,
@@ -60,7 +77,7 @@ public class PostRepositoryQuerydslImpl implements PostRepositoryQuerydsl {
                 .from(post)
                 .where(builder)
                 // 계산한 랜덤 값들을 기준으로 오름차순으로 정렬 (만약 중복된다면 id 오름차순으로)
-                .orderBy(randomValue.asc(), post.id.asc())
+                .orderBy(followOrder.asc(), randomValue.asc(), post.id.asc())
                 .limit(limit)
                 .fetch();
     }
@@ -95,7 +112,7 @@ public class PostRepositoryQuerydslImpl implements PostRepositoryQuerydsl {
 
         return queryFactory
                 .select(
-                        Projections.constructor(PostKeywordResponse.class,
+                        new QPostKeywordResponse(
                                 post.id,
                                 post.user.id,
                                 post.region.id,
