@@ -1,32 +1,37 @@
 package com.sparta.oishitable.domain.customer.restaurant.service;
 
 import com.sparta.oishitable.domain.customer.restaurant.dto.response.NearbyRestaurantResponse;
-import com.sparta.oishitable.domain.customer.restaurant.dto.response.RestaurantListResponse;
 import com.sparta.oishitable.domain.customer.restaurant.dto.response.RestaurantResponse;
+import com.sparta.oishitable.domain.customer.restaurant.dto.response.RestaurantSimpleResponse;
+import com.sparta.oishitable.domain.customer.restaurant.repository.CustomerRestaurantRepository;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
-import com.sparta.oishitable.domain.owner.restaurant.repository.RestaurantRepository;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class CustomerRestaurantService {
 
-    private final RestaurantRepository restaurantRepository;
+    private final CustomerRestaurantRepository restaurantRepository;
 
     private static final double EARTH_RADIUS = 6371;
 
-    public Page<RestaurantListResponse> findRestaurants(int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
-
-        Page<Restaurant> restaurants = restaurantRepository.findAll(pageable);
-
-        return restaurants.map(RestaurantListResponse::from);
+    public Slice<RestaurantSimpleResponse> findRestaurants(
+            Pageable pageable,
+            String keyword,
+            String location,
+            Integer minPrice,
+            Integer maxPrice,
+            String seatTypeName
+    ) {
+        return restaurantRepository.findRestaurantsByFilters(
+                pageable, keyword, location, minPrice, maxPrice, seatTypeName
+        );
     }
 
     public RestaurantResponse findRestaurant(Long restaurantId) {
