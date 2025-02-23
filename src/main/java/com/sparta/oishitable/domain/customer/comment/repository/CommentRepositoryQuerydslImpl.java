@@ -1,17 +1,17 @@
 package com.sparta.oishitable.domain.customer.comment.repository;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.oishitable.domain.customer.comment.dto.response.CommentPostResponse;
 import com.sparta.oishitable.domain.customer.comment.dto.response.CommentRepliesResponse;
+import com.sparta.oishitable.domain.customer.comment.dto.response.QCommentPostResponse;
+import com.sparta.oishitable.domain.customer.comment.dto.response.QCommentRepliesResponse;
 import com.sparta.oishitable.domain.customer.comment.entity.Comment;
 import com.sparta.oishitable.domain.customer.comment.entity.QComment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -41,7 +41,7 @@ public class CommentRepositoryQuerydslImpl implements CommentRepositoryQuerydsl 
 
         return queryFactory
                 .select(
-                        Projections.constructor(CommentPostResponse.class,
+                        new QCommentPostResponse(
                                 comment.id,
                                 comment.post.id,
                                 comment.user.id,
@@ -80,7 +80,7 @@ public class CommentRepositoryQuerydslImpl implements CommentRepositoryQuerydsl 
 
         List<CommentRepliesResponse> result = queryFactory
                 .select(
-                        Projections.constructor(CommentRepliesResponse.class,
+                        new QCommentRepliesResponse(
                                 comment.id,
                                 comment.post.id,
                                 comment.user.id,

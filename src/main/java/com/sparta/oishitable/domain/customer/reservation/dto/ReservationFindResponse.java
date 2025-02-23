@@ -32,7 +32,7 @@ public record ReservationFindResponse(
         String restaurantName,
 
         @NotBlank
-        String restaurantLocation,
+        String restaurantAddress,
 
         @NotNull
         Long seatTypeId,
@@ -49,7 +49,7 @@ public record ReservationFindResponse(
                 .status(reservation.getStatus())
                 .restaurantId(reservation.getRestaurantSeat().getRestaurant().getId())
                 .restaurantName(reservation.getRestaurantSeat().getRestaurant().getName())
-                .restaurantLocation(reservation.getRestaurantSeat().getRestaurant().getLocation())
+                .restaurantAddress(reservation.getRestaurantSeat().getRestaurant().getAddress())
                 .seatTypeId(reservation.getRestaurantSeat().getSeatType().getId())
                 .seatTypeName(reservation.getRestaurantSeat().getSeatType().getName())
                 .build();
