@@ -90,7 +90,13 @@ public enum ErrorCode {
     COUPON_ALREADY_DOWNLOAD(HttpStatus.CONFLICT, "이미 다운로드한 쿠폰입니다."),
 
     // 알림 관련 익셉션
-    EMAIL_SENDING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "메일 전송에 실패했습니다.");
+    EMAIL_SENDING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "메일 전송에 실패했습니다."),
+
+    // 웨이팅 관련 익셉션
+    ALREADY_REGISTERED_USER_IN_WAITING_QUEUE(HttpStatus.CONFLICT, "이미 대기열에 등록된 고객입니다."),
+    WAITING_QUEUE_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "대기열에 등록되지 않은 고객입니다."),
+    RESTAURANT_WAITING_IS_CLOSED(HttpStatus.BAD_REQUEST, "식당의 대기열이 닫혀있습니다."),
+    ;
 
     private final HttpStatus status;
     private final String message;
