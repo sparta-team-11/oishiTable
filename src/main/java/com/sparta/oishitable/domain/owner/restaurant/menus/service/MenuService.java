@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.IntSummaryStatistics;
 import java.util.List;
 
 @Service
@@ -36,6 +37,8 @@ public class MenuService {
                 .toList();
 
         menuRepository.saveAll(menus);
+
+        calculateRestaurantPriceRange(restaurant, menus);
     }
 
     @Transactional(readOnly = true)
@@ -55,23 +58,61 @@ public class MenuService {
     @Transactional
     public void updateMenu(Long userId, Long restaurantId, Long menuId, MenuUpdateRequest request) {
         Menu menu = findMenuByMenuIdAndRestaurantId(menuId, restaurantId);
+        Restaurant restaurant = menu.getRestaurant();
 
-        authService.checkUserAuthority(menu.getRestaurant().getOwner().getId(), userId);
+        authService.checkUserAuthority(restaurant.getOwner().getId(), userId);
 
-        menu.update(request.menuName(), menu.getPrice(), menu.getDescription());
+        int oldPrice = ceilToNearestTenThousand(menu.getPrice());
+        int newPrice = request.menuPrice();
+
+        menu.update(request.menuName(), newPrice, request.menuDescription());
+
+        if (restaurant.getMinPrice() == oldPrice || restaurant.getMaxPrice() == oldPrice) {
+            calculateRestaurantPriceRange(restaurant, restaurant.getMenus());
+        } else {
+            updateRestaurantPrice(restaurant, newPrice, newPrice);
+        }
     }
 
     @Transactional
     public void deleteMenu(Long userId, Long restaurantId, Long menuId) {
         Menu menu = findMenuByMenuIdAndRestaurantId(menuId, restaurantId);
+        Restaurant restaurant = menu.getRestaurant();
 
-        authService.checkUserAuthority(menu.getRestaurant().getOwner().getId(), userId);
+        authService.checkUserAuthority(restaurant.getOwner().getId(), userId);
+
+        int deletedPrice = ceilToNearestTenThousand(menu.getPrice());
 
         menuRepository.delete(menu);
+        restaurant.removeMenu(menu);
+
+        if (restaurant.getMinPrice() == deletedPrice || restaurant.getMaxPrice() == deletedPrice) {
+            calculateRestaurantPriceRange(restaurant, restaurant.getMenus());
+        }
     }
 
-    private Menu findMenuByMenuIdAndRestaurantId(Long restaurantId, Long menuId) {
+    private Menu findMenuByMenuIdAndRestaurantId(Long menuId, Long restaurantId) {
         return menuRepository.findByIdAndRestaurantId(menuId, restaurantId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MENU_NOT_FOUND));
+    }
+
+    private void calculateRestaurantPriceRange(Restaurant restaurant, List<Menu> menus) {
+        // min, max, sum 등 통계 정보를 한번에 연산
+        IntSummaryStatistics summaryStatistics = menus.stream()
+                .mapToInt(Menu::getPrice)
+                .summaryStatistics();
+
+        updateRestaurantPrice(restaurant, summaryStatistics.getMin(), summaryStatistics.getMax());
+    }
+
+    private void updateRestaurantPrice(Restaurant restaurant, int min, int max) {
+        int minPrice = ceilToNearestTenThousand(min);
+        int maxPrice = ceilToNearestTenThousand(max);
+
+        restaurant.updatePrice(minPrice, maxPrice);
+    }
+
+    private int ceilToNearestTenThousand(int price) {
+        return (int) Math.ceil(price / 10000.0) * 10000;
     }
 }

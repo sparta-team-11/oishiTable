@@ -18,7 +18,7 @@ public record RestaurantCreateRequest(
         String name,
 
         @NotBlank
-        String location,
+        String address,
 
         @NotNull
         @JsonFormat(pattern = "HH:mm")
@@ -46,19 +46,13 @@ public record RestaurantCreateRequest(
         @JsonFormat(pattern = "HH:mm")
         LocalTime reservationInterval,
 
-        @NotNull
-        Double latitude,
-
-        @NotNull
-        Double longitude,
-
         List<RestaurantSeatCreateRequest> restaurantSeatCreateRequestList
 ) {
 
-    public Restaurant toEntity(User owner) {
+    public Restaurant toEntity(User owner, double latitude, double longitude) {
         return Restaurant.builder()
                 .name(name)
-                .location(location)
+                .address(address)
                 .openTime(openTime)
                 .closeTime(closeTime)
                 .breakTimeStart(breakTimeStart)

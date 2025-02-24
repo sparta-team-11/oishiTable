@@ -30,13 +30,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-        String requestURI = request.getRequestURI();
-        
-        if (requestURI.equals("/owner/api/restaurants/geocode")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         String token = request.getHeader(AUTHORIZATION_HEADER);
 
         if (token != null && jwtTokenProvider.validateToken(token, TokenType.ACCESS)) {

@@ -1,0 +1,54 @@
+package com.sparta.oishitable.domain.customer.coupon.controller;
+
+import com.sparta.oishitable.domain.customer.coupon.dto.CouponCreateRequest;
+import com.sparta.oishitable.domain.customer.coupon.dto.CouponResponse;
+import com.sparta.oishitable.domain.customer.coupon.service.OwnerCouponService;
+import com.sparta.oishitable.global.security.entity.CustomUserDetails;
+import com.sparta.oishitable.global.util.UriBuilderUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+import java.util.List;
+
+@RestController
+@RequestMapping("/owner/api/restaurants/{restaurantId}/coupons")
+@RequiredArgsConstructor
+public class OwnerCouponController {
+
+    private final OwnerCouponService ownerCouponService;
+
+    @PostMapping
+    public ResponseEntity<CouponResponse> createCoupon(
+            @PathVariable Long restaurantId,
+            @RequestBody CouponCreateRequest request,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        System.out.println(" 컨트롤러에서 받은 userId: " + userDetails.getId());
+
+        CouponResponse response = ownerCouponService.createCoupon(userDetails.getId(), restaurantId, request);
+
+        URI location = UriBuilderUtil.create("/owner/api/restaurants/{restaurantId}", response.restaurantId());
+
+        return ResponseEntity.created(location).body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CouponResponse>> findCoupons(@PathVariable Long restaurantId) {
+        return ResponseEntity.ok(ownerCouponService.findCoupons(restaurantId));
+    }
+
+    @DeleteMapping("/{couponId}")
+    public ResponseEntity<Void> deleteCoupon(
+            @PathVariable Long restaurantId,
+            @PathVariable Long couponId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+
+    ) {
+        ownerCouponService.deleteCoupon(restaurantId,couponId,userDetails.getId());
+        return ResponseEntity.noContent().build();
+    }
+
+}

@@ -84,6 +84,13 @@ public enum ErrorCode {
 
     // 메뉴 관련 익셉션
     MENU_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 메뉴입니다."),
+
+    // 쿠폰 관련 익셉션
+    COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 쿠폰입니다."),
+    COUPON_ALREADY_USED(HttpStatus.CONFLICT, "이미 사용한 쿠폰입니다."),
+    COUPON_ALREADY_DOWNLOAD(HttpStatus.CONFLICT, "이미 다운로드한 쿠폰입니다."),
+
+    // 알림 관련 익셉션
     EMAIL_SENDING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "메일 전송에 실패했습니다."),
 
     // Geocoding 관련 익셉션

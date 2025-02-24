@@ -4,10 +4,8 @@ import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.domain.customer.post.dto.request.PostCreateRequest;
 import com.sparta.oishitable.domain.customer.post.dto.request.PostUpdateRequest;
-import com.sparta.oishitable.domain.customer.post.dto.response.FeedKeywordResponse;
-import com.sparta.oishitable.domain.customer.post.dto.response.FeedRandomResponse;
 import com.sparta.oishitable.domain.customer.post.dto.response.PostKeywordResponse;
-import com.sparta.oishitable.domain.customer.post.dto.response.PostRandomResponse;
+import com.sparta.oishitable.domain.customer.post.dto.response. PostRandomResponse;
 import com.sparta.oishitable.domain.customer.post.entity.Post;
 import com.sparta.oishitable.domain.customer.post.region.entity.Region;
 import com.sparta.oishitable.domain.customer.post.region.repository.RegionRepository;
@@ -16,6 +14,9 @@ import com.sparta.oishitable.global.exception.ForbiddenException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,7 +50,7 @@ public class PostService {
         return post.getId();
     }
 
-    public FeedRandomResponse findPostsByRandom(
+    public Slice<PostRandomResponse> findPostsByRandom(
             Long userId,
             Long regionId,
             Long cursorValue,
@@ -63,18 +64,13 @@ public class PostService {
                 limit,
                 randomSeed);
 
-        Long nextCursor = null;
-        boolean hasMore = false;
+        // 10개를 조회할 때 11개를 조회가 된다면 다음페이지가 있다고 판단
+        boolean hasNext = posts.size() == limit;
 
-        if (posts.size() == limit) {
-            nextCursor = posts.get(posts.size() - 1).randomValue();
-            hasMore = true; // 조회된 개수가 limit이면 다음 페이지 있으면 true 없으면 false 반환
-        }
-
-        return new FeedRandomResponse(posts, randomSeed, nextCursor, hasMore);
+        return new SliceImpl<>(posts, PageRequest.of(0, limit - 1), hasNext);
     }
 
-    public FeedKeywordResponse findPostsByKeyword(
+    public Slice<PostKeywordResponse> findPostsByKeyword(
             Long userId,
             Long regionId,
             Long cursorValue,
@@ -88,17 +84,10 @@ public class PostService {
                 keyword,
                 limit);
 
-        // 조회된 게시글 수가 limit과 동일하면 마지막 게시글의 id를 커서로 사용
-        // 그렇지 않으면 더 이상 데이터가 없음을 의미하므로 null
-        Long nextCursor = null;
-        boolean hasMore = false;
+        // 10개를 조회할 때 11개를 조회가 된다면 다음페이지가 있다고 판단
+        boolean hasNext = posts.size() == limit;
 
-        if (posts.size() == limit) {
-            nextCursor = posts.get(posts.size() - 1).postId();
-            hasMore = true;
-        }
-
-        return new FeedKeywordResponse(posts, nextCursor, hasMore);
+        return new SliceImpl<>(posts, PageRequest.of(0, limit - 1), hasNext);
     }
 
     @Transactional
@@ -130,7 +119,7 @@ public class PostService {
 
     private Region findRegionById(Long userId) {
         return regionRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.REGION_NOT_FOUND));
     }
 
     private Post findPostById(Long postId) {
