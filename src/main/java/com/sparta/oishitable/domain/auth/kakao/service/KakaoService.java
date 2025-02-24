@@ -2,10 +2,10 @@ package com.sparta.oishitable.domain.auth.kakao.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.oishitable.domain.auth.dto.response.AuthLoginResponse;
 import com.sparta.oishitable.domain.auth.kakao.dto.response.KakaoAccount;
 import com.sparta.oishitable.domain.auth.kakao.dto.response.KakaoInfo;
 import com.sparta.oishitable.domain.auth.kakao.dto.response.OAuthToken;
+import com.sparta.oishitable.domain.common.auth.dto.response.AuthLoginResponse;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.entity.UserRole;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
@@ -26,7 +26,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
-import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +35,7 @@ public class KakaoService {
     private final UserRepository userRepository;
     private final RedisRepository redisRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RestTemplate restTemplate;
 
     // 카카오 API 호출을 위한 HTTP 클라이언트
 
@@ -82,7 +82,6 @@ public class KakaoService {
     // 액세스 토큰 교환 메소드
     private String getAccessTokenFromKakao(String code) {
 
-        RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -119,9 +118,6 @@ public class KakaoService {
 
     // 사용자 정보 요청 메소드
     private KakaoAccount getKakaoUserInfo(String accessToken) {
-
-        // 카카오 API 호출 후 JSON 파싱하여 KakaoInfo DTO로 변환
-        RestTemplate restTemplate = new RestTemplate();
 
         // 요청 헤더에 Bearer 토큰 추가
         HttpHeaders headers = new HttpHeaders();
