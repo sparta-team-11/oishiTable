@@ -1,6 +1,6 @@
 package com.sparta.oishitable.domain.owner.restaurant.menus.service;
 
-import com.sparta.oishitable.domain.auth.service.AuthService;
+import com.sparta.oishitable.domain.common.auth.service.AuthService;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.menus.dto.request.MenuCreateRequest;
 import com.sparta.oishitable.domain.owner.restaurant.menus.dto.request.MenuUpdateRequest;
@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.IntSummaryStatistics;
 import java.util.List;
 
 @Service
@@ -32,13 +31,14 @@ public class MenuService {
 
         authService.checkUserAuthority(restaurant.getOwner().getId(), userId);
 
-        List<Menu> menus = request.stream()
+        List<Menu> newMenus = request.stream()
                 .map(m -> m.toEntity(restaurant))
                 .toList();
 
-        menuRepository.saveAll(menus);
+        menuRepository.saveAll(newMenus);
 
-        calculateRestaurantPriceRange(restaurant, menus);
+        // 레스토랑 최대/최소값 변경
+        restaurant.updateMinMaxPrice(newMenus);
     }
 
     @Transactional(readOnly = true)
@@ -62,15 +62,14 @@ public class MenuService {
 
         authService.checkUserAuthority(restaurant.getOwner().getId(), userId);
 
-        int oldPrice = ceilToNearestTenThousand(menu.getPrice());
-        int newPrice = request.menuPrice();
+        Integer oldPrice = menu.getPrice();
+        Integer newPrice = request.menuPrice();
 
         menu.update(request.menuName(), newPrice, request.menuDescription());
 
-        if (restaurant.getMinPrice() == oldPrice || restaurant.getMaxPrice() == oldPrice) {
-            calculateRestaurantPriceRange(restaurant, restaurant.getMenus());
-        } else {
-            updateRestaurantPrice(restaurant, newPrice, newPrice);
+        // 변경 이전/이후의 가격이 최대/최소값인 경우에만 업데이트 적용
+        if (restaurant.isMinOrMaxPrice(oldPrice) || restaurant.isMinOrMaxPrice(newPrice)) {
+            restaurant.updateMinMaxPrice();
         }
     }
 
@@ -81,38 +80,17 @@ public class MenuService {
 
         authService.checkUserAuthority(restaurant.getOwner().getId(), userId);
 
-        int deletedPrice = ceilToNearestTenThousand(menu.getPrice());
-
         menuRepository.delete(menu);
         restaurant.removeMenu(menu);
 
-        if (restaurant.getMinPrice() == deletedPrice || restaurant.getMaxPrice() == deletedPrice) {
-            calculateRestaurantPriceRange(restaurant, restaurant.getMenus());
+        // 삭제될 메뉴의 가격이 최대 혹은 최소값인 경우에만 업데이트 적용
+        if (restaurant.isMinOrMaxPrice(menu.getPrice())) {
+            restaurant.updateMinMaxPrice();
         }
     }
 
     private Menu findMenuByMenuIdAndRestaurantId(Long menuId, Long restaurantId) {
         return menuRepository.findByIdAndRestaurantId(menuId, restaurantId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MENU_NOT_FOUND));
-    }
-
-    private void calculateRestaurantPriceRange(Restaurant restaurant, List<Menu> menus) {
-        // min, max, sum 등 통계 정보를 한번에 연산
-        IntSummaryStatistics summaryStatistics = menus.stream()
-                .mapToInt(Menu::getPrice)
-                .summaryStatistics();
-
-        updateRestaurantPrice(restaurant, summaryStatistics.getMin(), summaryStatistics.getMax());
-    }
-
-    private void updateRestaurantPrice(Restaurant restaurant, int min, int max) {
-        int minPrice = ceilToNearestTenThousand(min);
-        int maxPrice = ceilToNearestTenThousand(max);
-
-        restaurant.updatePrice(minPrice, maxPrice);
-    }
-
-    private int ceilToNearestTenThousand(int price) {
-        return (int) Math.ceil(price / 10000.0) * 10000;
     }
 }

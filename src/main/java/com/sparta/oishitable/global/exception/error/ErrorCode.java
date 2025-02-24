@@ -84,6 +84,7 @@ public enum ErrorCode {
 
     // 메뉴 관련 익셉션
     MENU_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 메뉴입니다."),
+    MENUS_EMPTY(HttpStatus.BAD_REQUEST, "메뉴가 비어있습니다."),
 
     // 쿠폰 관련 익셉션
     COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 쿠폰입니다."),
