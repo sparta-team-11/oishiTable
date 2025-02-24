@@ -92,6 +92,12 @@ public enum ErrorCode {
     // 알림 관련 익셉션
     EMAIL_SENDING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "메일 전송에 실패했습니다."),
 
+    // Geocoding 관련 익셉션
+    GEOCODING_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Geocoding API 호출 중 오류가 발생했습니다."),
+    GEOCODING_CLIENT_ERROR(HttpStatus.BAD_REQUEST, "Geocoding API 클라이언트 오류가 발생했습니다."),
+    GEOCODING_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Geocoding API 서버 오류가 발생했습니다."),
+    GEOCODING_NO_RESULT(HttpStatus.NOT_FOUND, "Geocoding API 결과가 없습니다."),
+
     // 웨이팅 관련 익셉션
     ALREADY_REGISTERED_USER_IN_WAITING_QUEUE(HttpStatus.CONFLICT, "이미 대기열에 등록된 고객입니다."),
     WAITING_QUEUE_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "대기열에 등록되지 않은 고객입니다."),
