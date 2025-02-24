@@ -1,7 +1,7 @@
 package com.sparta.oishitable.domain.customer.restaurant.waiting.controller;
 
-import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueSizeResponse;
-import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueUserRankResponse;
+import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueFindSizeResponse;
+import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueFindUserRankResponse;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.service.CustomerRestaurantWaitingService;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -27,21 +27,21 @@ public class CustomerRestaurantWaitingController {
         return ResponseEntity.created(null).build();
     }
 
-    @GetMapping
-    public ResponseEntity<WaitingQueueSizeResponse> findWaitingQueueSize(
+    @GetMapping("/size")
+    public ResponseEntity<WaitingQueueFindSizeResponse> findWaitingQueueSize(
             @PathVariable Long restaurantId
     ) {
-        WaitingQueueSizeResponse waitingQueueSizeResponse = customerRestaurantWaitingService.findWaitingQueueSize(restaurantId);
+        WaitingQueueFindSizeResponse waitingQueueSizeResponse = customerRestaurantWaitingService.findWaitingQueueSize(restaurantId);
 
         return ResponseEntity.ok(waitingQueueSizeResponse);
     }
 
-    @GetMapping("/rank")
-    public ResponseEntity<WaitingQueueUserRankResponse> findWaitingQueueUserRank(
+    @GetMapping
+    public ResponseEntity<WaitingQueueFindUserRankResponse> findWaitingQueueUserRank(
             @PathVariable Long restaurantId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        WaitingQueueUserRankResponse waitingQueueUserRankResponse = customerRestaurantWaitingService.findWaitingQueueUserRank(userDetails.getId(), restaurantId);
+        WaitingQueueFindUserRankResponse waitingQueueUserRankResponse = customerRestaurantWaitingService.findWaitingQueueUserRank(userDetails.getId(), restaurantId);
 
         return ResponseEntity.ok(waitingQueueUserRankResponse);
     }

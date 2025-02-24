@@ -2,9 +2,9 @@ package com.sparta.oishitable.domain.customer.restaurant.waiting.service;
 
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
-import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueSizeResponse;
-import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueUserRankResponse;
-import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.CustomerRestaurantWaitingRepository;
+import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueFindSizeResponse;
+import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueFindUserRankResponse;
+import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.CustomerRestaurantWaitingRepositoryImpl;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.entity.WaitingStatus;
 import com.sparta.oishitable.domain.owner.restaurant.service.OwnerRestaurantService;
@@ -20,7 +20,7 @@ public class CustomerRestaurantWaitingService {
 
     private final UserRepository userRepository;
     private final OwnerRestaurantService ownerRestaurantService;
-    private final CustomerRestaurantWaitingRepository customerRestaurantWaitingRepository;
+    private final CustomerRestaurantWaitingRepositoryImpl customerRestaurantWaitingRepository;
 
     public void joinWaitingQueue(Long userId, Long restaurantId) {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
@@ -47,25 +47,25 @@ public class CustomerRestaurantWaitingService {
         customerRestaurantWaitingRepository.remove(user.getId(), restaurant.getId());
     }
 
-    public WaitingQueueUserRankResponse findWaitingQueueUserRank(Long userId, Long restaurantId) {
+    public WaitingQueueFindUserRankResponse findWaitingQueueUserRank(Long userId, Long restaurantId) {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
         checkWaitingStatus(restaurant.getWaitingStatus());
 
         User user = findUserById(userId);
 
         Long rank = customerRestaurantWaitingRepository.findUserRank(user.getId(), restaurant.getId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND));
+                .orElse(-1L);
 
-        return new WaitingQueueUserRankResponse(rank);
+        return WaitingQueueFindUserRankResponse.from(rank);
     }
 
-    public WaitingQueueSizeResponse findWaitingQueueSize(Long restaurantId) {
+    public WaitingQueueFindSizeResponse findWaitingQueueSize(Long restaurantId) {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
         checkWaitingStatus(restaurant.getWaitingStatus());
 
         Long size = customerRestaurantWaitingRepository.findQueueSize(restaurant.getId());
 
-        return new WaitingQueueSizeResponse(size);
+        return WaitingQueueFindSizeResponse.from(size);
     }
 
     private void checkWaitingStatus(WaitingStatus waitingStatus) {

@@ -1,16 +1,14 @@
 package com.sparta.oishitable.domain.customer.restaurant.waiting.repository;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Slf4j
 @Repository
 @RequiredArgsConstructor
-public class CustomerRestaurantWaitingRepository {
+public class CustomerRestaurantWaitingRepositoryImpl {
 
     private final RedisTemplate<String, String> redisTemplate;
 
