@@ -45,3 +45,4 @@ out/
 ### properties, yml ###
 /src/main/resources/*.properties
 /src/main/resources/*.yml
+.env

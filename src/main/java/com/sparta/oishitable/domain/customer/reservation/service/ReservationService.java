@@ -13,7 +13,7 @@ import com.sparta.oishitable.global.exception.ForbiddenException;
 import com.sparta.oishitable.global.exception.InvalidException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
-import com.sparta.oishitable.notification.event.ReservationEvent;
+import com.sparta.oishitable.domain.common.notification.event.ReservationEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

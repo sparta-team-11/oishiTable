@@ -46,14 +46,12 @@ public class Reservation extends BaseEntity {
 
     @Builder
     public Reservation(
-            Long id,
             LocalDateTime date,
             ReservationStatus status,
             Integer totalCount,
             User user,
             RestaurantSeat restaurantSeat
     ) {
-        this.id = id;
         this.date = date;
         this.status = status;
         this.totalCount = totalCount;

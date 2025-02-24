@@ -36,8 +36,7 @@ public class CollectionBookmark {
     private Bookmark bookmark;
 
     @Builder
-    public CollectionBookmark(Long id, Collection collection, Bookmark bookmark) {
-        this.id = id;
+    public CollectionBookmark(Collection collection, Bookmark bookmark) {
         this.collection = collection;
         this.bookmark = bookmark;
     }
