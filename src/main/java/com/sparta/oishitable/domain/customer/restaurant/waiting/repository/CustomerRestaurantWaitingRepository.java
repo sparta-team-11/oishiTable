@@ -16,12 +16,12 @@ public class CustomerRestaurantWaitingRepository {
 
     private static final String WAITING_QUEUE_PREFIX = "restaurant_waiting_queue:";
 
-    public Long push(Long userId, Long restaurantId) {
-        return redisTemplate.opsForList().rightPush(WAITING_QUEUE_PREFIX + restaurantId, userId.toString());
+    public void push(Long userId, Long restaurantId) {
+        redisTemplate.opsForList().rightPush(WAITING_QUEUE_PREFIX + restaurantId, userId.toString());
     }
 
-    public Long remove(Long userId, Long restaurantId) {
-        return redisTemplate.opsForList().remove(WAITING_QUEUE_PREFIX + restaurantId, 0, userId.toString());
+    public void remove(Long userId, Long restaurantId) {
+        redisTemplate.opsForList().remove(WAITING_QUEUE_PREFIX + restaurantId, 1, userId.toString());
     }
 
     public Optional<Long> findUserRank(Long userId, Long restaurantId) {
