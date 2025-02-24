@@ -2,9 +2,9 @@ package com.sparta.oishitable.domain.common.notification.repository;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sparta.oishitable.domain.customer.reservation.entity.ReservationStatus;
 import com.sparta.oishitable.domain.common.notification.entity.Notification;
-import com.sparta.oishitable.notification.entity.QNotification;
+import com.sparta.oishitable.domain.common.notification.entity.QNotification;
+import com.sparta.oishitable.domain.customer.reservation.entity.ReservationStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -13,14 +13,14 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.sparta.oishitable.domain.common.notification.entity.QNotification.notification;
 import static com.sparta.oishitable.domain.common.user.entity.QUser.user;
 import static com.sparta.oishitable.domain.customer.reservation.entity.QReservation.reservation;
 import static com.sparta.oishitable.domain.owner.restaurant.entity.QRestaurant.restaurant;
 import static com.sparta.oishitable.domain.owner.restaurantseat.entity.QRestaurantSeat.restaurantSeat;
-import static com.sparta.oishitable.notification.entity.QNotification.notification;
 
 @RequiredArgsConstructor
-public class NotificationRepositoryQuerydslImpl implements NotificationRepositoryQuerydsl{
+public class NotificationRepositoryQuerydslImpl implements NotificationRepositoryQuerydsl {
 
     private final JPAQueryFactory queryFactory;
 
