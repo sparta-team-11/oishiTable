@@ -3,9 +3,9 @@ package com.sparta.oishitable.domain.customer.coupon.service;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.domain.customer.coupon.dto.UserCouponResponse;
-import com.sparta.oishitable.domain.customer.coupon.entity.Coupon;
+import com.sparta.oishitable.domain.owner.coupon.entity.Coupon;
 import com.sparta.oishitable.domain.customer.coupon.entity.UserCoupon;
-import com.sparta.oishitable.domain.customer.coupon.repository.CouponRepository;
+import com.sparta.oishitable.domain.owner.coupon.repository.CouponRepository;
 import com.sparta.oishitable.domain.customer.coupon.repository.UserCouponRepository;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.NotFoundException;
@@ -72,6 +72,5 @@ public class UserCouponService {
         userCoupon.setCouponUsed(true);
 
         return UserCouponResponse.from(userCoupon);
-
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/customer/api/{userId}/coupons")
+@RequestMapping("/customer/api/coupons")
 @RequiredArgsConstructor
 public class UserCouponController {
 
@@ -21,16 +21,14 @@ public class UserCouponController {
     public ResponseEntity<UserCouponResponse> downloadCoupon(
             @PathVariable Long couponId,
             @AuthenticationPrincipal CustomUserDetails userDetails
-
     ) {
 
-        return ResponseEntity.ok(usercouponService.downloadCoupon(userDetails.getId(),couponId));
+        return ResponseEntity.ok(usercouponService.downloadCoupon(userDetails.getId(), couponId));
     }
 
     @GetMapping
     public ResponseEntity<List<UserCouponResponse>> findUserCoupons(
             @AuthenticationPrincipal CustomUserDetails userDetails
-
     ) {
         return ResponseEntity.ok(usercouponService.findUserCoupons(userDetails.getId()));
     }
@@ -39,10 +37,7 @@ public class UserCouponController {
     public ResponseEntity<UserCouponResponse> useCoupon(
             @PathVariable Long couponId,
             @AuthenticationPrincipal CustomUserDetails userDetails
-
     ) {
-
         return ResponseEntity.ok(usercouponService.useCoupon(userDetails.getId(), couponId));
     }
-
 }

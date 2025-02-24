@@ -1,7 +1,7 @@
 package com.sparta.oishitable.domain.owner.restaurantseat.entity;
 
-import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.admin.seatType.entity.SeatType;
+import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -38,14 +38,12 @@ public class RestaurantSeat {
 
     @Builder
     public RestaurantSeat(
-            Long id,
             Integer minGuestCount,
             Integer maxGuestCount,
             Integer quantity,
             SeatType seatType,
             Restaurant restaurant
     ) {
-        this.id = id;
         this.minGuestCount = minGuestCount;
         this.maxGuestCount = maxGuestCount;
         this.quantity = quantity;
