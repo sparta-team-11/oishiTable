@@ -36,6 +36,7 @@ public class KakaoService {
     private final RedisRepository redisRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
 
     // 카카오 API 호출을 위한 HTTP 클라이언트
 
@@ -102,8 +103,6 @@ public class KakaoService {
                 kakaoTokenRequest,
                 String.class);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-
         OAuthToken oAuthToken = null;
 
         try {
@@ -134,8 +133,6 @@ public class KakaoService {
                 kakaoProfileRequest,
                 String.class
         );
-
-        ObjectMapper objectMapper = new ObjectMapper();
 
         KakaoInfo kakaoProfile = null;
 
