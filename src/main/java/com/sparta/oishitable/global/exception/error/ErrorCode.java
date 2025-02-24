@@ -70,7 +70,6 @@ public enum ErrorCode {
 
     // 좋아요 관련 익셉션
     LIKE_DUPLICATED(HttpStatus.BAD_REQUEST, "이미 좋아요를 누르셨습니다."),
-
     LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "좋아요를 누르지 않으셨습니다"),
 
     // 북마크 관련 익셉션
@@ -97,7 +96,13 @@ public enum ErrorCode {
     GEOCODING_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Geocoding API 호출 중 오류가 발생했습니다."),
     GEOCODING_CLIENT_ERROR(HttpStatus.BAD_REQUEST, "Geocoding API 클라이언트 오류가 발생했습니다."),
     GEOCODING_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Geocoding API 서버 오류가 발생했습니다."),
-    GEOCODING_NO_RESULT(HttpStatus.NOT_FOUND, "Geocoding API 결과가 없습니다.");
+    GEOCODING_NO_RESULT(HttpStatus.NOT_FOUND, "Geocoding API 결과가 없습니다."),
+
+    // 웨이팅 관련 익셉션
+    ALREADY_REGISTERED_USER_IN_WAITING_QUEUE(HttpStatus.CONFLICT, "이미 대기열에 등록된 고객입니다."),
+    WAITING_QUEUE_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "대기열에 등록되지 않은 고객입니다."),
+    RESTAURANT_WAITING_IS_CLOSED(HttpStatus.BAD_REQUEST, "식당의 대기열이 닫혀있습니다."),
+    ;
 
     private final HttpStatus status;
     private final String message;

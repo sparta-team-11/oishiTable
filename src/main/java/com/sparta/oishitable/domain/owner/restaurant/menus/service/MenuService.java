@@ -1,6 +1,6 @@
 package com.sparta.oishitable.domain.owner.restaurant.menus.service;
 
-import com.sparta.oishitable.domain.auth.service.AuthService;
+import com.sparta.oishitable.domain.common.auth.service.AuthService;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.menus.dto.request.MenuCreateRequest;
 import com.sparta.oishitable.domain.owner.restaurant.menus.dto.request.MenuUpdateRequest;

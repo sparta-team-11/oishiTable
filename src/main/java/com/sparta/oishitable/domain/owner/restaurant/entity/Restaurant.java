@@ -8,6 +8,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -21,6 +23,7 @@ import java.util.List;
         })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicInsert
 public class Restaurant extends BaseEntity {
 
     @Id
@@ -64,6 +67,11 @@ public class Restaurant extends BaseEntity {
 
     @Column(nullable = false)
     private Double longitude;
+
+    @Column(nullable = false)
+    @ColumnDefault("'CLOSE'")
+    @Enumerated(EnumType.STRING)
+    public WaitingStatus waitingStatus;
 
     private Integer minPrice;
     private Integer maxPrice;
