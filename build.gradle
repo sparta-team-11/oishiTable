@@ -58,6 +58,10 @@ dependencies {
     // RabbitMQ TODO : 사용시 풀 것
 //    implementation 'org.springframework.boot:spring-boot-starter-amqp'
 
+
+    // webflux
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
 }
 
 tasks.named('test') {
