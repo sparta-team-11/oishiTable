@@ -36,8 +36,7 @@ public class Bookmark {
     private Restaurant restaurant;
 
     @Builder
-    public Bookmark(Long id, String memo, User user, Restaurant restaurant) {
-        this.id = id;
+    public Bookmark(String memo, User user, Restaurant restaurant) {
         this.memo = memo;
         this.user = user;
         this.restaurant = restaurant;

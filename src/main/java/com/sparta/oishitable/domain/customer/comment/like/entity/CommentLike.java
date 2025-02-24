@@ -33,8 +33,7 @@ public class CommentLike {
     private Comment comment;
 
     @Builder
-    public CommentLike(Long id, User user, Comment comment) {
-        this.id = id;
+    public CommentLike(User user, Comment comment) {
         this.user = user;
         this.comment = comment;
     }
