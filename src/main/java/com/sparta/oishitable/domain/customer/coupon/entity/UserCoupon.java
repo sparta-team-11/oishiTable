@@ -1,6 +1,7 @@
 package com.sparta.oishitable.domain.customer.coupon.entity;
 
 import com.sparta.oishitable.domain.common.user.entity.User;
+import com.sparta.oishitable.domain.owner.coupon.entity.Coupon;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,9 +9,10 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
-@Table(name = "UserCoupons")
+@Table(name = "user_coupons")
 @Getter
 public class UserCoupon {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,8 +29,7 @@ public class UserCoupon {
     private Coupon coupon;
 
     @Builder
-    public UserCoupon(Long id, Boolean couponUsed, User user, Coupon coupon) {
-        this.id = id;
+    public UserCoupon(Boolean couponUsed, User user, Coupon coupon) {
         this.couponUsed = couponUsed;
         this.user = user;
         this.coupon = coupon;
@@ -37,6 +38,4 @@ public class UserCoupon {
     public void setCouponUsed(Boolean couponUsed) {
         this.couponUsed = couponUsed;
     }
-
-
 }

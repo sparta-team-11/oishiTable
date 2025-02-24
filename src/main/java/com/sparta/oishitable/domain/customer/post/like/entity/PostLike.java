@@ -33,8 +33,7 @@ public class PostLike {
     private Post post;
 
     @Builder
-    public PostLike(Long id, User user, Post post) {
-        this.id = id;
+    public PostLike(User user, Post post) {
         this.user = user;
         this.post = post;
     }
