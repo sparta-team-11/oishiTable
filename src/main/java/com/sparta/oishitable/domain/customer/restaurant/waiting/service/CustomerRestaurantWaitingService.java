@@ -54,7 +54,7 @@ public class CustomerRestaurantWaitingService {
         User user = findUserById(userId);
 
         Long rank = customerRestaurantWaitingRepository.findUserRank(user.getId(), restaurant.getId())
-                .orElse(-1L);
+                .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND));
 
         return WaitingQueueFindUserRankResponse.from(rank);
     }
