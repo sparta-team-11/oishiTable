@@ -82,7 +82,8 @@ public class OwnerRestaurantService {
         return geocodingClient.findGeocoding(address)
                 .flatMap(geocodingResponse -> {
                     if (geocodingResponse != null && geocodingResponse.hasResult()) {
-                        return Mono.just(geocodingResponse.findFirstResult().orElse(null));
+                        return Mono.just(geocodingResponse.findFirstResult()
+                                .orElseThrow(() -> new CustomRuntimeException(ErrorCode.GEOCODING_NO_RESULT)));
                     } else {
                         return Mono.error(new CustomRuntimeException(ErrorCode.GEOCODING_NO_RESULT));
                     }
