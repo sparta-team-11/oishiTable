@@ -48,7 +48,7 @@ public class OwnerRestaurantWaitingController {
     ) {
         ownerRestaurantWaitingService.clearWaitingQueue(userDetails.getId(), restaurantId);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping
@@ -59,6 +59,6 @@ public class OwnerRestaurantWaitingController {
     ) {
         ownerRestaurantWaitingService.deleteUserFromWaitingQueue(userDetails.getId(), restaurantId, request.userId());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }
