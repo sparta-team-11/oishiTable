@@ -60,12 +60,12 @@ public class UserCouponService {
         List<UserCoupon> userCoupons = queryFactory
                 .selectFrom(userCoupon)
                 .where(
-                        userCoupon.user.id.eq(userId),                    // 사용자 ID 일치
-                        userCoupon.couponUsed.isFalse(),                  // 사용하지 않은 쿠폰
-                        cursor == null ? null : userCoupon.id.gt(cursor)  // 커서 처리
+                        userCoupon.user.id.eq(userId),
+                        userCoupon.couponUsed.isFalse(),
+                        cursor == null ? null : userCoupon.id.gt(cursor)
                 )
-                .orderBy(userCoupon.id.asc())                        // ID 오름차순 정렬
-                .limit(size)                                         // 페이지 크기 제한
+                .orderBy(userCoupon.id.asc())
+                .limit(size)
                 .fetch();
 
         return userCoupons.stream()
