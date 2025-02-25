@@ -16,6 +16,11 @@ public enum ErrorCode {
 
     USER_UNAUTHORIZED(HttpStatus.FORBIDDEN, "접근 권한이 없습니다"),
 
+    // Kakao 관련 익셉션
+    KAKAO_FAILED_TOKEN_PARSING_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "카카오 액세스 토큰 응답 파싱 실패했습니다."),
+    KAKAO_FAILED_PROFILE_PARSING_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "카카오 사용자 프로필 응답을 파싱하는데 실패했습니다."),
+
+
     // 식당 관련 익셉션
     RESTAURANT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 식당 입니다."),
 
@@ -83,6 +88,7 @@ public enum ErrorCode {
 
     // 메뉴 관련 익셉션
     MENU_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 메뉴입니다."),
+    MENUS_EMPTY(HttpStatus.BAD_REQUEST, "메뉴가 비어있습니다."),
 
     // 쿠폰 관련 익셉션
     COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 쿠폰입니다."),

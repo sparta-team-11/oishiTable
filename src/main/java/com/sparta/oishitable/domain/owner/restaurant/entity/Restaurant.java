@@ -3,6 +3,8 @@ package com.sparta.oishitable.domain.owner.restaurant.entity;
 import com.sparta.oishitable.domain.common.BaseEntity;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.owner.restaurant.menus.entity.Menu;
+import com.sparta.oishitable.domain.owner.restaurant.menus.vo.Menus;
+import com.sparta.oishitable.global.util.CalculatorUtil;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -115,9 +117,22 @@ public class Restaurant extends BaseEntity {
         this.deposit = deposit;
     }
 
-    public void updatePrice(int minPrice, int maxPrice) {
-        updateMinPrice(minPrice);
-        updateMaxPrice(maxPrice);
+    public void updateMinMaxPrice() {
+        Menus menus = new Menus(this.menus);
+        updateMinPrice(menus.getMinPrice());
+        updateMaxPrice(menus.getMaxPrice());
+    }
+
+    public void updateMinMaxPrice(List<Menu> newMenus) {
+        Menus menus = new Menus(newMenus);
+        updateMinPrice(menus.getMinPrice());
+        updateMaxPrice(menus.getMaxPrice());
+    }
+
+    public boolean isMinOrMaxPrice(int price) {
+        price = CalculatorUtil.ceilToNearestTenThousand(price);
+
+        return this.minPrice >= price || this.maxPrice <= price;
     }
 
     public void removeMenu(Menu menu) {
@@ -134,18 +149,22 @@ public class Restaurant extends BaseEntity {
     }
 
     private void updateMinPrice(int minPrice) {
+        minPrice = CalculatorUtil.ceilToNearestTenThousand(minPrice);
+
         if (this.minPrice > minPrice) {
             this.minPrice = minPrice;
         }
     }
 
     private void updateMaxPrice(int maxPrice) {
+        maxPrice = CalculatorUtil.ceilToNearestTenThousand(maxPrice);
+
         if (this.maxPrice < maxPrice) {
             this.maxPrice = maxPrice;
         }
     }
 
-    public void initializePrice() {
+    private void initializePrice() {
         this.maxPrice = 0;
         this.minPrice = Integer.MAX_VALUE;
     }
