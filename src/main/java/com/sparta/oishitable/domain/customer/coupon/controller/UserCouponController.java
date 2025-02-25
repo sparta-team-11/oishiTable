@@ -28,9 +28,12 @@ public class UserCouponController {
 
     @GetMapping
     public ResponseEntity<List<UserCouponResponse>> findUserCoupons(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam(required = false) Long cursor,
+            @RequestParam(defaultValue = "5") int size
+
     ) {
-        return ResponseEntity.ok(usercouponService.findUserCoupons(userDetails.getId()));
+        return ResponseEntity.ok(usercouponService.findUserCoupons(userDetails.getId(),cursor,size));
     }
 
     @PostMapping("/{couponId}/use")
