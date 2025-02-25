@@ -6,13 +6,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface BookmarkQRepository {
 
     boolean existsByUserIdAndRestaurantId(Long userId, Long restaurantId);
-
-    Optional<Bookmark> findByUserIdAndRestaurantId(Long userId, Long restaurantId);
 
     List<Bookmark> findAllByBookmarkIds(List<Long> bookmarkIds);
 

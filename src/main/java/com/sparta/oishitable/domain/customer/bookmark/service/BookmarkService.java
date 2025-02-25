@@ -29,7 +29,7 @@ public class BookmarkService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void createBookmark(Long userId, Long restaurantId) {
+    public Long createBookmark(Long userId, Long restaurantId) {
         if (bookmarkRepository.existsByUserIdAndRestaurantId(userId, restaurantId)) {
             throw new ConflictException(ErrorCode.BOOKMARK_ALREADY_EXISTS_RESTAURANT);
         }
@@ -45,7 +45,9 @@ public class BookmarkService {
                 .restaurant(restaurant)
                 .build();
 
-        bookmarkRepository.save(bookmark);
+        Bookmark savedBookmark = bookmarkRepository.save(bookmark);
+
+        return savedBookmark.getId();
     }
 
     public BookmarksFindResponse findBookmarks(Long userId, Pageable pageable) {
@@ -71,13 +73,6 @@ public class BookmarkService {
         bookmarkRepository.delete(bookmark);
     }
 
-    @Transactional
-    public void deleteBookmarkByUserIdAndRestaurantId(Long userId, Long restaurantId) {
-        Bookmark bookmark = findByUserIdAndRestaurantId(userId, restaurantId);
-
-        bookmarkRepository.delete(bookmark);
-    }
-
     private void checkUserAuthority(Long ownerId, Long userId) {
         if (!ownerId.equals(userId)) {
             throw new ForbiddenException(ErrorCode.USER_UNAUTHORIZED);
@@ -86,11 +81,6 @@ public class BookmarkService {
 
     private Bookmark findById(Long bookmarkId) {
         return bookmarkRepository.findById(bookmarkId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.BOOKMARK_NOT_FOUND));
-    }
-
-    private Bookmark findByUserIdAndRestaurantId(Long userId, Long restaurantId) {
-        return bookmarkRepository.findByUserIdAndRestaurantId(userId, restaurantId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.BOOKMARK_NOT_FOUND));
     }
 }

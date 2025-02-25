@@ -36,17 +36,6 @@ public class BookmarkQRepositoryImpl implements BookmarkQRepository {
     }
 
     @Override
-    public Optional<Bookmark> findByUserIdAndRestaurantId(Long userId, Long restaurantId) {
-        return Optional.ofNullable(queryFactory
-                .selectFrom(bookmark)
-                .where(
-                        bookmark.user.id.eq(userId),
-                        bookmark.restaurant.id.eq(restaurantId)
-                )
-                .fetchOne());
-    }
-
-    @Override
     public List<Bookmark> findAllByBookmarkIds(List<Long> bookmarkIds) {
         return queryFactory
                 .selectFrom(bookmark)

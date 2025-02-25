@@ -67,14 +67,4 @@ public class BookmarkController {
 
         return ResponseEntity.noContent().build();
     }
-
-    @DeleteMapping
-    public ResponseEntity<Void> deleteBookmarkByUserIdAndRestaurantId(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody @Valid BookmarkDeleteRequest bookmarkDeleteReq
-    ) {
-        bookmarkService.deleteBookmarkByUserIdAndRestaurantId(userDetails.getId(), bookmarkDeleteReq.restaurantId());
-
-        return ResponseEntity.noContent().build();
-    }
 }
