@@ -20,7 +20,7 @@ import static com.sparta.oishitable.domain.owner.restaurant.entity.QRestaurant.r
 import static com.sparta.oishitable.domain.owner.restaurantseat.entity.QRestaurantSeat.restaurantSeat;
 
 @RequiredArgsConstructor
-public class NotificationRepositoryQuerydslImpl implements NotificationRepositoryQuerydsl{
+public class NotificationRepositoryQuerydslImpl implements NotificationRepositoryQuerydsl {
 
     private final JPAQueryFactory queryFactory;
 
