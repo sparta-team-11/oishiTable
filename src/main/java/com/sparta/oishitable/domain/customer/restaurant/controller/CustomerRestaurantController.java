@@ -42,7 +42,9 @@ public class CustomerRestaurantController {
     }
 
     @GetMapping("/{restaurantId}")
-    public ResponseEntity<RestaurantResponse> findRestaurant(@PathVariable Long restaurantId) {
+    public ResponseEntity<RestaurantResponse> findRestaurant(
+            @PathVariable Long restaurantId
+    ) {
         RestaurantResponse restaurant = customerRestaurantService.findRestaurant(restaurantId);
 
         return ResponseEntity.ok(restaurant);
