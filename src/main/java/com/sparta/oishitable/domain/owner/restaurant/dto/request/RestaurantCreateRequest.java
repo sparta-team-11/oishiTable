@@ -11,9 +11,6 @@ import java.time.LocalTime;
 import java.util.List;
 
 public record RestaurantCreateRequest(
-        @NotNull
-        Long userId,
-
         @NotBlank
         String name,
 
