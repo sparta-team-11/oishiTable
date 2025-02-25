@@ -55,8 +55,7 @@ public class UserCouponService {
 
     public List<UserCouponResponse> findUserCoupons(Long userId, Long cursor, int size) {
         QUserCoupon userCoupon = QUserCoupon.userCoupon;
-        // 커서가 null인 경우 (첫 페이지일 때)는 모든 데이터를 조회하고,
-        // 커서가 존재하는 경우에는 cursor 이후 데이터를 조회합니다.
+
         List<UserCoupon> userCoupons = queryFactory
                 .selectFrom(userCoupon)
                 .where(
