@@ -70,13 +70,18 @@ public class AuthService {
     public AuthLoginResponse recreateAccessAndRefreshToken(AccessTokenReissueReq accessTokenReissueReq) {
         String accessToken = accessTokenReissueReq.accessToken();
         String refreshToken = accessTokenReissueReq.refreshToken();
-        User user = jwtTokenProvider.getUserFromToken(accessToken);
 
-        String userId = String.valueOf(user.getId());
+        if (!jwtTokenProvider.validateToken(accessToken, TokenType.ACCESS)) {
+            throw new InvalidException(ErrorCode.INVALID_TOKEN);
+        }
+
+        User user = jwtTokenProvider.getUserFromToken(accessToken);
 
         if (!jwtTokenProvider.validateToken(refreshToken, TokenType.REFRESH)) {
             throw new InvalidException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
+
+        String userId = String.valueOf(user.getId());
 
         if (!Objects.equals(refreshToken, redisRepository.getData(userId))) {
             throw new InvalidException(ErrorCode.INVALID_REFRESH_TOKEN);
