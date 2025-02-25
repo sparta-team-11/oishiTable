@@ -3,18 +3,19 @@ package com.sparta.oishitable.domain.customer.collection.controller;
 import com.sparta.oishitable.domain.customer.collection.dto.request.CollectionCreateRequest;
 import com.sparta.oishitable.domain.customer.collection.dto.request.CollectionUpdateRequest;
 import com.sparta.oishitable.domain.customer.collection.dto.response.CollectionDetailResponse;
-import com.sparta.oishitable.domain.customer.collection.dto.response.CollectionInfoResponse;
+import com.sparta.oishitable.domain.customer.collection.dto.response.CollectionInfosResponse;
 import com.sparta.oishitable.domain.customer.collection.service.CollectionService;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import com.sparta.oishitable.global.util.UriBuilderUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/customer/api/collections")
@@ -38,18 +39,19 @@ public class CollectionController {
     public ResponseEntity<CollectionDetailResponse> findCollection(
             @PathVariable Long collectionId
     ) {
-        CollectionDetailResponse collection = collectionService.findCollection(collectionId);
+        CollectionDetailResponse body = collectionService.findCollection(collectionId);
 
-        return ResponseEntity.ok(collection);
+        return ResponseEntity.ok(body);
     }
 
     @GetMapping
-    public ResponseEntity<List<CollectionInfoResponse>> findCollections(
+    public ResponseEntity<CollectionInfosResponse> findCollections(
+            @PageableDefault Pageable pageable,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        List<CollectionInfoResponse> collections = collectionService.findCollections(userDetails.getId());
+        CollectionInfosResponse body = collectionService.findCollections(userDetails.getId(), pageable);
 
-        return ResponseEntity.ok(collections);
+        return ResponseEntity.ok(body);
     }
 
     @PatchMapping("/{collectionId}")

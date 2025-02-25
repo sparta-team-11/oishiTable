@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Table(
-        name = "collections",
+        name = "collectionInfos",
         indexes = {
                 @Index(name = "idx_fk_user_id", columnList = "user_id")
         })

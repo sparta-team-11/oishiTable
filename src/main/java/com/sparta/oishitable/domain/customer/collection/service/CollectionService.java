@@ -1,21 +1,22 @@
 package com.sparta.oishitable.domain.customer.collection.service;
 
+import com.sparta.oishitable.domain.common.user.entity.User;
+import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.domain.customer.collection.dto.request.CollectionCreateRequest;
 import com.sparta.oishitable.domain.customer.collection.dto.request.CollectionUpdateRequest;
 import com.sparta.oishitable.domain.customer.collection.dto.response.CollectionDetailResponse;
 import com.sparta.oishitable.domain.customer.collection.dto.response.CollectionInfoResponse;
+import com.sparta.oishitable.domain.customer.collection.dto.response.CollectionInfosResponse;
 import com.sparta.oishitable.domain.customer.collection.entity.Collection;
 import com.sparta.oishitable.domain.customer.collection.repository.CollectionRepository;
-import com.sparta.oishitable.domain.common.user.entity.User;
-import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.global.exception.ForbiddenException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -47,8 +48,10 @@ public class CollectionService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.COLLECTION_NOT_FOUND));
     }
 
-    public List<CollectionInfoResponse> findCollections(Long userId) {
-        return collectionRepository.findAllByUserId(userId);
+    public CollectionInfosResponse findCollections(Long userId, Pageable pageable) {
+        Page<CollectionInfoResponse> collectionInfos = collectionRepository.findAllByUserId(userId, pageable);
+
+        return CollectionInfosResponse.from(collectionInfos);
     }
 
     @Transactional

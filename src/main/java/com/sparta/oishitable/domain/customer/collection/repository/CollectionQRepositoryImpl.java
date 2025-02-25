@@ -1,14 +1,16 @@
 package com.sparta.oishitable.domain.customer.collection.repository;
 
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.oishitable.domain.customer.collection.dto.response.CollectionDetailResponse;
 import com.sparta.oishitable.domain.customer.collection.dto.response.CollectionInfoResponse;
 import com.sparta.oishitable.domain.customer.collection.dto.response.QCollectionDetailResponse;
 import com.sparta.oishitable.domain.customer.collection.dto.response.QCollectionInfoResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,12 +34,21 @@ public class CollectionQRepositoryImpl implements CollectionQRepository {
     }
 
     @Override
-    public List<CollectionInfoResponse> findAllByUserId(Long userId) {
-        return queryFactory
+    public Page<CollectionInfoResponse> findAllByUserId(Long userId, Pageable pageable) {
+        List<CollectionInfoResponse> content = queryFactory
                 .select(new QCollectionInfoResponse(
                         collection.name, collection.isPublic))
                 .from(collection)
                 .where(collection.user.id.eq(userId))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
+
+        JPAQuery<Integer> count = queryFactory
+                .selectOne()
+                .from(collection)
+                .where(collection.user.id.eq(userId));
+
+        return PageableExecutionUtils.getPage(content, pageable, count::fetchOne);
     }
 }
