@@ -139,6 +139,15 @@ public class Restaurant extends BaseEntity {
         this.menus.remove(menu);
     }
 
+    public void switchWaitingStatus() {
+        if (this.waitingStatus == WaitingStatus.OPEN) {
+            this.waitingStatus = WaitingStatus.CLOSE;
+            return;
+        }
+
+        this.waitingStatus = WaitingStatus.OPEN;
+    }
+
     private void updateMinPrice(int minPrice) {
         minPrice = CalculatorUtil.ceilToNearestTenThousand(minPrice);
 
