@@ -57,6 +57,7 @@ public class BookmarkQRepositoryImpl implements BookmarkQRepository {
                 .from(bookmark)
                 .innerJoin(bookmark.restaurant, restaurant)
                 .where(bookmark.user.id.eq(userId))
+                .orderBy(bookmark.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
