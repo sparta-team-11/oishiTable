@@ -48,11 +48,11 @@ public class CommentRepositoryQuerydslImpl implements CommentRepositoryQuerydsl 
                                 comment.user.name,
                                 comment.content,
                                 JPAExpressions
-                                        .select(reply.count().coalesce(0L))
+                                        .select(reply.count().coalesce(0L).intValue())
                                         .from(reply)
                                         .where(reply.parent.id.eq(comment.id)),
                                 JPAExpressions
-                                        .select(commentLike.count().coalesce(0L))
+                                        .select(commentLike.count().coalesce(0L).intValue())
                                         .from(commentLike)
                                         .where(commentLike.comment.id.eq(comment.id)),
                                 comment.modifiedAt
@@ -87,7 +87,7 @@ public class CommentRepositoryQuerydslImpl implements CommentRepositoryQuerydsl 
                                 comment.user.name,
                                 comment.content,
                                 JPAExpressions
-                                        .select(commentLike.count().coalesce(0L))
+                                        .select(commentLike.count().coalesce(0L).intValue())
                                         .from(commentLike)
                                         .where(commentLike.comment.id.eq(comment.id)),
                                 comment.modifiedAt
@@ -101,14 +101,5 @@ public class CommentRepositoryQuerydslImpl implements CommentRepositoryQuerydsl 
                 .fetch();
 
         return new PageImpl<>(result, pageable, total);
-    }
-
-    @Override
-    public Optional<Comment> findCommentWithRepliesById(Long commentId) {
-        return Optional.ofNullable(queryFactory
-                .selectFrom(comment)
-                .leftJoin(comment.replies).fetchJoin()
-                .where(comment.id.eq(commentId))
-                .fetchOne());
     }
 }
