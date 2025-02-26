@@ -41,11 +41,13 @@ public class CollectionQRepositoryImpl implements CollectionQRepository {
     public Page<CollectionInfoResponse> findAllByCollectionOwnerId(Long userId, Pageable pageable) {
         List<CollectionInfoResponse> content = queryFactory
                 .select(new QCollectionInfoResponse(
+                        collection.id,
                         collection.name,
                         collection.isPublic
                 ))
                 .from(collection)
                 .where(collection.user.id.eq(userId))
+                .orderBy(collection.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -62,6 +64,7 @@ public class CollectionQRepositoryImpl implements CollectionQRepository {
     public Page<CollectionInfoResponse> findAllByPublicCollections(Long userId, Pageable pageable) {
         List<CollectionInfoResponse> content = queryFactory
                 .select(new QCollectionInfoResponse(
+                        collection.id,
                         collection.name,
                         collection.isPublic
                 ))
@@ -70,6 +73,7 @@ public class CollectionQRepositoryImpl implements CollectionQRepository {
                         collection.user.id.eq(userId)
                                 .and(collection.isPublic.eq(true))
                 )
+                .orderBy(collection.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

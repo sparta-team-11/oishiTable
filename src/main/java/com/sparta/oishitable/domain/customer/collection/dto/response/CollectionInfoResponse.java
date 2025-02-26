@@ -6,11 +6,13 @@ import lombok.Getter;
 @Getter
 public class CollectionInfoResponse {
 
+    private final Long collectionId;
     private final String name;
     private final boolean isPublic;
 
     @QueryProjection
-    public CollectionInfoResponse(String name, boolean isPublic) {
+    public CollectionInfoResponse(Long collectionId, String name, boolean isPublic) {
+        this.collectionId = collectionId;
         this.name = name;
         this.isPublic = isPublic;
     }
