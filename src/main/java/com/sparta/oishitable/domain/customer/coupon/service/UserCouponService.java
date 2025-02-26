@@ -1,8 +1,10 @@
 package com.sparta.oishitable.domain.customer.coupon.service;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.domain.customer.coupon.dto.UserCouponResponse;
+import com.sparta.oishitable.domain.customer.coupon.entity.QUserCoupon;
 import com.sparta.oishitable.domain.owner.coupon.entity.Coupon;
 import com.sparta.oishitable.domain.customer.coupon.entity.UserCoupon;
 import com.sparta.oishitable.domain.owner.coupon.repository.CouponRepository;
@@ -24,6 +26,8 @@ public class UserCouponService {
     private final UserCouponRepository userCouponRepository;
     private final UserRepository userRepository;
     private final CouponRepository couponRepository;
+    private final JPAQueryFactory queryFactory;
+
 
     public UserCouponResponse downloadCoupon(Long userId, Long couponId) {
         User user = userRepository.findById(userId)
@@ -49,13 +53,21 @@ public class UserCouponService {
 
     }
 
-    public List<UserCouponResponse> findUserCoupons(Long userId) {
-        List<UserCoupon> usercoupons = userCouponRepository.findByUserId(userId)
-                .stream()
-                .filter(userCoupon -> !userCoupon.getCouponUsed())
-                .collect(Collectors.toList());
+    public List<UserCouponResponse> findUserCoupons(Long userId, Long cursor, int size) {
+        QUserCoupon userCoupon = QUserCoupon.userCoupon;
 
-        return usercoupons.stream()
+        List<UserCoupon> userCoupons = queryFactory
+                .selectFrom(userCoupon)
+                .where(
+                        userCoupon.user.id.eq(userId),
+                        userCoupon.couponUsed.isFalse(),
+                        cursor == null ? null : userCoupon.id.gt(cursor)
+                )
+                .orderBy(userCoupon.id.asc())
+                .limit(size)
+                .fetch();
+
+        return userCoupons.stream()
                 .map(UserCouponResponse::from)
                 .collect(Collectors.toList());
     }
