@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class CollectionBookmarkDetails {
 
-    private final Long bookmarkId;
+    private final Long collectionBookmarkId;
     private final Long restaurantId;
     private final String bookmarkMemo;
     private final String restaurantName;
@@ -16,8 +16,8 @@ public class CollectionBookmarkDetails {
     private final Double latitude;
 
     @QueryProjection
-    public CollectionBookmarkDetails(Long bookmarkId, Long restaurantId, String bookmarkMemo, String restaurantName, String restaurantIntroduction, String restaurantAddress, Double longitude, Double latitude) {
-        this.bookmarkId = bookmarkId;
+    public CollectionBookmarkDetails(Long collectionBookmarkId, Long restaurantId, String bookmarkMemo, String restaurantName, String restaurantIntroduction, String restaurantAddress, Double longitude, Double latitude) {
+        this.collectionBookmarkId = collectionBookmarkId;
         this.restaurantId = restaurantId;
         this.bookmarkMemo = bookmarkMemo;
         this.restaurantName = restaurantName;

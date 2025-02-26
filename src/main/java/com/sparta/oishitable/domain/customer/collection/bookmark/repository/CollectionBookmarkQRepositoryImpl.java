@@ -49,7 +49,7 @@ public class CollectionBookmarkQRepositoryImpl implements CollectionBookmarkQRep
     public Page<CollectionBookmarkDetails> findBookmarkDetailsByCollectionId(Long collectionId, Pageable pageable) {
         List<CollectionBookmarkDetails> records = queryFactory
                 .select(new QCollectionBookmarkDetails(
-                        bookmark.id,
+                        collectionBookmark.id,
                         bookmark.restaurant.id,
                         bookmark.memo,
                         restaurant.name,
