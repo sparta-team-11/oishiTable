@@ -8,14 +8,18 @@ import java.time.LocalDateTime;
 @Getter
 public class CollectionDetailResponse {
 
+    private final Long userId;
     private final String name;
     private final String description;
+    private final boolean isPublic;
     private final LocalDateTime modifiedAt;
 
     @QueryProjection
-    public CollectionDetailResponse(String name, String description, LocalDateTime modifiedAt) {
+    public CollectionDetailResponse(Long userId, String name, String description, boolean isPublic, LocalDateTime modifiedAt) {
+        this.userId = userId;
         this.name = name;
         this.description = description;
+        this.isPublic = isPublic;
         this.modifiedAt = modifiedAt;
     }
 }

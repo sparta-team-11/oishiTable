@@ -43,9 +43,15 @@ public class CollectionService {
         return savedCollection.getId();
     }
 
-    public CollectionDetailResponse findCollection(Long collectionId) {
-        return collectionRepository.findCollectionDetail(collectionId)
+    public CollectionDetailResponse findCollection(Long userId, Long collectionId) {
+        CollectionDetailResponse collectionDetailResponse = collectionRepository.findCollectionDetail(collectionId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.COLLECTION_NOT_FOUND));
+
+        if (!collectionDetailResponse.getUserId().equals(userId) && !collectionDetailResponse.isPublic()) {
+            throw new ForbiddenException(ErrorCode.USER_UNAUTHORIZED);
+        }
+
+        return collectionDetailResponse;
     }
 
     public CollectionInfosResponse findCollections(Long userId, Pageable pageable) {

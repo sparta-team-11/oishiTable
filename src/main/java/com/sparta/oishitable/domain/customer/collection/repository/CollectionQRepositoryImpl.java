@@ -26,7 +26,11 @@ public class CollectionQRepositoryImpl implements CollectionQRepository {
     public Optional<CollectionDetailResponse> findCollectionDetail(Long collectionId) {
         return Optional.ofNullable(queryFactory
                 .select(new QCollectionDetailResponse(
-                        collection.name, collection.description, collection.modifiedAt
+                        collection.user.id,
+                        collection.name,
+                        collection.description,
+                        collection.isPublic,
+                        collection.modifiedAt
                 ))
                 .from(collection)
                 .where(collection.id.eq(collectionId))
