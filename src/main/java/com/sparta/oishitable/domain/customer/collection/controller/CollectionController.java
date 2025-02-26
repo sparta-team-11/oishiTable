@@ -37,9 +37,10 @@ public class CollectionController {
 
     @GetMapping("/{collectionId}")
     public ResponseEntity<CollectionDetailResponse> findCollection(
-            @PathVariable Long collectionId
+            @PathVariable Long collectionId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        CollectionDetailResponse body = collectionService.findCollection(collectionId);
+        CollectionDetailResponse body = collectionService.findCollection(userDetails.getId(), collectionId);
 
         return ResponseEntity.ok(body);
     }
