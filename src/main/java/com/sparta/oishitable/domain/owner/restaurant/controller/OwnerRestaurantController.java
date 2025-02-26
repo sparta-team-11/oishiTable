@@ -4,10 +4,12 @@ import com.sparta.oishitable.domain.owner.restaurant.dto.request.RestaurantCreat
 import com.sparta.oishitable.domain.owner.restaurant.dto.request.RestaurantProfileUpdateRequest;
 import com.sparta.oishitable.domain.owner.restaurant.dto.response.RestaurantFindResponse;
 import com.sparta.oishitable.domain.owner.restaurant.service.OwnerRestaurantService;
+import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import com.sparta.oishitable.global.util.UriBuilderUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -21,9 +23,10 @@ public class OwnerRestaurantController {
 
     @PostMapping
     public ResponseEntity<Void> createRestaurant(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody @Valid RestaurantCreateRequest restaurantCreateRequest
     ) {
-        Long restaurantId = ownerRestaurantService.createRestaurant(restaurantCreateRequest);
+        Long restaurantId = ownerRestaurantService.createRestaurant(userDetails.getId(), restaurantCreateRequest);
         URI location = UriBuilderUtil.create("/owner/api/restaurants/{restaurantId}", restaurantId);
 
         return ResponseEntity.created(location).build();
@@ -40,19 +43,21 @@ public class OwnerRestaurantController {
 
     @PatchMapping("/{restaurantId}")
     public ResponseEntity<Void> updateRestaurant(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long restaurantId,
             @RequestBody @Valid RestaurantProfileUpdateRequest restaurantProfileUpdateRequest
     ) {
-        ownerRestaurantService.updateRestaurantProfile(restaurantId, restaurantProfileUpdateRequest);
+        ownerRestaurantService.updateRestaurantProfile(userDetails.getId(), restaurantId, restaurantProfileUpdateRequest);
 
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{restaurantId}")
     public ResponseEntity<Void> deleteRestaurant(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long restaurantId
     ) {
-        ownerRestaurantService.deleteRestaurant(restaurantId);
+        ownerRestaurantService.deleteRestaurant(userDetails.getId(), restaurantId);
 
         return ResponseEntity.noContent().build();
     }

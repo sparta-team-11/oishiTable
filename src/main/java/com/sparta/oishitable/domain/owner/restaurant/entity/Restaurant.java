@@ -112,9 +112,17 @@ public class Restaurant extends BaseEntity {
     }
 
     public void updateProfile(String name, String introduce, Integer deposit) {
-        this.name = name;
-        this.introduce = introduce;
-        this.deposit = deposit;
+        if (name != null) {
+            this.name = name;
+        }
+
+        if (introduce != null) {
+            this.introduce = introduce;
+        }
+
+        if (deposit != null) {
+            this.deposit = deposit;
+        }
     }
 
     public void updateMinMaxPrice() {
