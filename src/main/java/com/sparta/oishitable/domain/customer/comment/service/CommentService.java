@@ -1,5 +1,7 @@
 package com.sparta.oishitable.domain.customer.comment.service;
 
+import com.sparta.oishitable.domain.common.user.entity.User;
+import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.domain.customer.comment.dto.request.CommentCreateRequest;
 import com.sparta.oishitable.domain.customer.comment.dto.request.CommentUpdateRequest;
 import com.sparta.oishitable.domain.customer.comment.dto.response.CommentPostResponse;
@@ -8,10 +10,8 @@ import com.sparta.oishitable.domain.customer.comment.entity.Comment;
 import com.sparta.oishitable.domain.customer.comment.repository.CommentRepository;
 import com.sparta.oishitable.domain.customer.post.entity.Post;
 import com.sparta.oishitable.domain.customer.post.repository.PostRepository;
-import com.sparta.oishitable.domain.common.user.entity.User;
-import com.sparta.oishitable.domain.common.user.repository.UserRepository;
-import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.ForbiddenException;
+import com.sparta.oishitable.global.exception.InvalidException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +33,7 @@ public class CommentService {
 
     @Transactional
     public Long create(Long userId, CommentCreateRequest request) {
+
         Post post = findPostById(request.postId());
         User user = findUserById(userId);
 
@@ -47,7 +48,7 @@ public class CommentService {
             Comment parentComment = findCommentById(request.parentId());
 
             if (!post.getId().equals(parentComment.getPost().getId())) {
-                throw new CustomRuntimeException(ErrorCode.POST_NOT_EQUAL);
+                throw new InvalidException(ErrorCode.POST_NOT_EQUAL);
             }
 
             Comment comment = builder.parent(parentComment)
@@ -62,6 +63,7 @@ public class CommentService {
 
         } else {
             // 게시글 댓글
+
             Comment comment = builder.build();
 
             // 게시글의 댓글리스트에 추가
@@ -74,6 +76,7 @@ public class CommentService {
     }
 
     public Slice<CommentPostResponse> findPostComments(Long postId, Long cursorValue, int limit) {
+
         List<CommentPostResponse> replies = commentRepository.findPostComments(
                 postId,
                 cursorValue,
@@ -96,6 +99,7 @@ public class CommentService {
 
     @Transactional
     public void update(Long userId, Long commentId, CommentUpdateRequest request) {
+
         Comment comment = findCommentById(commentId);
 
         isCommentOwner(comment.getUser().getId(), userId);
@@ -105,8 +109,8 @@ public class CommentService {
 
     @Transactional
     public void delete(Long commentId, Long userId) {
-        Comment comment = commentRepository.findCommentWithRepliesById(commentId)
-                .orElseThrow(() -> new CustomRuntimeException(ErrorCode.COMMENT_NOT_FOUND));
+
+        Comment comment = findCommentById(commentId);
 
         isCommentOwner(comment.getUser().getId(), userId);
 
