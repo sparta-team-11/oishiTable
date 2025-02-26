@@ -2,6 +2,7 @@ package com.sparta.oishitable.domain.common.user.entity;
 
 import com.sparta.oishitable.domain.common.BaseEntity;
 import com.sparta.oishitable.domain.customer.coupon.entity.UserCoupon;
+import com.sparta.oishitable.domain.customer.post.region.entity.Region;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -37,12 +38,18 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String phoneNumber;
 
+    private String introduce;
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserCoupon> userCoupons = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "region_id")
+    private Region region;
 
     @Builder
     public User(
