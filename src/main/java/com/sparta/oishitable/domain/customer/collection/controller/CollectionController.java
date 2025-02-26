@@ -47,10 +47,11 @@ public class CollectionController {
 
     @GetMapping
     public ResponseEntity<CollectionInfosResponse> findCollections(
+            @RequestParam Long userId,
             @PageableDefault Pageable pageable,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        CollectionInfosResponse body = collectionService.findCollections(userDetails.getId(), pageable);
+        CollectionInfosResponse body = collectionService.findCollections(userDetails.getId(), userId, pageable);
 
         return ResponseEntity.ok(body);
     }
