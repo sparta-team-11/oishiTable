@@ -62,7 +62,7 @@ public class CollectionController {
     ) {
         collectionService.updateCollection(userDetails.getId(), collectionId, collectionUpdateRequest);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{collectionId}")
