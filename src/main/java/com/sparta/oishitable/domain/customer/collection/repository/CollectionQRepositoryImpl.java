@@ -38,10 +38,12 @@ public class CollectionQRepositoryImpl implements CollectionQRepository {
     }
 
     @Override
-    public Page<CollectionInfoResponse> findAllByUserId(Long userId, Pageable pageable) {
+    public Page<CollectionInfoResponse> findAllByCollectionOwnerId(Long userId, Pageable pageable) {
         List<CollectionInfoResponse> content = queryFactory
                 .select(new QCollectionInfoResponse(
-                        collection.name, collection.isPublic))
+                        collection.name,
+                        collection.isPublic
+                ))
                 .from(collection)
                 .where(collection.user.id.eq(userId))
                 .offset(pageable.getOffset())
@@ -52,6 +54,33 @@ public class CollectionQRepositoryImpl implements CollectionQRepository {
                 .selectOne()
                 .from(collection)
                 .where(collection.user.id.eq(userId));
+
+        return PageableExecutionUtils.getPage(content, pageable, count::fetchOne);
+    }
+
+    @Override
+    public Page<CollectionInfoResponse> findAllByPublicCollections(Long userId, Pageable pageable) {
+        List<CollectionInfoResponse> content = queryFactory
+                .select(new QCollectionInfoResponse(
+                        collection.name,
+                        collection.isPublic
+                ))
+                .from(collection)
+                .where(
+                        collection.user.id.eq(userId)
+                                .and(collection.isPublic.eq(true))
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Integer> count = queryFactory
+                .selectOne()
+                .from(collection)
+                .where(
+                        collection.user.id.eq(userId)
+                                .and(collection.isPublic.eq(true))
+                );
 
         return PageableExecutionUtils.getPage(content, pageable, count::fetchOne);
     }

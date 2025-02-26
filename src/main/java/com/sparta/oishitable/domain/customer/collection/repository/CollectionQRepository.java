@@ -11,5 +11,7 @@ public interface CollectionQRepository {
 
     Optional<CollectionDetailResponse> findCollectionDetail(Long collectionId);
 
-    Page<CollectionInfoResponse> findAllByUserId(Long userId, Pageable pageable);
+    Page<CollectionInfoResponse> findAllByCollectionOwnerId(Long userId, Pageable pageable);
+
+    Page<CollectionInfoResponse> findAllByPublicCollections(Long userId, Pageable pageable);
 }

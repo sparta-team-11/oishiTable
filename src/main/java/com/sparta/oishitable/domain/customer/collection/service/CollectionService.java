@@ -54,8 +54,16 @@ public class CollectionService {
         return collectionDetailResponse;
     }
 
-    public CollectionInfosResponse findCollections(Long userId, Pageable pageable) {
-        Page<CollectionInfoResponse> collectionInfos = collectionRepository.findAllByUserId(userId, pageable);
+    public CollectionInfosResponse findCollections(Long userId, Long collectionOwnerId, Pageable pageable) {
+        Page<CollectionInfoResponse> collectionInfos = null;
+
+        if (userId.equals(collectionOwnerId)) {
+            collectionInfos = collectionRepository.findAllByCollectionOwnerId(collectionOwnerId, pageable);
+        }
+
+        if (!userId.equals(collectionOwnerId)) {
+            collectionInfos = collectionRepository.findAllByPublicCollections(collectionOwnerId, pageable);
+        }
 
         return CollectionInfosResponse.from(collectionInfos);
     }
