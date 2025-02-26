@@ -1,6 +1,5 @@
 package com.sparta.oishitable.domain.common.auth.dto.request;
 
-import com.sparta.oishitable.domain.common.auth.dto.AuthValidationMessage;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.entity.UserRole;
 import jakarta.validation.constraints.NotBlank;
@@ -8,41 +7,51 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+import static com.sparta.oishitable.domain.common.auth.dto.AuthValidationMessage.*;
+
 public record AuthSignupRequest(
-        @NotBlank(message = AuthValidationMessage.EMAIL_BLANK_MESSAGE)
+        @NotBlank(message = EMAIL_BLANK_MESSAGE)
         @Pattern(
-                regexp = AuthValidationMessage.EMAIL_REG,
-                message = AuthValidationMessage.INVALID_EMAIL_MESSAGE
+                regexp = EMAIL_REG,
+                message = INVALID_EMAIL_MESSAGE
         )
         String email,
 
-        @NotBlank(message = AuthValidationMessage.PASSWORD_BLANK_MESSAGE)
+        @NotBlank(message = PASSWORD_BLANK_MESSAGE)
         @Size(
-                min = AuthValidationMessage.PASSWORD_MIN,
-                max = AuthValidationMessage.PASSWORD_MAX,
-                message = AuthValidationMessage.PASSWORD_RANGE_MESSAGE)
+                min = PASSWORD_MIN,
+                max = PASSWORD_MAX,
+                message = PASSWORD_RANGE_MESSAGE)
         @Pattern(
-                regexp = AuthValidationMessage.PASSWORD_REG,
-                message = AuthValidationMessage.INVALID_PASSWORD_MESSAGE
+                regexp = PASSWORD_REG,
+                message = INVALID_PASSWORD_MESSAGE
         )
         String password,
 
-        @NotBlank(message = AuthValidationMessage.NICKNAME_BLANK_MESSAGE)
+        @NotBlank(message = NAME_BLANK_MESSAGE)
         @Size(
-                min = AuthValidationMessage.NICKNAME_MIN,
-                max = AuthValidationMessage.NICKNAME_MAX,
-                message = AuthValidationMessage.NICKNAME_RANGE_MESSAGE
+                min = NAME_MIN,
+                max = NAME_MAX,
+                message = NAME_RANGE_MESSAGE
         )
         String name,
 
-        @NotBlank(message = AuthValidationMessage.PHONE_NUMBER_BLANK_MESSAGE)
+        @NotBlank(message = NICKNAME_BLANK_MESSAGE)
+        @Size(
+                min = NICKNAME_MIN,
+                max = NICKNAME_MAX,
+                message = NICKNAME_RANGE_MESSAGE
+        )
+        String nickname,
+
+        @NotBlank(message = PHONE_NUMBER_BLANK_MESSAGE)
         @Pattern(
-                regexp = AuthValidationMessage.PHONE_NUMBER_REG,
-                message = AuthValidationMessage.INVALID_PHONE_NUMBER_MESSAGE
+                regexp = PHONE_NUMBER_REG,
+                message = INVALID_PHONE_NUMBER_MESSAGE
         )
         String phoneNumber,
 
-        @NotNull(message = AuthValidationMessage.ROLE_NULL_MESSAGE)
+        @NotNull(message = ROLE_NULL_MESSAGE)
         UserRole userRole
 ) {
 
@@ -51,6 +60,7 @@ public record AuthSignupRequest(
                 .email(email)
                 .password(encodedPassword)
                 .name(name)
+                .nickname(nickname)
                 .phoneNumber(phoneNumber)
                 .role(userRole)
                 .build();
