@@ -1,5 +1,6 @@
 package com.sparta.oishitable.domain.common.auth.dto.request;
 
+import com.sparta.oishitable.domain.common.auth.dto.AuthValidationMessage;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.entity.UserRole;
 import jakarta.validation.constraints.NotBlank;
@@ -8,28 +9,40 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record AuthSignupRequest(
-        @NotBlank(message = "이메일 입력은 필수입니다.")
+        @NotBlank(message = AuthValidationMessage.EMAIL_BLANK_MESSAGE)
         @Pattern(
-                regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]$",
-                message = "올바른 이메일 형식을 입력해주세요."
+                regexp = AuthValidationMessage.EMAIL_REG,
+                message = AuthValidationMessage.INVALID_EMAIL_MESSAGE
         )
         String email,
 
-        @NotBlank(message = "비밀번호 입력은 필수입니다.")
-        @Size(min = 8, max = 20, message = "비밀번호는 8자 이상 20자 이내여야 합니다.")
+        @NotBlank(message = AuthValidationMessage.PASSWORD_BLANK_MESSAGE)
+        @Size(
+                min = AuthValidationMessage.PASSWORD_MIN,
+                max = AuthValidationMessage.PASSWORD_MAX,
+                message = AuthValidationMessage.PASSWORD_RANGE_MESSAGE)
         @Pattern(
-                regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,20}$",
-                message = "비밀번호는 대소문자, 숫자, 특수문자를 최소 1개씩 포함해야 합니다."
+                regexp = AuthValidationMessage.PASSWORD_REG,
+                message = AuthValidationMessage.INVALID_PASSWORD_MESSAGE
         )
         String password,
 
-        @NotBlank(message = "이름 입력은 필수입니다.")
+        @NotBlank(message = AuthValidationMessage.NICKNAME_BLANK_MESSAGE)
+        @Size(
+                min = AuthValidationMessage.NICKNAME_MIN,
+                max = AuthValidationMessage.NICKNAME_MAX,
+                message = AuthValidationMessage.NICKNAME_RANGE_MESSAGE
+        )
         String name,
 
-        @NotBlank(message = "전화번호 입력은 필수입니다.")
+        @NotBlank(message = AuthValidationMessage.PHONE_NUMBER_BLANK_MESSAGE)
+        @Pattern(
+                regexp = AuthValidationMessage.PHONE_NUMBER_REG,
+                message = AuthValidationMessage.INVALID_PHONE_NUMBER_MESSAGE
+        )
         String phoneNumber,
 
-        @NotNull
+        @NotNull(message = AuthValidationMessage.ROLE_NULL_MESSAGE)
         UserRole userRole
 ) {
 
