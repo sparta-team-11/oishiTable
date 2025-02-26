@@ -11,9 +11,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.sparta.oishitable.domain.customer.bookmark.entity.QBookmark.bookmark;
+import static com.sparta.oishitable.domain.customer.collection.bookmark.entity.QCollectionBookmark.collectionBookmark;
 import static com.sparta.oishitable.domain.owner.restaurant.entity.QRestaurant.restaurant;
 
 @RequiredArgsConstructor
@@ -65,6 +65,48 @@ public class BookmarkQRepositoryImpl implements BookmarkQRepository {
                 .select(bookmark.count())
                 .from(bookmark)
                 .where(bookmark.user.id.eq(userId));
+
+        return PageableExecutionUtils.getPage(records, pageable, count::fetchOne);
+    }
+
+    @Override
+    public Page<BookmarkDetails> findBookmarkDetailsByUserIdAndNotInCollection(Long userId, Long collectionId, Pageable pageable) {
+        List<BookmarkDetails> records = queryFactory
+                .select(new QBookmarkDetails(
+                        bookmark.id,
+                        bookmark.restaurant.id,
+                        bookmark.memo,
+                        restaurant.name,
+                        restaurant.introduce,
+                        restaurant.address
+                ))
+                .from(bookmark)
+                .innerJoin(bookmark.restaurant, restaurant)
+                .leftJoin(collectionBookmark)
+                .on(collectionBookmark.bookmark.id.eq(bookmark.id)
+                        .and(collectionBookmark.collection.id.eq(collectionId))
+                )
+                .where(
+                        bookmark.user.id.eq(userId)
+                                .and(collectionBookmark.bookmark.id.isNull())
+                )
+                .orderBy(bookmark.id.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // TODO: count 쿼리 최적화
+        JPAQuery<Long> count = queryFactory
+                .select(bookmark.count())
+                .from(bookmark)
+                .leftJoin(collectionBookmark)
+                .on(collectionBookmark.bookmark.id.eq(bookmark.id)
+                        .and(collectionBookmark.collection.id.eq(collectionId))
+                )
+                .where(
+                        bookmark.user.id.eq(userId)
+                                .and(collectionBookmark.bookmark.id.isNull())
+                );
 
         return PageableExecutionUtils.getPage(records, pageable, count::fetchOne);
     }

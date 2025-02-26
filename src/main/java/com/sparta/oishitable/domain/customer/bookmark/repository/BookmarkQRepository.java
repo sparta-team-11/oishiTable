@@ -14,4 +14,6 @@ public interface BookmarkQRepository {
     List<Bookmark> findAllByBookmarkIds(List<Long> bookmarkIds);
 
     Page<BookmarkDetails> findBookmarkDetailsPaginationByUserId(Long userId, Pageable pageable);
+
+    Page<BookmarkDetails> findBookmarkDetailsByUserIdAndNotInCollection(Long userId, Long collectionId, Pageable pageable);
 }

@@ -10,5 +10,9 @@ import java.util.Optional;
 
 public interface CollectionBookmarkQRepository {
 
+    Optional<CollectionBookmark> findByCollectionBookmarkId(Long collectionBookmarkId);
+
+    boolean existsByCollectionIdAndBookmarkIds(Long collectionId, List<Long> bookmarkIds);
+
     Page<CollectionBookmarkDetails> findBookmarkDetailsByCollectionId(Long collectionId, Pageable pageable);
 }

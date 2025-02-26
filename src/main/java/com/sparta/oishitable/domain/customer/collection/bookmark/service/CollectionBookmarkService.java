@@ -1,6 +1,7 @@
 package com.sparta.oishitable.domain.customer.collection.bookmark.service;
 
 import com.sparta.oishitable.domain.customer.bookmark.dto.response.BookmarkDetails;
+import com.sparta.oishitable.domain.customer.bookmark.dto.response.BookmarksFindResponse;
 import com.sparta.oishitable.domain.customer.bookmark.entity.Bookmark;
 import com.sparta.oishitable.domain.customer.bookmark.repository.BookmarkRepository;
 import com.sparta.oishitable.domain.customer.collection.bookmark.dto.request.CollectionBookmarkCreateRequest;
@@ -18,7 +19,6 @@ import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,6 +86,12 @@ public class CollectionBookmarkService {
                 = collectionBookmarkRepository.findBookmarkDetailsByCollectionId(collectionId, pageable);
 
         return CollectionBookmarksFindResponse.from(bookmarkDetails);
+    }
+
+    public BookmarksFindResponse findBookmarksNotInCollection(Long userId, Long collectionId, Pageable pageable) {
+        Page<BookmarkDetails> unBookmarkedBookmarks = bookmarkRepository.findBookmarkDetailsByUserIdAndNotInCollection(userId, collectionId, pageable);
+
+        return BookmarksFindResponse.from(unBookmarkedBookmarks);
     }
 
     @Transactional
