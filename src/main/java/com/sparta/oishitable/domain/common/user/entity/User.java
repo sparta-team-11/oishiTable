@@ -36,8 +36,12 @@ public class User extends BaseEntity {
     private String name;
 
     @Column(nullable = false)
+    private String nickname;
+
+    @Column(nullable = false)
     private String phoneNumber;
 
+    @Column(length = 35)
     private String introduce;
 
     @Column(nullable = false)
@@ -57,6 +61,7 @@ public class User extends BaseEntity {
             String email,
             String password,
             String name,
+            String nickname,
             String phoneNumber,
             UserRole role
     ) {
@@ -64,7 +69,30 @@ public class User extends BaseEntity {
         this.email = email;
         this.password = password;
         this.name = name;
+        this.nickname = nickname;
         this.phoneNumber = phoneNumber;
         this.role = role;
+    }
+
+    public void updateProfile(String nickname, String introduce, Region region) {
+        updateNickname(nickname);
+        updateIntroduce(introduce);
+        updateRegion(region);
+    }
+
+    private void updateNickname(String nickname) {
+        if (nickname != null) {
+            this.name = nickname;
+        }
+    }
+
+    private void updateIntroduce(String introduce) {
+        if (introduce != null) {
+            this.introduce = introduce;
+        }
+    }
+
+    private void updateRegion(Region region) {
+        this.region = region;
     }
 }
