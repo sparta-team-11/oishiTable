@@ -4,9 +4,6 @@ import jakarta.validation.constraints.NotNull;
 
 public record CouponCreateRequest(
         @NotNull
-        Long restaurantId,
-
-        @NotNull
         Integer discount
 
 ) {}
