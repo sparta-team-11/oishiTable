@@ -5,6 +5,7 @@ import com.sparta.oishitable.domain.customer.bookmark.entity.Bookmark;
 import com.sparta.oishitable.domain.customer.bookmark.repository.BookmarkRepository;
 import com.sparta.oishitable.domain.customer.collection.bookmark.dto.request.CollectionBookmarkCreateRequest;
 import com.sparta.oishitable.domain.customer.collection.bookmark.dto.request.CollectionBookmarksCreateRequest;
+import com.sparta.oishitable.domain.customer.collection.bookmark.dto.response.CollectionBookmarkDetails;
 import com.sparta.oishitable.domain.customer.collection.bookmark.dto.response.CollectionBookmarksFindResponse;
 import com.sparta.oishitable.domain.customer.collection.bookmark.entity.CollectionBookmark;
 import com.sparta.oishitable.domain.customer.collection.bookmark.repository.CollectionBookmarkRepository;
@@ -81,8 +82,8 @@ public class CollectionBookmarkService {
             checkUserAuthority(collection.getUser().getId(), userId);
         }
 
-        Page<BookmarkDetails> bookmarkDetails
-                = collectionBookmarkRepository.findBookmarkDetailsPaginationByCollectionId(collectionId, pageable);
+        Page<CollectionBookmarkDetails> bookmarkDetails
+                = collectionBookmarkRepository.findBookmarkDetailsByCollectionId(collectionId, pageable);
 
         return CollectionBookmarksFindResponse.from(bookmarkDetails);
     }
