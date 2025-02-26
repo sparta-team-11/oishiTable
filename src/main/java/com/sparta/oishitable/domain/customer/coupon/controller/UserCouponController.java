@@ -30,7 +30,7 @@ public class UserCouponController {
     public ResponseEntity<List<UserCouponResponse>> findUserCoupons(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(required = false) Long cursor,
-            @RequestParam(defaultValue = "5") int size
+            @RequestParam(defaultValue = "10") int size
 
     ) {
         return ResponseEntity.ok(usercouponService.findUserCoupons(userDetails.getId(),cursor,size));
