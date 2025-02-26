@@ -1,5 +1,6 @@
 package com.sparta.oishitable.domain.common.user.service;
 
+import com.sparta.oishitable.domain.common.user.dto.request.UserMyProfileResponse;
 import com.sparta.oishitable.domain.common.user.dto.request.UserProfileResponse;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
@@ -18,7 +19,16 @@ public class UserService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
 
-    public UserProfileResponse findMyProfile(Long userId) {
+    public UserMyProfileResponse findMyProfile(Long userId) {
+        User user = findUserById(userId);
+
+        long followerCount = followRepository.countFollower(userId);
+        long followingCount = followRepository.countFollowing(userId);
+
+        return UserMyProfileResponse.of(user, followerCount, followingCount);
+    }
+
+    public UserProfileResponse findUserProfile(Long userId) {
         User user = findUserById(userId);
 
         long followerCount = followRepository.countFollower(userId);

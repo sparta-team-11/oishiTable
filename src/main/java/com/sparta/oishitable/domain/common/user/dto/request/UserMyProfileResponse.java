@@ -5,8 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 
 @Builder(access = AccessLevel.PRIVATE)
-public record UserProfileResponse(
-        String userId,
+public record UserMyProfileResponse(
         String userName,
         String userIntroduce,
         String region,
@@ -14,9 +13,8 @@ public record UserProfileResponse(
         long followingCount
 ) {
 
-    public UserProfileResponse of(User user, long followerCount, long followingCount) {
-        return UserProfileResponse.builder()
-                .userId(user.getId())
+    public UserMyProfileResponse of(User user, long followerCount, long followingCount) {
+        return UserMyProfileResponse.builder()
                 .userName(user.getName())
                 .userIntroduce(user.getIntroduce())
                 .region(user.getRegion().getName())
@@ -25,4 +23,3 @@ public record UserProfileResponse(
                 .build();
     }
 }
-
