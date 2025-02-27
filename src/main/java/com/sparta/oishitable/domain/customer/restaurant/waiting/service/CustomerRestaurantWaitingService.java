@@ -1,59 +1,75 @@
 package com.sparta.oishitable.domain.customer.restaurant.waiting.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
+import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.request.WaitingJoinRequest;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueFindSizeResponse;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueFindUserRankResponse;
-import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.CustomerRestaurantWaitingRepositoryImpl;
+import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.CustomerWaitingRedisRepository;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.entity.WaitingStatus;
 import com.sparta.oishitable.domain.owner.restaurant.service.OwnerRestaurantService;
+import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingRedisDto;
+import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingType;
 import com.sparta.oishitable.global.exception.ConflictException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CustomerRestaurantWaitingService {
 
     private final UserRepository userRepository;
     private final OwnerRestaurantService ownerRestaurantService;
-    private final CustomerRestaurantWaitingRepositoryImpl customerRestaurantWaitingRepository;
+    private final CustomerWaitingRedisRepository customerWaitingRedisRepository;
 
-    public void joinWaitingQueue(Long userId, Long restaurantId) {
+    public void joinWaitingQueue(Long userId, Long restaurantId, WaitingJoinRequest waitingQueueCreateRequest) {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
-        checkWaitingStatus(restaurant.getWaitingStatus());
+        isPossibleWaiting(restaurant.getWaitingStatus());
 
-        User user = findUserById(userId);
-
-        boolean isPresent = customerRestaurantWaitingRepository.findUserRank(user.getId(), restaurantId)
+        boolean isRegistered = customerWaitingRedisRepository.findUser(restaurantId, userId)
                 .isPresent();
 
-        if (isPresent) {
+        if (isRegistered) {
             throw new ConflictException(ErrorCode.ALREADY_REGISTERED_USER_IN_WAITING_QUEUE);
         }
 
-        customerRestaurantWaitingRepository.push(user.getId(), restaurant.getId());
+        User user = findUserById(userId);
+
+        WaitingRedisDto waitingRedisDto = WaitingRedisDto.builder()
+                .userId(user.getId())
+                .totalCount(waitingQueueCreateRequest.totalCount())
+                .waitingType(WaitingType.of(waitingQueueCreateRequest.waitingType()))
+                .build();
+
+        try {
+            customerWaitingRedisRepository.push(restaurant.getId(), waitingRedisDto);
+        } catch (JsonProcessingException e) {
+            log.error("build to json error");
+        }
     }
 
     public void cancelWaitingQueue(Long userId, Long restaurantId) {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
-        checkWaitingStatus(restaurant.getWaitingStatus());
+        isPossibleWaiting(restaurant.getWaitingStatus());
 
         User user = findUserById(userId);
 
-        customerRestaurantWaitingRepository.remove(user.getId(), restaurant.getId());
+        customerWaitingRedisRepository.remove(user.getId(), restaurant.getId());
     }
 
     public WaitingQueueFindUserRankResponse findWaitingQueueUserRank(Long userId, Long restaurantId) {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
-        checkWaitingStatus(restaurant.getWaitingStatus());
+        isPossibleWaiting(restaurant.getWaitingStatus());
 
         User user = findUserById(userId);
 
-        Long rank = customerRestaurantWaitingRepository.findUserRank(user.getId(), restaurant.getId())
+        Long rank = customerWaitingRedisRepository.findUserRank(user.getId(), restaurant.getId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND));
 
         return WaitingQueueFindUserRankResponse.from(rank);
@@ -61,14 +77,14 @@ public class CustomerRestaurantWaitingService {
 
     public WaitingQueueFindSizeResponse findWaitingQueueSize(Long restaurantId) {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
-        checkWaitingStatus(restaurant.getWaitingStatus());
+        isPossibleWaiting(restaurant.getWaitingStatus());
 
-        Long size = customerRestaurantWaitingRepository.findQueueSize(restaurant.getId());
+        Long size = customerWaitingRedisRepository.findQueueSize(restaurant.getId());
 
         return WaitingQueueFindSizeResponse.from(size);
     }
 
-    private void checkWaitingStatus(WaitingStatus waitingStatus) {
+    private void isPossibleWaiting(WaitingStatus waitingStatus) {
         if (waitingStatus == WaitingStatus.CLOSE) {
             throw new ConflictException(ErrorCode.RESTAURANT_WAITING_IS_CLOSED);
         }
@@ -78,4 +94,13 @@ public class CustomerRestaurantWaitingService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
     }
+
+//    public void save(Long userId, Long restaurantId, int totalCount) throws JsonProcessingException {
+//        WaitingRedisDto build = WaitingRedisDto.builder()
+//                .userId(userId)
+//                .totalCount(totalCount)
+//                .build();
+//
+//        redisTemplate.opsForList().rightPush("test_r_w:" + restaurantId, objectMapper.writeValueAsString(build));
+//    }
 }
