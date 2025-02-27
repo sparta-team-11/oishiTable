@@ -2,6 +2,7 @@ package com.sparta.oishitable.domain.common.user.controller;
 
 import com.sparta.oishitable.domain.common.user.dto.request.UserUpdateInfoRequest;
 import com.sparta.oishitable.domain.common.user.dto.request.UserUpdateProfileRequest;
+import com.sparta.oishitable.domain.common.user.dto.response.UserMyInfoResponse;
 import com.sparta.oishitable.domain.common.user.dto.response.UserMyProfileResponse;
 import com.sparta.oishitable.domain.common.user.dto.response.UserProfileResponse;
 import com.sparta.oishitable.domain.common.user.service.UserService;
@@ -31,6 +32,13 @@ public class UserController {
             @PathVariable Long userId
     ) {
         return ResponseEntity.ok(userService.findUserProfile(userId));
+    }
+
+    @GetMapping("/me/info")
+    public ResponseEntity<UserMyInfoResponse> findMyInfo(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        return ResponseEntity.ok(userService.findMyInfo(userDetails.getId()));
     }
 
     @PatchMapping("/me/profile")

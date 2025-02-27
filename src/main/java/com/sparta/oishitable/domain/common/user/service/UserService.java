@@ -2,6 +2,7 @@ package com.sparta.oishitable.domain.common.user.service;
 
 import com.sparta.oishitable.domain.common.user.dto.request.UserUpdateInfoRequest;
 import com.sparta.oishitable.domain.common.user.dto.request.UserUpdateProfileRequest;
+import com.sparta.oishitable.domain.common.user.dto.response.UserMyInfoResponse;
 import com.sparta.oishitable.domain.common.user.dto.response.UserMyProfileResponse;
 import com.sparta.oishitable.domain.common.user.dto.response.UserProfileResponse;
 import com.sparta.oishitable.domain.common.user.entity.User;
@@ -41,6 +42,13 @@ public class UserService {
         long followingCount = followRepository.countFollowing(userId);
 
         return UserProfileResponse.of(user, followerCount, followingCount);
+    }
+
+    @Transactional(readOnly = true)
+    public UserMyInfoResponse findMyInfo(Long userId) {
+        User user = findUserById(userId);
+
+        return UserMyInfoResponse.from(user);
     }
 
     @Transactional
