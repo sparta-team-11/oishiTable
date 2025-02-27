@@ -1,5 +1,6 @@
 package com.sparta.oishitable.domain.customer.reservation.service;
 
+import com.sparta.oishitable.domain.common.auth.service.AuthService;
 import com.sparta.oishitable.domain.common.notification.event.ReservationEvent;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.service.UserService;
@@ -11,7 +12,6 @@ import com.sparta.oishitable.domain.owner.restaurantseat.entity.RestaurantSeat;
 import com.sparta.oishitable.domain.owner.restaurantseat.service.RestaurantSeatService;
 import com.sparta.oishitable.global.aop.annotation.DistributedLock;
 import com.sparta.oishitable.global.exception.DuplicatedResourceException;
-import com.sparta.oishitable.global.exception.ForbiddenException;
 import com.sparta.oishitable.global.exception.InvalidException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
@@ -26,6 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReservationService {
 
+    private final AuthService authService;
     private final UserService userService;
     private final RestaurantSeatService restaurantSeatService;
     private final ReservationRepository reservationRepository;
@@ -100,9 +101,7 @@ public class ReservationService {
     public void deleteReservation(Long userId, Long reservationId) {
         Reservation reservation = findReservedReservationById(reservationId);
 
-        if (reservation.getUser().getId().equals(userId)) {
-            throw new ForbiddenException(ErrorCode.USER_UNAUTHORIZED);
-        }
+        authService.checkUserAuthority(reservation.getUser().getId(), userId);
 
         reservation.cancel();
     }
