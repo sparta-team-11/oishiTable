@@ -88,6 +88,10 @@ public class User extends BaseEntity {
         this.region = region;
     }
 
+    public void resetPassword(String password) {
+        this.password = password;
+    }
+
     private void updateNickname(String nickname) {
         if (nickname != null) {
             this.name = nickname;

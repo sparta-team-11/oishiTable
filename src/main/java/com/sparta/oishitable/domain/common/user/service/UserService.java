@@ -1,6 +1,8 @@
 package com.sparta.oishitable.domain.common.user.service;
 
+import com.sparta.oishitable.domain.common.auth.service.AuthService;
 import com.sparta.oishitable.domain.common.user.dto.request.UserUpdateInfoRequest;
+import com.sparta.oishitable.domain.common.user.dto.request.UserUpdatePasswordRequest;
 import com.sparta.oishitable.domain.common.user.dto.request.UserUpdateProfileRequest;
 import com.sparta.oishitable.domain.common.user.dto.response.UserMyInfoResponse;
 import com.sparta.oishitable.domain.common.user.dto.response.UserMyPageResponse;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
 
+    private final AuthService authService;
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
     private final RegionRepository regionRepository;
@@ -80,6 +83,13 @@ public class UserService {
         User user = findUserById(userId);
 
         user.updateInfo(request.name(), request.phoneNumber());
+    }
+
+    @Transactional
+    public void updateMyPassword(Long userId, UserUpdatePasswordRequest request) {
+        User user = findUserById(userId);
+
+        user.resetPassword(authService.encodePassword(request.password()));
     }
 
     public User findUserById(Long userId) {

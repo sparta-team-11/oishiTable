@@ -40,7 +40,7 @@ public class AuthService {
             throw new DuplicatedResourceException(ErrorCode.DUPLICATE_EMAIL);
         }
 
-        User user = request.toEntity(passwordEncoder.encode(request.password()));
+        User user = request.toEntity(encodePassword(request.password()));
 
         User savedUser = userRepository.save(user);
 
@@ -99,5 +99,9 @@ public class AuthService {
         if (!userId.equals(loginUserId)) {
             throw new ForbiddenException(ErrorCode.USER_UNAUTHORIZED);
         }
+    }
+
+    public String encodePassword(String password) {
+        return passwordEncoder.encode(password);
     }
 }
