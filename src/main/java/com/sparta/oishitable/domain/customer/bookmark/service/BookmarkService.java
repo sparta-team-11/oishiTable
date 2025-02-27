@@ -1,5 +1,6 @@
 package com.sparta.oishitable.domain.customer.bookmark.service;
 
+import com.sparta.oishitable.domain.common.auth.service.AuthService;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.domain.customer.bookmark.dto.request.BookmarkUpdateRequest;
@@ -10,7 +11,6 @@ import com.sparta.oishitable.domain.customer.bookmark.repository.BookmarkReposit
 import com.sparta.oishitable.domain.customer.restaurant.repository.CustomerRestaurantRepository;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.global.exception.ConflictException;
-import com.sparta.oishitable.global.exception.ForbiddenException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +27,7 @@ public class BookmarkService {
     private final BookmarkRepository bookmarkRepository;
     private final CustomerRestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
+    private final AuthService authService;
 
     @Transactional
     public Long createBookmark(Long userId, Long restaurantId) {
@@ -60,7 +61,7 @@ public class BookmarkService {
     @Transactional
     public void updateBookmarkMemo(Long userId, Long bookmarkId, BookmarkUpdateRequest bookmarkUpdateRequest) {
         Bookmark bookmark = findById(bookmarkId);
-        checkUserAuthority(userId, bookmark.getUser().getId());
+        authService.checkUserAuthority(bookmark.getUser().getId(), userId);
 
         bookmark.updateMemo(bookmarkUpdateRequest.updateMemo());
     }
@@ -68,15 +69,9 @@ public class BookmarkService {
     @Transactional
     public void deleteBookmark(Long userId, Long bookmarkId) {
         Bookmark bookmark = findById(bookmarkId);
-        checkUserAuthority(userId, bookmark.getUser().getId());
+        authService.checkUserAuthority(bookmark.getUser().getId(), userId);
 
         bookmarkRepository.delete(bookmark);
-    }
-
-    private void checkUserAuthority(Long ownerId, Long userId) {
-        if (!ownerId.equals(userId)) {
-            throw new ForbiddenException(ErrorCode.USER_UNAUTHORIZED);
-        }
     }
 
     private Bookmark findById(Long bookmarkId) {

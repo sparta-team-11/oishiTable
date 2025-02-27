@@ -1,5 +1,6 @@
 package com.sparta.oishitable.domain.customer.collection.bookmark.service;
 
+import com.sparta.oishitable.domain.common.auth.service.AuthService;
 import com.sparta.oishitable.domain.customer.bookmark.dto.response.BookmarkDetails;
 import com.sparta.oishitable.domain.customer.bookmark.dto.response.BookmarksFindResponse;
 import com.sparta.oishitable.domain.customer.bookmark.entity.Bookmark;
@@ -33,6 +34,7 @@ public class CollectionBookmarkService {
     private final CollectionBookmarkRepository collectionBookmarkRepository;
     private final CollectionRepository collectionRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final AuthService authService;
 
     @Transactional
     public void createCollectionBookmarks(
@@ -50,7 +52,7 @@ public class CollectionBookmarkService {
 
         Collection collection = findCollectionById(collectionId);
 
-        checkUserAuthority(collection.getUser().getId(), userId);
+        authService.checkUserAuthority(collection.getUser().getId(), userId);
 
         List<Bookmark> bookmarks = bookmarkRepository.findAllByBookmarkIds(bookmarkIds);
 
@@ -63,7 +65,7 @@ public class CollectionBookmarkService {
                             .findFirst()
                             .orElseThrow(() -> new NotFoundException(ErrorCode.BOOKMARK_NOT_FOUND));
 
-                    checkUserAuthority(findBookmark.getUser().getId(), userId);
+                    authService.checkUserAuthority(findBookmark.getUser().getId(), userId);
 
                     return CollectionBookmark.builder()
                             .collection(collection)
@@ -79,7 +81,7 @@ public class CollectionBookmarkService {
         Collection collection = findCollectionById(collectionId);
 
         if (!collection.isPublic()) {
-            checkUserAuthority(collection.getUser().getId(), userId);
+            authService.checkUserAuthority(collection.getUser().getId(), userId);
         }
 
         Page<CollectionBookmarkDetails> bookmarkDetails
@@ -102,7 +104,7 @@ public class CollectionBookmarkService {
             throw new BadRequest(ErrorCode.INVALID_ACCESS_BOOKMARK_IN_COLLECTION);
         }
 
-        checkUserAuthority(collectionBookmark.getBookmark().getUser().getId(), userId);
+        authService.checkUserAuthority(collectionBookmark.getBookmark().getUser().getId(), userId);
 
         collectionBookmarkRepository.delete(collectionBookmark);
     }
@@ -115,11 +117,5 @@ public class CollectionBookmarkService {
     private Collection findCollectionById(Long collectionId) {
         return collectionRepository.findById(collectionId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.COLLECTION_NOT_FOUND));
-    }
-
-    private void checkUserAuthority(Long recordOwnerId, Long userId) {
-        if (!recordOwnerId.equals(userId)) {
-            throw new ForbiddenException(ErrorCode.USER_UNAUTHORIZED);
-        }
     }
 }
