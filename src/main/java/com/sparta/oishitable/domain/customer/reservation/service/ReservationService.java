@@ -92,7 +92,7 @@ public class ReservationService {
     public void deleteReservation(Long userId, Long reservationId) {
         Reservation reservation = findReservedReservationById(reservationId);
 
-        if (reservation.getUser().getId().equals(userId)) {
+        if (!reservation.getUser().getId().equals(userId)) {
             throw new ForbiddenException(ErrorCode.USER_UNAUTHORIZED);
         }
 

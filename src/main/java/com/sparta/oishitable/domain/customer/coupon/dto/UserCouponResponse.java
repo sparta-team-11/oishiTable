@@ -5,29 +5,24 @@ import jakarta.validation.constraints.NotNull;
 
 public record UserCouponResponse(
         @NotNull
-        Long id,
+        Long couponId,
 
         @NotNull
         String couponName,
 
         @NotNull
-        String discount,
+        Integer discount,
 
         @NotNull
-        Boolean couponUsed,
-
-        @NotNull
-        Long restaurantId
-
+        Boolean couponUsed
 ) {
 
     public static UserCouponResponse from(UserCoupon usercoupon) {
         return new UserCouponResponse(
                 usercoupon.getId(),
                 usercoupon.getCoupon().getCouponName(),
-                usercoupon.getCoupon().getDiscount() + "% 할인 쿠폰입니다.",
-                usercoupon.getCouponUsed(),
-                usercoupon.getCoupon().getRestaurant().getId()
+                usercoupon.getCoupon().getDiscount(),
+                usercoupon.getCouponUsed()
         );
     }
 }

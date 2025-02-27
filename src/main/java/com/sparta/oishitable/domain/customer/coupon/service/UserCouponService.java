@@ -5,6 +5,7 @@ import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.domain.customer.coupon.dto.UserCouponResponse;
 import com.sparta.oishitable.domain.customer.coupon.entity.UserCoupon;
 import com.sparta.oishitable.domain.customer.coupon.repository.UserCouponRepository;
+import com.sparta.oishitable.domain.owner.coupon.dto.request.CouponResponse;
 import com.sparta.oishitable.domain.owner.coupon.entity.Coupon;
 import com.sparta.oishitable.domain.owner.coupon.repository.CouponRepository;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
@@ -25,8 +26,15 @@ public class UserCouponService {
     private final UserRepository userRepository;
     private final CouponRepository couponRepository;
 
+    public List<CouponResponse> findRestaurantCoupons(Long restaurantId) {
+        List<Coupon> coupons = couponRepository.findByRestaurantId(restaurantId);
 
-    public Long downloadCoupon(Long userId, Long couponId) {
+        return coupons.stream()
+                .map(CouponResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    public void downloadCoupon(Long userId, Long couponId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
@@ -45,9 +53,7 @@ public class UserCouponService {
                 .build();
 
         userCouponRepository.save(userCoupon);
-
-        return userCoupon.getId();
-
+        
     }
 
     public List<UserCouponResponse> findUserCoupons(Long userId, Long cursor, int size) {
