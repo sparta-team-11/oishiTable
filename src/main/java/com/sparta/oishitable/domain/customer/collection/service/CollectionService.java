@@ -1,21 +1,22 @@
 package com.sparta.oishitable.domain.customer.collection.service;
 
+import com.sparta.oishitable.domain.common.auth.service.AuthService;
+import com.sparta.oishitable.domain.common.user.entity.User;
+import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.domain.customer.collection.dto.request.CollectionCreateRequest;
 import com.sparta.oishitable.domain.customer.collection.dto.request.CollectionUpdateRequest;
 import com.sparta.oishitable.domain.customer.collection.dto.response.CollectionDetailResponse;
 import com.sparta.oishitable.domain.customer.collection.dto.response.CollectionInfoResponse;
+import com.sparta.oishitable.domain.customer.collection.dto.response.CollectionInfosResponse;
 import com.sparta.oishitable.domain.customer.collection.entity.Collection;
 import com.sparta.oishitable.domain.customer.collection.repository.CollectionRepository;
-import com.sparta.oishitable.domain.common.user.entity.User;
-import com.sparta.oishitable.domain.common.user.repository.UserRepository;
-import com.sparta.oishitable.global.exception.ForbiddenException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -24,6 +25,7 @@ public class CollectionService {
 
     private final CollectionRepository collectionRepository;
     private final UserRepository userRepository;
+    private final AuthService authService;
 
     @Transactional
     public Long createCollection(Long userId, CollectionCreateRequest collectionCreateRequest) {
@@ -42,22 +44,36 @@ public class CollectionService {
         return savedCollection.getId();
     }
 
-    public CollectionDetailResponse findCollection(Long collectionId) {
-        return collectionRepository.findCollectionDetail(collectionId)
+    public CollectionDetailResponse findCollection(Long userId, Long collectionId) {
+        CollectionDetailResponse collectionDetailResponse = collectionRepository.findCollectionDetail(collectionId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.COLLECTION_NOT_FOUND));
+
+        if (!collectionDetailResponse.isPublic()) {
+            authService.checkUserAuthority(collectionDetailResponse.userId(), userId);
+        }
+
+        return collectionDetailResponse;
     }
 
-    public List<CollectionInfoResponse> findCollections(Long userId) {
-        return collectionRepository.findAllByUserId(userId);
+    public CollectionInfosResponse findCollections(Long userId, Long collectionOwnerId, Pageable pageable) {
+        Page<CollectionInfoResponse> collectionInfos = null;
+
+        if (userId.equals(collectionOwnerId)) {
+            collectionInfos = collectionRepository.findAllByCollectionOwnerId(collectionOwnerId, pageable);
+        }
+
+        if (!userId.equals(collectionOwnerId)) {
+            collectionInfos = collectionRepository.findAllByPublicCollections(collectionOwnerId, pageable);
+        }
+
+        return CollectionInfosResponse.from(collectionInfos);
     }
 
     @Transactional
     public void updateCollection(Long userId, Long collectionId, CollectionUpdateRequest collectionUpdateRequest) {
         Collection collection = findById(collectionId);
 
-        if (!collection.getUser().getId().equals(userId)) {
-            throw new ForbiddenException(ErrorCode.USER_UNAUTHORIZED);
-        }
+        authService.checkUserAuthority(collection.getUser().getId(), userId);
 
         collection.updateCollectionInfo(collectionUpdateRequest);
     }
@@ -66,9 +82,7 @@ public class CollectionService {
     public void deleteCollection(Long userId, Long collectionId) {
         Collection collection = findById(collectionId);
 
-        if (!collection.getUser().getId().equals(userId)) {
-            throw new ForbiddenException(ErrorCode.USER_UNAUTHORIZED);
-        }
+        authService.checkUserAuthority(collection.getUser().getId(), userId);
 
         collectionRepository.delete(collection);
     }
