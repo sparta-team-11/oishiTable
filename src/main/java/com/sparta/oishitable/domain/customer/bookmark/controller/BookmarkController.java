@@ -1,7 +1,6 @@
 package com.sparta.oishitable.domain.customer.bookmark.controller;
 
 import com.sparta.oishitable.domain.customer.bookmark.dto.request.BookmarkCreateRequest;
-import com.sparta.oishitable.domain.customer.bookmark.dto.request.BookmarkDeleteRequest;
 import com.sparta.oishitable.domain.customer.bookmark.dto.request.BookmarkUpdateRequest;
 import com.sparta.oishitable.domain.customer.bookmark.dto.response.BookmarksFindResponse;
 import com.sparta.oishitable.domain.customer.bookmark.service.BookmarkService;
