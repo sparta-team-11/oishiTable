@@ -97,13 +97,4 @@ public class CustomerRestaurantWaitingService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
     }
-
-//    public void save(Long userId, Long restaurantId, int totalCount) throws JsonProcessingException {
-//        WaitingRedisDto build = WaitingRedisDto.builder()
-//                .userId(userId)
-//                .totalCount(totalCount)
-//                .build();
-//
-//        redisTemplate.opsForList().rightPush("test_r_w:" + restaurantId, objectMapper.writeValueAsString(build));
-//    }
 }
