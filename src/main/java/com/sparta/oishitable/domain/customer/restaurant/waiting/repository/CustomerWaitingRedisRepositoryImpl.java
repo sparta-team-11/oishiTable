@@ -60,8 +60,24 @@ public class CustomerWaitingRedisRepositoryImpl implements CustomerWaitingRedisR
 
     @Override
     public Optional<Long> findUserRank(Long userId, Long restaurantId) {
-        String key = WAITING_QUEUE_PREFIX + restaurantId;
-        return Optional.ofNullable(redisTemplate.opsForList().indexOf(key, userId.toString()));
+        List<Object> queue = findQueue(restaurantId);
+
+        if (queue == null || queue.isEmpty()) {
+            return Optional.empty();
+        }
+
+        for (int i = 0; i < queue.size(); i++) {
+            try {
+                WaitingRedisDto dto = convertToDto(queue.get(i));
+                if (dto.getUserId().equals(userId)) {
+                    return Optional.of((long) i);
+                }
+            } catch (JsonProcessingException e) {
+                return Optional.empty();
+            }
+        }
+
+        return Optional.empty();
     }
 
     @Override
