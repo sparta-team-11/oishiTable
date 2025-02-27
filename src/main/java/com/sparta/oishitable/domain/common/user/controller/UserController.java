@@ -3,7 +3,8 @@ package com.sparta.oishitable.domain.common.user.controller;
 import com.sparta.oishitable.domain.common.user.dto.request.UserUpdateInfoRequest;
 import com.sparta.oishitable.domain.common.user.dto.request.UserUpdateProfileRequest;
 import com.sparta.oishitable.domain.common.user.dto.response.UserMyInfoResponse;
-import com.sparta.oishitable.domain.common.user.dto.response.UserMyProfileResponse;
+import com.sparta.oishitable.domain.common.user.dto.response.UserMyPageResponse;
+import com.sparta.oishitable.domain.common.user.dto.response.UserPageResponse;
 import com.sparta.oishitable.domain.common.user.dto.response.UserProfileResponse;
 import com.sparta.oishitable.domain.common.user.service.UserService;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
@@ -21,14 +22,14 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
-    public ResponseEntity<UserMyProfileResponse> findMyProfile(
+    public ResponseEntity<UserMyPageResponse> findMyPage(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        return ResponseEntity.ok(userService.findMyProfile(userDetails.getId()));
+        return ResponseEntity.ok(userService.findMyPage(userDetails.getId()));
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserProfileResponse> findUserProfile(
+    public ResponseEntity<UserPageResponse> findUserProfile(
             @PathVariable Long userId
     ) {
         return ResponseEntity.ok(userService.findUserProfile(userId));
@@ -39,6 +40,13 @@ public class UserController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         return ResponseEntity.ok(userService.findMyInfo(userDetails.getId()));
+    }
+
+    @GetMapping("/me/profile")
+    public ResponseEntity<UserProfileResponse> findMyProfile(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        return ResponseEntity.ok(userService.findMyProfile(userDetails.getId()));
     }
 
     @PatchMapping("/me/profile")

@@ -74,15 +74,18 @@ public class User extends BaseEntity {
         this.role = role;
     }
 
-    public void updateProfile(String nickname, String introduce, Region region) {
+    public void updateProfile(String nickname, String introduce) {
         updateNickname(nickname);
         updateIntroduce(introduce);
-        updateRegion(region);
     }
 
     public void updateInfo(String name, String phoneNumber) {
         updateName(name);
         updatePhoneNumber(phoneNumber);
+    }
+
+    public void updateRegion(Region region) {
+        this.region = region;
     }
 
     private void updateNickname(String nickname) {
@@ -95,10 +98,6 @@ public class User extends BaseEntity {
         if (introduce != null) {
             this.introduce = introduce;
         }
-    }
-
-    private void updateRegion(Region region) {
-        this.region = region;
     }
 
     private void updateName(String name) {

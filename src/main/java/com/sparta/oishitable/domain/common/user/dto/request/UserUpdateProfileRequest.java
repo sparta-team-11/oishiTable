@@ -17,6 +17,7 @@ public record UserUpdateProfileRequest(
                 message = INTRODUCE_RANGE_MESSAGE
         )
         String introduce,
-        Long regionId
+        Long regionId,
+        Boolean isChangeRegion
 ) {
 }

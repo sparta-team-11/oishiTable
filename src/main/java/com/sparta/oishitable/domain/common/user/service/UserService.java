@@ -3,7 +3,8 @@ package com.sparta.oishitable.domain.common.user.service;
 import com.sparta.oishitable.domain.common.user.dto.request.UserUpdateInfoRequest;
 import com.sparta.oishitable.domain.common.user.dto.request.UserUpdateProfileRequest;
 import com.sparta.oishitable.domain.common.user.dto.response.UserMyInfoResponse;
-import com.sparta.oishitable.domain.common.user.dto.response.UserMyProfileResponse;
+import com.sparta.oishitable.domain.common.user.dto.response.UserMyPageResponse;
+import com.sparta.oishitable.domain.common.user.dto.response.UserPageResponse;
 import com.sparta.oishitable.domain.common.user.dto.response.UserProfileResponse;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
@@ -25,23 +26,23 @@ public class UserService {
     private final RegionRepository regionRepository;
 
     @Transactional(readOnly = true)
-    public UserMyProfileResponse findMyProfile(Long userId) {
+    public UserMyPageResponse findMyPage(Long userId) {
         User user = findUserById(userId);
 
         long followerCount = followRepository.countFollower(userId);
         long followingCount = followRepository.countFollowing(userId);
 
-        return UserMyProfileResponse.of(user, followerCount, followingCount);
+        return UserMyPageResponse.of(user, followerCount, followingCount);
     }
 
     @Transactional(readOnly = true)
-    public UserProfileResponse findUserProfile(Long userId) {
+    public UserPageResponse findUserProfile(Long userId) {
         User user = findUserById(userId);
 
         long followerCount = followRepository.countFollower(userId);
         long followingCount = followRepository.countFollowing(userId);
 
-        return UserProfileResponse.of(user, followerCount, followingCount);
+        return UserPageResponse.of(user, followerCount, followingCount);
     }
 
     @Transactional(readOnly = true)
@@ -51,14 +52,27 @@ public class UserService {
         return UserMyInfoResponse.from(user);
     }
 
+    @Transactional(readOnly = true)
+    public UserProfileResponse findMyProfile(Long userId) {
+        User user = findUserById(userId);
+
+        return UserProfileResponse.from(user);
+    }
+
     @Transactional
     public void updateMyProfile(Long userId, UserUpdateProfileRequest request) {
         User user = findUserById(userId);
 
-        Region region = request.regionId() != null ?
-                regionRepository.findById(request.regionId()).orElse(null) : null;
+        // 요청에서 isChangeRegion == true 일 때만 지역을 변경해준다
+        if (request.isChangeRegion()) {
+            Region region = request.regionId() != null ?
+                    regionRepository.findById(request.regionId())
+                            .orElseThrow(() -> new NotFoundException(ErrorCode.REGION_NOT_FOUND)) : null;
 
-        user.updateProfile(request.nickname(), request.introduce(), region);
+            user.updateRegion(region);
+        }
+
+        user.updateProfile(request.nickname(), request.introduce());
     }
 
     @Transactional
