@@ -2,8 +2,8 @@ package com.sparta.oishitable.domain.customer.collection.bookmark.repository;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sparta.oishitable.domain.customer.bookmark.dto.response.BookmarkDetails;
-import com.sparta.oishitable.domain.customer.bookmark.dto.response.QBookmarkDetails;
+import com.sparta.oishitable.domain.customer.collection.bookmark.dto.response.CollectionBookmarkDetails;
+import com.sparta.oishitable.domain.customer.collection.bookmark.dto.response.QCollectionBookmarkDetails;
 import com.sparta.oishitable.domain.customer.collection.bookmark.entity.CollectionBookmark;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -46,15 +46,17 @@ public class CollectionBookmarkQRepositoryImpl implements CollectionBookmarkQRep
     }
 
     @Override
-    public Page<BookmarkDetails> findBookmarkDetailsPaginationByCollectionId(Long collectionId, Pageable pageable) {
-        List<BookmarkDetails> records = queryFactory
-                .select(new QBookmarkDetails(
-                        bookmark.id,
+    public Page<CollectionBookmarkDetails> findBookmarkDetailsByCollectionId(Long collectionId, Pageable pageable) {
+        List<CollectionBookmarkDetails> records = queryFactory
+                .select(new QCollectionBookmarkDetails(
+                        collectionBookmark.id,
                         bookmark.restaurant.id,
                         bookmark.memo,
                         restaurant.name,
                         restaurant.introduce,
-                        restaurant.address
+                        restaurant.address,
+                        restaurant.longitude,
+                        restaurant.latitude
                 ))
                 .from(collectionBookmark)
                 .innerJoin(collectionBookmark.bookmark, bookmark)

@@ -1,5 +1,6 @@
 package com.sparta.oishitable.domain.customer.collection.bookmark.controller;
 
+import com.sparta.oishitable.domain.customer.bookmark.dto.response.BookmarksFindResponse;
 import com.sparta.oishitable.domain.customer.collection.bookmark.dto.request.CollectionBookmarksCreateRequest;
 import com.sparta.oishitable.domain.customer.collection.bookmark.dto.response.CollectionBookmarksFindResponse;
 import com.sparta.oishitable.domain.customer.collection.bookmark.service.CollectionBookmarkService;
@@ -16,14 +17,14 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/customer/api/collections/{collectionId}/bookmarks")
+@RequestMapping("/customer/api/collections/{collectionId}")
 @RequiredArgsConstructor
 public class CollectionBookmarkController {
 
     private final CollectionBookmarkService collectionBookmarkService;
 
-    @PostMapping
-    public ResponseEntity<Void> createCollectionBookmark(
+    @PostMapping("/bookmarks")
+    public ResponseEntity<Void> createCollectionBookmarks(
             @PathVariable Long collectionId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody @Valid CollectionBookmarksCreateRequest collectionBookmarksCreateRequest
@@ -35,7 +36,7 @@ public class CollectionBookmarkController {
         return ResponseEntity.created(location).build();
     }
 
-    @GetMapping
+    @GetMapping("/bookmarks")
     public ResponseEntity<CollectionBookmarksFindResponse> findBookmarks(
             @PathVariable Long collectionId,
             @PageableDefault Pageable pageable,
@@ -47,7 +48,19 @@ public class CollectionBookmarkController {
         return ResponseEntity.ok(body);
     }
 
-    @DeleteMapping("/{collectionBookmarkId}")
+    @GetMapping("/not-included")
+    public ResponseEntity<BookmarksFindResponse> findBookmarksNotInCollection(
+            @PathVariable Long collectionId,
+            @PageableDefault Pageable pageable,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        BookmarksFindResponse body
+                = collectionBookmarkService.findBookmarksNotInCollection(userDetails.getId(), collectionId, pageable);
+
+        return ResponseEntity.ok(body);
+    }
+
+    @DeleteMapping("/bookmarks/{collectionBookmarkId}")
     public ResponseEntity<Void> deleteCollectionBookmarks(
             @PathVariable Long collectionId,
             @PathVariable Long collectionBookmarkId,

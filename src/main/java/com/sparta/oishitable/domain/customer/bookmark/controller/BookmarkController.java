@@ -1,7 +1,6 @@
 package com.sparta.oishitable.domain.customer.bookmark.controller;
 
 import com.sparta.oishitable.domain.customer.bookmark.dto.request.BookmarkCreateRequest;
-import com.sparta.oishitable.domain.customer.bookmark.dto.request.BookmarkDeleteRequest;
 import com.sparta.oishitable.domain.customer.bookmark.dto.request.BookmarkUpdateRequest;
 import com.sparta.oishitable.domain.customer.bookmark.dto.response.BookmarksFindResponse;
 import com.sparta.oishitable.domain.customer.bookmark.service.BookmarkService;
@@ -64,16 +63,6 @@ public class BookmarkController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         bookmarkService.deleteBookmark(userDetails.getId(), bookmarkId);
-
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping
-    public ResponseEntity<Void> deleteBookmarkByUserIdAndRestaurantId(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody @Valid BookmarkDeleteRequest bookmarkDeleteReq
-    ) {
-        bookmarkService.deleteBookmarkByUserIdAndRestaurantId(userDetails.getId(), bookmarkDeleteReq.restaurantId());
 
         return ResponseEntity.noContent().build();
     }

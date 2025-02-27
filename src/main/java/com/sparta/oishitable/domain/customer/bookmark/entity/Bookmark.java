@@ -7,6 +7,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 @Getter
 @Entity
@@ -17,6 +19,7 @@ import lombok.NoArgsConstructor;
                 @Index(name = "idx_fk_restaurant_id", columnList = "restaurant_id")
         })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicInsert
 public class Bookmark {
 
     @Id
@@ -24,7 +27,8 @@ public class Bookmark {
     @Column(name = "bookmark_id")
     private Long id;
 
-    @Column(length = 100)
+    @Column(length = 100, nullable = false)
+    @ColumnDefault("''")
     private String memo;
 
     @ManyToOne(fetch = FetchType.LAZY)
