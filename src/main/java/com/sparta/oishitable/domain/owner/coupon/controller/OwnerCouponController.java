@@ -26,8 +26,7 @@ public class OwnerCouponController {
             @RequestBody CouponCreateRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        System.out.println(" 컨트롤러에서 받은 userId: " + userDetails.getId());
-
+        
         CouponResponse response = ownerCouponService.createCoupon(userDetails.getId(), restaurantId, request);
 
         URI location = UriBuilderUtil.create("/owner/api/restaurants/{restaurantId}", response.restaurantId());
