@@ -23,18 +23,16 @@ public class OwnerCouponService {
     private final CouponRepository couponRepository;
     private final OwnerRestaurantRepository restaurantRepository;
 
+
     @Transactional
     public CouponResponse createCoupon(
             Long userId,
             Long restaurantId,
             CouponCreateRequest request
     ) {
-        System.out.println(" 서비스에서 받은 userId " + userId);
 
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.RESTAURANT_NOT_FOUND));
-
-        System.out.println(" 레스토랑 주인 ID " + restaurant.getOwner().getId());
 
         // 인증된 사용자 ID와 요청된 userId가 동일한지 확인
         if (!userId.equals(restaurant.getOwner().getId())) {
@@ -42,6 +40,7 @@ public class OwnerCouponService {
         }
 
         Coupon createCoupon = Coupon.builder()
+                .couponName(request.couponName())
                 .discount(request.discount())
                 .restaurant(restaurant)
                 .build();
@@ -70,8 +69,6 @@ public class OwnerCouponService {
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.RESTAURANT_NOT_FOUND));
 
-        System.out.println(" 레스토랑 주인 ID: " + restaurant.getOwner().getId());
-
         // 인증된 사용자 ID와 요청된 userId가 동일한지 확인
         if (!userId.equals(restaurant.getOwner().getId())) {
             throw new CustomRuntimeException(ErrorCode.AUTHORIZATION_EXCEPTION);
@@ -81,5 +78,4 @@ public class OwnerCouponService {
         }
         couponRepository.deleteById(couponId);
     }
-
 }

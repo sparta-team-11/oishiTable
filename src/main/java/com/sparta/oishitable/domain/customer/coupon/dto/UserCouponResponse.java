@@ -11,6 +11,9 @@ public record UserCouponResponse(
         String couponName,
 
         @NotNull
+        String discount,
+
+        @NotNull
         Boolean couponUsed,
 
         @NotNull
@@ -21,6 +24,7 @@ public record UserCouponResponse(
     public static UserCouponResponse from(UserCoupon usercoupon) {
         return new UserCouponResponse(
                 usercoupon.getId(),
+                usercoupon.getCoupon().getCouponName(),
                 usercoupon.getCoupon().getDiscount() + "% 할인 쿠폰입니다.",
                 usercoupon.getCouponUsed(),
                 usercoupon.getCoupon().getRestaurant().getId()

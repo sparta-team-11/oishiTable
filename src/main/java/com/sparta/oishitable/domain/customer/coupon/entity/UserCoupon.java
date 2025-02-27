@@ -9,7 +9,13 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
-@Table(name = "user_coupons")
+@Table(
+        name = "user_coupons",
+        indexes = {
+                @Index(name = "idx_user_id", columnList = "user_id"),
+                @Index(name = "idx_coupon_id", columnList = "coupon_id")
+        }
+)
 @Getter
 public class UserCoupon {
 

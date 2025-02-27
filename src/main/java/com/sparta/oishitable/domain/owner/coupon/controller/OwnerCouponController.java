@@ -47,8 +47,7 @@ public class OwnerCouponController {
             @AuthenticationPrincipal CustomUserDetails userDetails
 
     ) {
-        ownerCouponService.deleteCoupon(restaurantId,couponId,userDetails.getId());
+        ownerCouponService.deleteCoupon(restaurantId, couponId, userDetails.getId());
         return ResponseEntity.noContent().build();
     }
-
 }

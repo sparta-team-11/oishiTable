@@ -29,7 +29,7 @@ public class UserCouponService {
     private final JPAQueryFactory queryFactory;
 
 
-    public UserCouponResponse downloadCoupon(Long userId, Long couponId) {
+    public void downloadCoupon(Long userId, Long couponId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
@@ -49,23 +49,16 @@ public class UserCouponService {
 
         userCouponRepository.save(userCoupon);
 
-        return UserCouponResponse.from(userCoupon);
+        UserCouponResponse.from(userCoupon);
 
     }
 
     public List<UserCouponResponse> findUserCoupons(Long userId, Long cursor, int size) {
-        QUserCoupon userCoupon = QUserCoupon.userCoupon;
+        if( cursor == null ) {
+            cursor = 0L;
+        }
 
-        List<UserCoupon> userCoupons = queryFactory
-                .selectFrom(userCoupon)
-                .where(
-                        userCoupon.user.id.eq(userId),
-                        userCoupon.couponUsed.isFalse(),
-                        cursor == null ? null : userCoupon.id.gt(cursor)
-                )
-                .orderBy(userCoupon.id.asc())
-                .limit(size)
-                .fetch();
+        List<UserCoupon> userCoupons = userCouponRepository.findByUserIdAndCouponUsedFalseAndIdGreaterThan(userId, cursor, size);
 
         return userCoupons.stream()
                 .map(UserCouponResponse::from)
@@ -73,7 +66,7 @@ public class UserCouponService {
     }
 
     @Transactional
-    public UserCouponResponse useCoupon(Long userId, Long couponId) {
+    public void useCoupon(Long userId, Long couponId) {
         UserCoupon userCoupon = userCouponRepository.findByUserIdAndCouponId(userId, couponId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.COUPON_NOT_FOUND));
 
@@ -83,6 +76,6 @@ public class UserCouponService {
 
         userCoupon.setCouponUsed(true);
 
-        return UserCouponResponse.from(userCoupon);
+        UserCouponResponse.from(userCoupon);
     }
 }

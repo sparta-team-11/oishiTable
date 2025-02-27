@@ -8,6 +8,9 @@ public record CouponResponse(
         Long id,
 
         @NotNull
+        String couponName,
+
+        @NotNull
         Integer discount,
 
         @NotNull
@@ -17,6 +20,7 @@ public record CouponResponse(
     public static CouponResponse from(Coupon coupon) {
         return new CouponResponse(
                 coupon.getId(),
+                coupon.getCouponName(),
                 coupon.getDiscount(),
                 coupon.getRestaurant().getId()
         );
@@ -25,6 +29,7 @@ public record CouponResponse(
     public static CouponResponse from(Coupon coupon, Long userId) {
         return new CouponResponse(
                 coupon.getId(),
+                coupon.getCouponName(),
                 coupon.getDiscount(),
                 coupon.getRestaurant().getId()
         );

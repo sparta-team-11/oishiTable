@@ -18,12 +18,14 @@ public class UserCouponController {
     private final UserCouponService usercouponService;
 
     @PostMapping("/{couponId}/download")
-    public ResponseEntity<UserCouponResponse> downloadCoupon(
+    public ResponseEntity<Void> downloadCoupon(
             @PathVariable Long couponId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
 
-        return ResponseEntity.ok(usercouponService.downloadCoupon(userDetails.getId(), couponId));
+        usercouponService.downloadCoupon(userDetails.getId(), couponId);
+
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
@@ -37,10 +39,12 @@ public class UserCouponController {
     }
 
     @PostMapping("/{couponId}/use")
-    public ResponseEntity<UserCouponResponse> useCoupon(
+    public ResponseEntity<Void> useCoupon(
             @PathVariable Long couponId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        return ResponseEntity.ok(usercouponService.useCoupon(userDetails.getId(), couponId));
+        usercouponService.useCoupon(userDetails.getId(), couponId);
+
+        return ResponseEntity.noContent().build();
     }
 }
