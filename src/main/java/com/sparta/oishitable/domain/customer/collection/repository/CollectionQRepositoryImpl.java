@@ -26,6 +26,7 @@ public class CollectionQRepositoryImpl implements CollectionQRepository {
     public Optional<CollectionDetailResponse> findCollectionDetail(Long collectionId) {
         return Optional.ofNullable(queryFactory
                 .select(new QCollectionDetailResponse(
+                        collection.id,
                         collection.user.id,
                         collection.name,
                         collection.description,

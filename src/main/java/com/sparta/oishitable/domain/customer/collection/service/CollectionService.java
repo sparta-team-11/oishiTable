@@ -47,7 +47,7 @@ public class CollectionService {
         CollectionDetailResponse collectionDetailResponse = collectionRepository.findCollectionDetail(collectionId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.COLLECTION_NOT_FOUND));
 
-        if (!collectionDetailResponse.getUserId().equals(userId) && !collectionDetailResponse.isPublic()) {
+        if (!collectionDetailResponse.userId().equals(userId) && !collectionDetailResponse.isPublic()) {
             throw new ForbiddenException(ErrorCode.USER_UNAUTHORIZED);
         }
 
