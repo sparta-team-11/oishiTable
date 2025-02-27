@@ -1,8 +1,8 @@
 package com.sparta.oishitable.domain.customer.collection.entity;
 
-import com.sparta.oishitable.domain.customer.collection.dto.request.CollectionUpdateRequest;
 import com.sparta.oishitable.domain.common.BaseEntity;
 import com.sparta.oishitable.domain.common.user.entity.User;
+import com.sparta.oishitable.domain.customer.collection.dto.request.CollectionUpdateRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -27,7 +27,7 @@ public class Collection extends BaseEntity {
     @Column(length = 10, nullable = false)
     private String name;
 
-    @Column(length = 200)
+    @Column(length = 200, nullable = false)
     private String description;
 
     @Column(nullable = false)

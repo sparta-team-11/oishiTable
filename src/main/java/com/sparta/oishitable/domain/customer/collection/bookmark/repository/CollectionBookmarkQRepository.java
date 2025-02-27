@@ -1,6 +1,6 @@
 package com.sparta.oishitable.domain.customer.collection.bookmark.repository;
 
-import com.sparta.oishitable.domain.customer.bookmark.dto.response.BookmarkDetails;
+import com.sparta.oishitable.domain.customer.collection.bookmark.dto.response.CollectionBookmarkDetails;
 import com.sparta.oishitable.domain.customer.collection.bookmark.entity.CollectionBookmark;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,5 +14,5 @@ public interface CollectionBookmarkQRepository {
 
     boolean existsByCollectionIdAndBookmarkIds(Long collectionId, List<Long> bookmarkIds);
 
-    Page<BookmarkDetails> findBookmarkDetailsPaginationByCollectionId(Long collectionId, Pageable pageable);
+    Page<CollectionBookmarkDetails> findBookmarkDetailsByCollectionId(Long collectionId, Pageable pageable);
 }
