@@ -5,28 +5,28 @@ import jakarta.validation.constraints.NotNull;
 
 public record CouponResponse(
         @NotNull
-        Long id,
+        Long couponId,
 
         @NotNull
-        Integer discount,
+        String couponName,
 
         @NotNull
-        Long restaurantId
+        Integer discount
 ) {
 
     public static CouponResponse from(Coupon coupon) {
         return new CouponResponse(
                 coupon.getId(),
-                coupon.getDiscount(),
-                coupon.getRestaurant().getId()
+                coupon.getCouponName(),
+                coupon.getDiscount()
         );
     }
 
     public static CouponResponse from(Coupon coupon, Long userId) {
         return new CouponResponse(
                 coupon.getId(),
-                coupon.getDiscount(),
-                coupon.getRestaurant().getId()
+                coupon.getCouponName(),
+                coupon.getDiscount()
         );
     }
 }

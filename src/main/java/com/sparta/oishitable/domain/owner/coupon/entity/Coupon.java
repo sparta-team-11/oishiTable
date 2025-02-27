@@ -13,13 +13,20 @@ import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "coupons")
+@Table(name = "coupons",
+        indexes = {
+                @Index(name = "idx_restaurant_id", columnList = "restaurant_id")
+        }
+)
 @Getter
 
 public class Coupon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "coupon_name", nullable = false)
+    private String couponName;
 
     @Column(name = "discount", nullable = false)
     private Integer discount;
@@ -33,9 +40,11 @@ public class Coupon {
 
     @Builder
     public Coupon(
+            String couponName,
             Integer discount,
             Restaurant restaurant
     ) {
+        this.couponName = couponName;
         this.discount = discount;
         this.restaurant = restaurant;
     }

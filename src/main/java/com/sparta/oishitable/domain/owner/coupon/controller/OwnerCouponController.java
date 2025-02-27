@@ -26,11 +26,10 @@ public class OwnerCouponController {
             @RequestBody CouponCreateRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        System.out.println(" 컨트롤러에서 받은 userId: " + userDetails.getId());
 
         CouponResponse response = ownerCouponService.createCoupon(userDetails.getId(), restaurantId, request);
 
-        URI location = UriBuilderUtil.create("/owner/api/restaurants/{restaurantId}", response.restaurantId());
+        URI location = UriBuilderUtil.create("/owner/api/restaurants/{restaurantId}", restaurantId);
 
         return ResponseEntity.created(location).body(response);
     }
@@ -47,8 +46,7 @@ public class OwnerCouponController {
             @AuthenticationPrincipal CustomUserDetails userDetails
 
     ) {
-        ownerCouponService.deleteCoupon(restaurantId,couponId,userDetails.getId());
+        ownerCouponService.deleteCoupon(restaurantId, couponId, userDetails.getId());
         return ResponseEntity.noContent().build();
     }
-
 }
