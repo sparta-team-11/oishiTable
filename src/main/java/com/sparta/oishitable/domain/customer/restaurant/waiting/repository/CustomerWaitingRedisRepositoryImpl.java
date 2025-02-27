@@ -69,6 +69,7 @@ public class CustomerWaitingRedisRepositoryImpl implements CustomerWaitingRedisR
         for (int i = 0; i < queue.size(); i++) {
             try {
                 WaitingRedisDto dto = convertToDto(queue.get(i));
+
                 if (dto.getUserId().equals(userId)) {
                     return Optional.of((long) i);
                 }
