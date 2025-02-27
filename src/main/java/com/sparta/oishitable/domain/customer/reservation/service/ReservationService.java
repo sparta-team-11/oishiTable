@@ -1,5 +1,6 @@
 package com.sparta.oishitable.domain.customer.reservation.service;
 
+import com.sparta.oishitable.domain.common.notification.event.ReservationEvent;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.domain.customer.reservation.dto.ReservationCreateRequest;
@@ -13,7 +14,6 @@ import com.sparta.oishitable.global.exception.ForbiddenException;
 import com.sparta.oishitable.global.exception.InvalidException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
-import com.sparta.oishitable.domain.common.notification.event.ReservationEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,8 +24,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReservationService {
 
-    private final AuthService authService;
-    private final RestaurantSeatService restaurantSeatService;
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
     private final RestaurantSeatService restaurantSeatService;
@@ -94,7 +92,9 @@ public class ReservationService {
     public void deleteReservation(Long userId, Long reservationId) {
         Reservation reservation = findReservedReservationById(reservationId);
 
-        authService.checkUserAuthority(reservation.getUser().getId(), userId);
+        if (reservation.getUser().getId().equals(userId)) {
+            throw new ForbiddenException(ErrorCode.USER_UNAUTHORIZED);
+        }
 
         reservation.cancel();
     }
