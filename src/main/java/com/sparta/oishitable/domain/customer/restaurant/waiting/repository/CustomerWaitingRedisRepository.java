@@ -11,7 +11,7 @@ public interface CustomerWaitingRedisRepository {
 
     Optional<WaitingRedisDto> findUser(Long restaurantId, Long userId);
 
-    void remove(Long userId, Long restaurantId);
+    void remove(Long restaurantId, Long idx);
 
     Optional<Long> findUserRank(Long userId, Long restaurantId);
 

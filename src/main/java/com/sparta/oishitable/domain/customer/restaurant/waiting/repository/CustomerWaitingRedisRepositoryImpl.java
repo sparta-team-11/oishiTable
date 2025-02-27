@@ -53,9 +53,11 @@ public class CustomerWaitingRedisRepositoryImpl implements CustomerWaitingRedisR
     }
 
     @Override
-    public void remove(Long userId, Long restaurantId) {
+    public void remove(Long restaurantId, Long idx) {
         String key = WAITING_QUEUE_PREFIX + restaurantId;
-        redisTemplate.opsForList().remove(key, 1, userId.toString());
+        Object target = redisTemplate.opsForList().index(key, idx);
+
+        redisTemplate.opsForList().remove(key, 1, target);
     }
 
     @Override

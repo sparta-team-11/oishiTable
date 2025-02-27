@@ -60,7 +60,10 @@ public class CustomerRestaurantWaitingService {
 
         User user = findUserById(userId);
 
-        customerWaitingRedisRepository.remove(user.getId(), restaurant.getId());
+        Long rank = customerWaitingRedisRepository.findUserRank(user.getId(), restaurant.getId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND));
+
+        customerWaitingRedisRepository.remove(restaurant.getId(), rank);
     }
 
     public WaitingQueueFindUserRankResponse findWaitingQueueUserRank(Long userId, Long restaurantId) {
