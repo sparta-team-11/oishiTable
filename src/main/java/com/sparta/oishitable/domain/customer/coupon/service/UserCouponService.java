@@ -1,14 +1,12 @@
 package com.sparta.oishitable.domain.customer.coupon.service;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.domain.customer.coupon.dto.UserCouponResponse;
-import com.sparta.oishitable.domain.customer.coupon.entity.QUserCoupon;
-import com.sparta.oishitable.domain.owner.coupon.entity.Coupon;
 import com.sparta.oishitable.domain.customer.coupon.entity.UserCoupon;
-import com.sparta.oishitable.domain.owner.coupon.repository.CouponRepository;
 import com.sparta.oishitable.domain.customer.coupon.repository.UserCouponRepository;
+import com.sparta.oishitable.domain.owner.coupon.entity.Coupon;
+import com.sparta.oishitable.domain.owner.coupon.repository.CouponRepository;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
@@ -26,10 +24,9 @@ public class UserCouponService {
     private final UserCouponRepository userCouponRepository;
     private final UserRepository userRepository;
     private final CouponRepository couponRepository;
-    private final JPAQueryFactory queryFactory;
 
 
-    public void downloadCoupon(Long userId, Long couponId) {
+    public Long downloadCoupon(Long userId, Long couponId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
@@ -49,14 +46,11 @@ public class UserCouponService {
 
         userCouponRepository.save(userCoupon);
 
-        UserCouponResponse.from(userCoupon);
+        return userCoupon.getId();
 
     }
 
     public List<UserCouponResponse> findUserCoupons(Long userId, Long cursor, int size) {
-        if( cursor == null ) {
-            cursor = 0L;
-        }
 
         List<UserCoupon> userCoupons = userCouponRepository.findByUserIdAndCouponUsedFalseAndIdGreaterThan(userId, cursor, size);
 
@@ -75,7 +69,5 @@ public class UserCouponService {
         }
 
         userCoupon.setCouponUsed(true);
-
-        UserCouponResponse.from(userCoupon);
     }
 }

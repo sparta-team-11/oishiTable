@@ -1,11 +1,13 @@
 package com.sparta.oishitable.domain.customer.coupon.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sparta.oishitable.domain.customer.coupon.entity.QUserCoupon;
 import com.sparta.oishitable.domain.customer.coupon.entity.UserCoupon;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+
+import static com.sparta.oishitable.domain.customer.coupon.entity.QUserCoupon.userCoupon;
+
 
 @RequiredArgsConstructor
 public class UserCouponRepositoryQuerydslImpl implements UserCouponRepositoryQuerydsl {
@@ -14,16 +16,15 @@ public class UserCouponRepositoryQuerydslImpl implements UserCouponRepositoryQue
 
     @Override
     public List<UserCoupon> findByUserIdAndCouponUsedFalseAndIdGreaterThan(Long userId, Long cursor, int size) {
-        QUserCoupon qUserCoupon = QUserCoupon.userCoupon;
 
         return queryFactory
-                .selectFrom(qUserCoupon)
+                .selectFrom(userCoupon)
                 .where(
-                        qUserCoupon.user.id.eq(userId),
-                        qUserCoupon.couponUsed.isFalse(),
-                        cursor != null ? qUserCoupon.id.gt(cursor) : null
+                        userCoupon.user.id.eq(userId),
+                        userCoupon.couponUsed.isFalse(),
+                        cursor != null ? userCoupon.id.gt(cursor) : null
                 )
-                .orderBy(qUserCoupon.id.asc())
+                .orderBy(userCoupon.id.asc())
                 .limit(size)
                 .fetch();
     }
