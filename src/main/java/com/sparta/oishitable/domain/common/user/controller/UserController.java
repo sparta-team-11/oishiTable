@@ -1,5 +1,6 @@
 package com.sparta.oishitable.domain.common.user.controller;
 
+import com.sparta.oishitable.domain.common.user.dto.request.UserUpdateInfoRequest;
 import com.sparta.oishitable.domain.common.user.dto.request.UserUpdateProfileRequest;
 import com.sparta.oishitable.domain.common.user.dto.response.UserMyProfileResponse;
 import com.sparta.oishitable.domain.common.user.dto.response.UserProfileResponse;
@@ -38,6 +39,16 @@ public class UserController {
             @RequestBody @Valid UserUpdateProfileRequest request
     ) {
         userService.updateMyProfile(userDetails.getId(), request);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/me/info")
+    public ResponseEntity<Void> updateMyProfile(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody @Valid UserUpdateInfoRequest request
+    ) {
+        userService.updateMyInfo(userDetails.getId(), request);
 
         return ResponseEntity.ok().build();
     }

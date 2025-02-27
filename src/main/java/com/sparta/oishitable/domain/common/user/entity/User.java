@@ -32,13 +32,13 @@ public class User extends BaseEntity {
     private String email;
     private String password;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10)
     private String nickname;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 11)
     private String phoneNumber;
 
     @Column(length = 35)
@@ -80,6 +80,11 @@ public class User extends BaseEntity {
         updateRegion(region);
     }
 
+    public void updateInfo(String name, String phoneNumber) {
+        updateName(name);
+        updatePhoneNumber(phoneNumber);
+    }
+
     private void updateNickname(String nickname) {
         if (nickname != null) {
             this.name = nickname;
@@ -94,5 +99,17 @@ public class User extends BaseEntity {
 
     private void updateRegion(Region region) {
         this.region = region;
+    }
+
+    private void updateName(String name) {
+        if (name != null) {
+            this.name = name;
+        }
+    }
+
+    private void updatePhoneNumber(String phoneNumber) {
+        if (phoneNumber != null) {
+            this.phoneNumber = phoneNumber;
+        }
     }
 }

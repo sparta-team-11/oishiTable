@@ -1,5 +1,6 @@
 package com.sparta.oishitable.domain.common.user.service;
 
+import com.sparta.oishitable.domain.common.user.dto.request.UserUpdateInfoRequest;
 import com.sparta.oishitable.domain.common.user.dto.request.UserUpdateProfileRequest;
 import com.sparta.oishitable.domain.common.user.dto.response.UserMyProfileResponse;
 import com.sparta.oishitable.domain.common.user.dto.response.UserProfileResponse;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserService {
 
@@ -23,6 +23,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RegionRepository regionRepository;
 
+    @Transactional(readOnly = true)
     public UserMyProfileResponse findMyProfile(Long userId) {
         User user = findUserById(userId);
 
@@ -32,6 +33,7 @@ public class UserService {
         return UserMyProfileResponse.of(user, followerCount, followingCount);
     }
 
+    @Transactional(readOnly = true)
     public UserProfileResponse findUserProfile(Long userId) {
         User user = findUserById(userId);
 
@@ -41,6 +43,7 @@ public class UserService {
         return UserProfileResponse.of(user, followerCount, followingCount);
     }
 
+    @Transactional
     public void updateMyProfile(Long userId, UserUpdateProfileRequest request) {
         User user = findUserById(userId);
 
@@ -48,6 +51,13 @@ public class UserService {
                 regionRepository.findById(request.regionId()).orElse(null) : null;
 
         user.updateProfile(request.nickname(), request.introduce(), region);
+    }
+
+    @Transactional
+    public void updateMyInfo(Long userId, UserUpdateInfoRequest request) {
+        User user = findUserById(userId);
+
+        user.updateInfo(request.name(), request.phoneNumber());
     }
 
     public User findUserById(Long userId) {
