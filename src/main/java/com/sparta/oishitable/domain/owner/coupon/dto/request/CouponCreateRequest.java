@@ -4,6 +4,9 @@ import jakarta.validation.constraints.NotNull;
 
 public record CouponCreateRequest(
         @NotNull
-        Integer discount
+        String couponName,
 
-) {}
+        @NotNull
+        Integer discount
+) {
+}

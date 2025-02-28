@@ -14,6 +14,8 @@ public class PostRandomResponse {
     private final String title;
     private final String content;
     private final String username;
+    private final Integer commentCount;
+    private final Integer likeCount;
     private final LocalDateTime modifiedAt;
     private final Long randomValue;
 
@@ -25,6 +27,8 @@ public class PostRandomResponse {
             String title,
             String content,
             String username,
+            Integer commentCount,
+            Integer likeCount,
             LocalDateTime modifiedAt,
             Long randomValue
     ) {
@@ -34,6 +38,8 @@ public class PostRandomResponse {
         this.title = title;
         this.content = content;
         this.username = username;
+        this.commentCount = commentCount;
+        this.likeCount = likeCount;
         this.modifiedAt = modifiedAt;
         this.randomValue = randomValue;
     }

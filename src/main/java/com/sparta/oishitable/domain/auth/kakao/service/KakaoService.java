@@ -56,7 +56,7 @@ public class KakaoService {
         // 액세스 토큰으로 카카오 사용자 정보 받아오기
         KakaoAccount kakaoAccount = getKakaoUserInfo(accessToken);
 
-        // 기존 사용자 확인 후 회원가입 또는 로그인 처리
+        // 기존 사용자 확인 후 회원가입 후 로그인 처리
         User user = userRepository.findByEmail(kakaoAccount.getEmail())
                 .orElseGet(() -> {
                     // 신규 회원 가입
