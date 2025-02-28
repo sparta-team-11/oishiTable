@@ -61,13 +61,17 @@ public class PostService {
                 userId,
                 regionId,
                 cursorValue,
-                limit,
+                limit + 1,
                 randomSeed);
 
         // 10개를 조회할 때 11개를 조회가 된다면 다음페이지가 있다고 판단
         boolean hasNext = posts.size() == limit;
 
-        return new SliceImpl<>(posts, PageRequest.of(0, limit - 1), hasNext);
+        if (hasNext) {
+            posts = posts.subList(0, limit);
+        }
+
+        return new SliceImpl<>(posts, PageRequest.of(0, limit), hasNext);
     }
 
     public Slice<PostKeywordResponse> findPostsByKeyword(
@@ -82,12 +86,16 @@ public class PostService {
                 regionId,
                 cursorValue,
                 keyword,
-                limit);
+                limit + 1);
 
         // 10개를 조회할 때 11개를 조회가 된다면 다음페이지가 있다고 판단
-        boolean hasNext = posts.size() == limit;
+        boolean hasNext = posts.size() == limit + 1;
 
-        return new SliceImpl<>(posts, PageRequest.of(0, limit - 1), hasNext);
+        if (hasNext) {
+            posts = posts.subList(0, limit);
+        }
+
+        return new SliceImpl<>(posts, PageRequest.of(0, limit), hasNext);
     }
 
     @Transactional

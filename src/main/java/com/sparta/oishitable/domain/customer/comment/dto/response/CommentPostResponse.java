@@ -13,8 +13,8 @@ public class CommentPostResponse {
     private final Long userId;
     private final String username;
     private final String content;
-    private final Long replyCount;
-    private final Long likeCount;
+    private final Integer replyCount;
+    private final Integer likeCount;
     private final LocalDateTime modifiedAt;
 
     @QueryProjection
@@ -24,8 +24,8 @@ public class CommentPostResponse {
             Long userId,
             String username,
             String content,
-            Long replyCount,
-            Long likeCount,
+            Integer replyCount,
+            Integer likeCount,
             LocalDateTime modifiedAt
     ) {
         this.commentId = commentId;

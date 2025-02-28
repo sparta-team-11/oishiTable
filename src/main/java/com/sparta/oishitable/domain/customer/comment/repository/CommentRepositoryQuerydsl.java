@@ -13,5 +13,4 @@ public interface CommentRepositoryQuerydsl {
 
     List<CommentPostResponse> findPostComments(Long postId, Long cursorValue, int limit);
     Page<CommentRepliesResponse> findReplies(Long parentCommentId, Pageable pageable);
-    Optional<Comment> findCommentWithRepliesById(Long commentId);
 }

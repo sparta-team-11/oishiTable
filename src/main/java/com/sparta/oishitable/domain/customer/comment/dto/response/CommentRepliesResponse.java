@@ -13,7 +13,7 @@ public class CommentRepliesResponse {
     private final Long userId;
     private final String username;
     private final String content;
-    private final Long likeCount;
+    private final Integer likeCount;
     private final LocalDateTime modifiedAt;
 
     @QueryProjection
@@ -23,7 +23,7 @@ public class CommentRepliesResponse {
             Long userId,
             String username,
             String content,
-            Long likeCount,
+            Integer likeCount,
             LocalDateTime modifiedAt
     ) {
         this.commentId = commentId;
