@@ -1,7 +1,5 @@
 package com.sparta.oishitable.domain.customer.restaurant.waiting.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingRedisDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -9,78 +7,54 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 @Repository
 @RequiredArgsConstructor
 public class CustomerWaitingRedisRepositoryImpl implements CustomerWaitingRedisRepository {
 
-    private final RedisTemplate<String, Object> redisTemplate;
-    private final ObjectMapper objectMapper;
-
+    private final RedisTemplate<String, WaitingRedisDto> redisTemplate;
     private static final String WAITING_QUEUE_PREFIX = "restaurant_waiting_queue:";
 
     @Override
-    public void push(Long restaurantId, WaitingRedisDto waitingRedisDto) throws JsonProcessingException {
+    public void push(Long restaurantId, WaitingRedisDto waitingRedisDto) {
         String key = WAITING_QUEUE_PREFIX + restaurantId;
-        redisTemplate.opsForList().rightPush(key, objectMapper.writeValueAsString(waitingRedisDto));
+        redisTemplate.opsForList().rightPush(key, waitingRedisDto);
     }
 
     @Override
     public Optional<WaitingRedisDto> findUser(Long restaurantId, Long userId) {
-        List<Object> queue = findQueue(restaurantId);
+        List<WaitingRedisDto> queue = findQueue(restaurantId);
 
         if (queue == null || queue.isEmpty()) {
             return Optional.empty();
         }
 
         return queue.stream()
-                .filter(o -> {
-                    try {
-                        WaitingRedisDto dto = convertToDto(o);
-                        return dto.getUserId().equals(userId);
-                    } catch (JsonProcessingException e) {
-                        return false;
-                    }
-                })
-                .findFirst()
-                .map(o -> {
-                    try {
-                        return convertToDto(o);
-                    } catch (JsonProcessingException e) {
-                        return null;
-                    }
-                });
+                .filter(w -> w.getUserId().equals(userId))
+                .findFirst();
     }
 
     @Override
     public void remove(Long restaurantId, Long idx) {
         String key = WAITING_QUEUE_PREFIX + restaurantId;
-        Object target = redisTemplate.opsForList().index(key, idx);
+        WaitingRedisDto target = redisTemplate.opsForList().index(key, idx);
 
         redisTemplate.opsForList().remove(key, 1, target);
     }
 
     @Override
     public Optional<Long> findUserRank(Long userId, Long restaurantId) {
-        List<Object> queue = findQueue(restaurantId);
+        List<WaitingRedisDto> queue = findQueue(restaurantId);
 
         if (queue == null || queue.isEmpty()) {
             return Optional.empty();
         }
 
-        for (int i = 0; i < queue.size(); i++) {
-            try {
-                WaitingRedisDto dto = convertToDto(queue.get(i));
-
-                if (dto.getUserId().equals(userId)) {
-                    return Optional.of((long) i);
-                }
-            } catch (JsonProcessingException e) {
-                return Optional.empty();
-            }
-        }
-
-        return Optional.empty();
+        return IntStream.range(0, queue.size())
+                .filter(i -> queue.get(i).getUserId().equals(userId))
+                .mapToObj(i -> (long) i)
+                .findFirst();
     }
 
     @Override
@@ -89,12 +63,8 @@ public class CustomerWaitingRedisRepositoryImpl implements CustomerWaitingRedisR
         return redisTemplate.opsForList().size(key);
     }
 
-    private List<Object> findQueue(Long restaurantId) {
+    private List<WaitingRedisDto> findQueue(Long restaurantId) {
         String key = WAITING_QUEUE_PREFIX + restaurantId;
         return redisTemplate.opsForList().range(key, 0, -1);
-    }
-
-    private WaitingRedisDto convertToDto(Object o) throws JsonProcessingException {
-        return objectMapper.readValue(String.valueOf(o), WaitingRedisDto.class);
     }
 }

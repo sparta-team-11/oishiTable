@@ -1,12 +1,12 @@
 package com.sparta.oishitable.domain.customer.restaurant.waiting.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.request.WaitingJoinRequest;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueFindSizeResponse;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueFindUserRankResponse;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.CustomerWaitingRedisRepository;
+import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.CustomerWaitingRepository;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.entity.WaitingStatus;
 import com.sparta.oishitable.domain.owner.restaurant.service.OwnerRestaurantService;
@@ -26,6 +26,7 @@ public class CustomerRestaurantWaitingService {
 
     private final UserRepository userRepository;
     private final OwnerRestaurantService ownerRestaurantService;
+    private final CustomerWaitingRepository customerWaitingRepository;
     private final CustomerWaitingRedisRepository customerWaitingRedisRepository;
 
     public void joinWaitingQueue(Long userId, Long restaurantId, WaitingJoinRequest waitingQueueCreateRequest) {
@@ -47,11 +48,7 @@ public class CustomerRestaurantWaitingService {
                 .waitingType(WaitingType.of(waitingQueueCreateRequest.waitingType()))
                 .build();
 
-        try {
-            customerWaitingRedisRepository.push(restaurant.getId(), waitingRedisDto);
-        } catch (JsonProcessingException e) {
-            log.error("build to json error");
-        }
+        customerWaitingRedisRepository.push(restaurant.getId(), waitingRedisDto);
     }
 
     public void cancelWaitingQueue(Long userId, Long restaurantId) {
@@ -85,6 +82,19 @@ public class CustomerRestaurantWaitingService {
         Long size = customerWaitingRedisRepository.findQueueSize(restaurant.getId());
 
         return WaitingQueueFindSizeResponse.from(size);
+    }
+
+    private Integer getTodayLastSequence(Long restaurantId) {
+
+
+        Integer todayMaxSequence = customerWaitingRepository.findTodayMaxSequence(restaurantId)
+                .orElse(0);
+
+        return todayMaxSequence;
+    }
+
+    private void findWaitingLastSequence() {
+
     }
 
     private void isPossibleWaiting(WaitingStatus waitingStatus) {

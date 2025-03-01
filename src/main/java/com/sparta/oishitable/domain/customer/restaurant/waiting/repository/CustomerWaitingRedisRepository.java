@@ -1,13 +1,12 @@
 package com.sparta.oishitable.domain.customer.restaurant.waiting.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingRedisDto;
 
 import java.util.Optional;
 
 public interface CustomerWaitingRedisRepository {
 
-    void push(Long restaurantId, WaitingRedisDto waitingRedisDto) throws JsonProcessingException;
+    void push(Long restaurantId, WaitingRedisDto waitingRedisDto);
 
     Optional<WaitingRedisDto> findUser(Long restaurantId, Long userId);
 
