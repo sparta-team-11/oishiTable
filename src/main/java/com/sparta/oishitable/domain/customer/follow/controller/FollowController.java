@@ -1,18 +1,19 @@
 package com.sparta.oishitable.domain.customer.follow.controller;
 
-import com.sparta.oishitable.domain.customer.follow.dto.FollowUserResponse;
+import com.sparta.oishitable.domain.customer.follow.dto.response.FollowUserResponse;
 import com.sparta.oishitable.domain.customer.follow.service.FollowService;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import com.sparta.oishitable.global.util.UriBuilderUtil;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
+
+import static com.sparta.oishitable.domain.customer.follow.dto.FollowValidationMessage.*;
 
 @RestController
 @RequestMapping("/customer/api/follows")
@@ -24,7 +25,7 @@ public class FollowController {
     @PostMapping("/{followingId}")
     public ResponseEntity<Void> followUser(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @PathVariable Long followingId
+            @PathVariable @Positive(message = FOLLOWING_ID_POSITIVE) Long followingId
     ) {
         Long followId = followService.followUser(userDetails.getId(), followingId);
 
@@ -36,7 +37,7 @@ public class FollowController {
     @DeleteMapping("/{followingId}")
     public ResponseEntity<Void> unfollowUser(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @PathVariable Long followingId
+            @PathVariable @Positive(message = FOLLOWING_ID_POSITIVE) Long followingId
     ) {
         followService.unfollowUser(userDetails.getId(), followingId);
 
@@ -44,18 +45,20 @@ public class FollowController {
     }
 
     @GetMapping("/{userId}/followers")
-    public ResponseEntity<Page<FollowUserResponse>> findFollowers(
-            @PathVariable Long userId,
-            @PageableDefault Pageable pageable
+    public ResponseEntity<List<FollowUserResponse>> findFollowers(
+            @PathVariable @Positive(message = USER_ID_POSITIVE) Long userId,
+            @RequestParam(required = false) Long cursor,
+            @RequestParam(defaultValue = "10") @Positive(message = LIMIT_POSITIVE) int limit
     ) {
-        return ResponseEntity.ok(followService.findFollowers(userId, pageable));
+        return ResponseEntity.ok(followService.findFollowers(userId, cursor, limit));
     }
 
     @GetMapping("/{userId}/followings")
-    public ResponseEntity<Page<FollowUserResponse>> findFollowings(
-            @PathVariable Long userId,
-            @PageableDefault Pageable pageable
+    public ResponseEntity<List<FollowUserResponse>> findFollowings(
+            @PathVariable @Positive(message = USER_ID_POSITIVE) Long userId,
+            @RequestParam(required = false) Long cursor,
+            @RequestParam(defaultValue = "10") @Positive(message = LIMIT_POSITIVE) int limit
     ) {
-        return ResponseEntity.ok(followService.findFollowings(userId, pageable));
+        return ResponseEntity.ok(followService.findFollowings(userId, cursor, limit));
     }
 }

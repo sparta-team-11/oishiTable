@@ -7,7 +7,6 @@ import com.sparta.oishitable.domain.customer.comment.dto.response.CommentPostRes
 import com.sparta.oishitable.domain.customer.comment.dto.response.CommentRepliesResponse;
 import com.sparta.oishitable.domain.customer.comment.dto.response.QCommentPostResponse;
 import com.sparta.oishitable.domain.customer.comment.dto.response.QCommentRepliesResponse;
-import com.sparta.oishitable.domain.customer.comment.entity.Comment;
 import com.sparta.oishitable.domain.customer.comment.entity.QComment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,7 +14,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.sparta.oishitable.domain.customer.comment.entity.QComment.comment;
 import static com.sparta.oishitable.domain.customer.comment.like.entity.QCommentLike.commentLike;

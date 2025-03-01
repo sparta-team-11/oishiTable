@@ -33,7 +33,6 @@ public class CommentService {
 
     @Transactional
     public Long create(Long userId, CommentCreateRequest request) {
-
         Post post = findPostById(request.postId());
         User user = findUserById(userId);
 
@@ -63,7 +62,6 @@ public class CommentService {
 
         } else {
             // 게시글 댓글
-
             Comment comment = builder.build();
 
             // 게시글의 댓글리스트에 추가
@@ -76,7 +74,6 @@ public class CommentService {
     }
 
     public Slice<CommentPostResponse> findPostComments(Long postId, Long cursorValue, int limit) {
-
         List<CommentPostResponse> replies = commentRepository.findPostComments(
                 postId,
                 cursorValue,
@@ -99,7 +96,6 @@ public class CommentService {
 
     @Transactional
     public void update(Long userId, Long commentId, CommentUpdateRequest request) {
-
         Comment comment = findCommentById(commentId);
 
         isCommentOwner(comment.getUser().getId(), userId);
@@ -109,7 +105,6 @@ public class CommentService {
 
     @Transactional
     public void delete(Long commentId, Long userId) {
-
         Comment comment = findCommentById(commentId);
 
         isCommentOwner(comment.getUser().getId(), userId);
