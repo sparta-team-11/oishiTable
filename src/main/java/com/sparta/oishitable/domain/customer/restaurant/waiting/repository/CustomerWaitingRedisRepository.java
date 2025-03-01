@@ -15,4 +15,10 @@ public interface CustomerWaitingRedisRepository {
     Optional<Long> findUserRank(Long userId, Long restaurantId);
 
     Long findQueueSize(Long restaurantId);
+
+    void zAdd(Long restaurantId, Long userId, Integer sequence);
+
+    Optional<Integer> zFindLastSequence(Long restaurantId);
+
+    Optional<Long> zFindUserRank(Long restaurantId, Long userId);
 }

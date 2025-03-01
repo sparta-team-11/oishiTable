@@ -2,6 +2,7 @@ package com.sparta.oishitable.domain.customer.restaurant.waiting.service;
 
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
+import com.sparta.oishitable.domain.customer.reservation.entity.ReservationStatus;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.request.WaitingJoinRequest;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueFindSizeResponse;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueFindUserRankResponse;
@@ -10,7 +11,7 @@ import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.Custo
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.entity.WaitingStatus;
 import com.sparta.oishitable.domain.owner.restaurant.service.OwnerRestaurantService;
-import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingRedisDto;
+import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.Waiting;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingType;
 import com.sparta.oishitable.global.exception.ConflictException;
 import com.sparta.oishitable.global.exception.NotFoundException;
@@ -18,6 +19,8 @@ import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -33,7 +36,10 @@ public class CustomerRestaurantWaitingService {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
         isPossibleWaiting(restaurant.getWaitingStatus());
 
-        boolean isRegistered = customerWaitingRedisRepository.findUser(restaurantId, userId)
+//        boolean isRegistered = customerWaitingRedisRepository.findUser(restaurantId, userId)
+//                .isPresent();
+
+        boolean isRegistered = customerWaitingRedisRepository.zFindUserRank(restaurantId, userId)
                 .isPresent();
 
         if (isRegistered) {
@@ -42,13 +48,35 @@ public class CustomerRestaurantWaitingService {
 
         User user = findUserById(userId);
 
-        WaitingRedisDto waitingRedisDto = WaitingRedisDto.builder()
-                .userId(user.getId())
+        Integer lastSequence = findWaitingLastSequence(restaurantId);
+        Integer sequence = lastSequence + 1;
+        log.info("joined user daily sequence: {}", sequence);
+
+        Waiting waiting = Waiting.builder()
+                .user(user)
+                .restaurant(restaurant)
+                .dailySequence(sequence)
                 .totalCount(waitingQueueCreateRequest.totalCount())
-                .waitingType(WaitingType.of(waitingQueueCreateRequest.waitingType()))
+                .type(WaitingType.of(waitingQueueCreateRequest.waitingType()))
+                .status(ReservationStatus.RESERVED)
                 .build();
 
-        customerWaitingRedisRepository.push(restaurant.getId(), waitingRedisDto);
+        customerWaitingRepository.save(waiting);
+
+        customerWaitingRedisRepository.zAdd(restaurant.getId(), user.getId(), sequence);
+    }
+
+    private Integer findWaitingLastSequence(Long restaurantId) {
+        // 1.Redis 마지막 순번 조회
+        Optional<Integer> sequence = customerWaitingRedisRepository.zFindLastSequence(restaurantId);
+
+        if (sequence.isPresent()) {
+            return sequence.get();
+        }
+
+        // 2. DB 마지막 순번 조회
+        return customerWaitingRepository.findTodayLastSequence(restaurantId)
+                .orElse(0);
     }
 
     public void cancelWaitingQueue(Long userId, Long restaurantId) {
@@ -82,19 +110,6 @@ public class CustomerRestaurantWaitingService {
         Long size = customerWaitingRedisRepository.findQueueSize(restaurant.getId());
 
         return WaitingQueueFindSizeResponse.from(size);
-    }
-
-    private Integer getTodayLastSequence(Long restaurantId) {
-
-
-        Integer todayMaxSequence = customerWaitingRepository.findTodayMaxSequence(restaurantId)
-                .orElse(0);
-
-        return todayMaxSequence;
-    }
-
-    private void findWaitingLastSequence() {
-
     }
 
     private void isPossibleWaiting(WaitingStatus waitingStatus) {

@@ -1,0 +1,38 @@
+package com.sparta.oishitable.domain.customer.restaurant.waiting.repository;
+
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import static com.sparta.oishitable.domain.owner.restaurant.waiting.entity.QWaiting.waiting;
+
+@Slf4j
+@RequiredArgsConstructor
+public class CustomerWaitingQRepositoryImpl implements CustomerWaitingQRepository {
+
+    private final JPAQueryFactory queryFactory;
+
+    @Override
+    public Optional<Integer> findTodayLastSequence(Long restaurantId) {
+        LocalDateTime startOfToday = LocalDateTime.now().toLocalDate().atStartOfDay();
+        LocalDateTime endOfToday = startOfToday.plusDays(1).minusNanos(1);
+
+        log.info("startOfToday: {}", startOfToday);
+        log.info("endOfToday: {}", endOfToday);
+
+        return Optional.ofNullable(queryFactory
+                .select(
+                        waiting.dailySequence
+                )
+                .from(waiting)
+                .where(
+                        waiting.restaurant.id.eq(restaurantId),
+                        waiting.createdAt.between(startOfToday, endOfToday)
+                )
+                .orderBy(waiting.createdAt.desc())
+                .fetchFirst());
+    }
+}
