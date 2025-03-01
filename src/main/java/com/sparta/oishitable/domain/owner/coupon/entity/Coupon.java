@@ -19,16 +19,16 @@ import java.util.List;
         }
 )
 @Getter
-
 public class Coupon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "coupon_id")
     private Long id;
 
-    @Column(name = "coupon_name", nullable = false)
+    @Column(nullable = false)
     private String couponName;
 
-    @Column(name = "discount", nullable = false)
+    @Column(nullable = false)
     private Integer discount;
 
     @ManyToOne

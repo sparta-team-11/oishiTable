@@ -3,9 +3,9 @@ package com.sparta.oishitable.domain.customer.post.region.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 
-@Getter
 @Entity
 @Table(name = "regions")
+@Getter
 public class Region {
 
     @Id

@@ -24,7 +24,6 @@ public class OwnerCouponService {
     private final OwnerRestaurantService ownerRestaurantService;
     private final AuthService authService;
 
-
     @Transactional
     public CouponResponse createCoupon(
             Long userId,
@@ -33,7 +32,7 @@ public class OwnerCouponService {
     ) {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
 
-        authService.checkUserAuthority(userId, restaurant.getOwner().getId());
+        authService.checkUserAuthority(restaurant.getOwner().getId(), userId);
 
         Coupon createCoupon = Coupon.builder()
                 .couponName(request.couponName())
@@ -61,10 +60,9 @@ public class OwnerCouponService {
             Long couponId,
             Long userId
     ) {
-
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
 
-        authService.checkUserAuthority(userId, restaurant.getOwner().getId());
+        authService.checkUserAuthority(restaurant.getOwner().getId(), userId);
 
         if (!couponRepository.existsById(couponId)) {
             throw new NotFoundException(ErrorCode.COUPON_NOT_FOUND);

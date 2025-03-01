@@ -8,5 +8,5 @@ public record CouponCreateRequest(
 
         @NotNull
         Integer discount
-
-) {}
+) {
+}

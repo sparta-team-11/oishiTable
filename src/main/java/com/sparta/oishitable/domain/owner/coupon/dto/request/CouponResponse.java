@@ -21,12 +21,4 @@ public record CouponResponse(
                 coupon.getDiscount()
         );
     }
-
-    public static CouponResponse from(Coupon coupon, Long userId) {
-        return new CouponResponse(
-                coupon.getId(),
-                coupon.getCouponName(),
-                coupon.getDiscount()
-        );
-    }
 }

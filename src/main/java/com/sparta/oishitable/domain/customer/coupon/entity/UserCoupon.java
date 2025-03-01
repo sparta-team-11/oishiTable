@@ -21,9 +21,10 @@ public class UserCoupon {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_coupon_id")
     private Long id;
 
-    @Column(name = "coupon_used", nullable = false)
+    @Column(nullable = false)
     private Boolean couponUsed = false;
 
     @ManyToOne

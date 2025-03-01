@@ -1,7 +1,7 @@
 package com.sparta.oishitable.domain.customer.follow.service;
 
 import com.sparta.oishitable.domain.common.user.entity.User;
-import com.sparta.oishitable.domain.common.user.repository.UserRepository;
+import com.sparta.oishitable.domain.common.user.service.UserService;
 import com.sparta.oishitable.domain.customer.follow.dto.response.FollowUserResponse;
 import com.sparta.oishitable.domain.customer.follow.entity.Follow;
 import com.sparta.oishitable.domain.customer.follow.repository.FollowRepository;
@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class FollowService {
 
+    private final UserService userService;
     private final FollowRepository followRepository;
-    private final UserRepository userRepository;
 
     @Transactional
     @CacheEvict(value = {"followers", "followings"}, allEntries = true)
@@ -35,11 +35,8 @@ public class FollowService {
             throw new CustomRuntimeException(ErrorCode.ALREADY_FOLLOWING);
         }
 
-        User follower = userRepository.findById(followerId)
-                .orElseThrow(() -> new CustomRuntimeException(ErrorCode.USER_NOT_FOUND));
-
-        User following = userRepository.findById(followingId)
-                .orElseThrow(() -> new CustomRuntimeException(ErrorCode.USER_NOT_FOUND));
+        User follower = userService.findUserById(followerId);
+        User following = userService.findUserById(followingId);
 
         Follow follow = Follow.builder()
                 .follower(follower)
