@@ -95,4 +95,10 @@ public class CustomerWaitingRedisRepositoryImpl implements CustomerWaitingRedisR
         String key = WAITING_QUEUE_PREFIX + restaurantId;
         return Optional.ofNullable(redisTemplate.opsForZSet().rank(key, userId.toString()));
     }
+
+    @Override
+    public void zRemove(Long restaurantId, Long userId) {
+        String key = WAITING_QUEUE_PREFIX + restaurantId;
+        redisTemplate.opsForZSet().remove(key, userId.toString());
+    }
 }

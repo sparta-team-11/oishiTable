@@ -1,5 +1,6 @@
 package com.sparta.oishitable.domain.customer.restaurant.waiting.service;
 
+import com.sparta.oishitable.domain.common.auth.service.AuthService;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.domain.customer.reservation.entity.ReservationStatus;
@@ -19,6 +20,7 @@ import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -27,17 +29,16 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CustomerRestaurantWaitingService {
 
+    private final AuthService authService;
     private final UserRepository userRepository;
     private final OwnerRestaurantService ownerRestaurantService;
     private final CustomerWaitingRepository customerWaitingRepository;
     private final CustomerWaitingRedisRepository customerWaitingRedisRepository;
 
+    @Transactional
     public void joinWaitingQueue(Long userId, Long restaurantId, WaitingJoinRequest waitingQueueCreateRequest) {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
         isPossibleWaiting(restaurant.getWaitingStatus());
-
-//        boolean isRegistered = customerWaitingRedisRepository.findUser(restaurantId, userId)
-//                .isPresent();
 
         boolean isRegistered = customerWaitingRedisRepository.zFindUserRank(restaurantId, userId)
                 .isPresent();
@@ -48,7 +49,7 @@ public class CustomerRestaurantWaitingService {
 
         User user = findUserById(userId);
 
-        Integer lastSequence = findWaitingLastSequence(restaurantId);
+        Integer lastSequence = findWaitingLastSequence(restaurant.getId());
         Integer sequence = lastSequence + 1;
         log.info("joined user daily sequence: {}", sequence);
 
@@ -66,6 +67,26 @@ public class CustomerRestaurantWaitingService {
         customerWaitingRedisRepository.zAdd(restaurant.getId(), user.getId(), sequence);
     }
 
+    @Transactional
+    public void cancelWaitingQueue(Long userId, Long restaurantId, Long waitingId) {
+        Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
+        isPossibleWaiting(restaurant.getWaitingStatus());
+
+        User user = findUserById(userId);
+
+        customerWaitingRedisRepository.zFindUserRank(restaurantId, userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND));
+
+        Waiting waiting = customerWaitingRepository.findById(waitingId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_NOT_FOUND));
+
+        authService.checkUserAuthority(waiting.getUser().getId(), user.getId());
+
+        waiting.updateStatus(ReservationStatus.CANCELED);
+
+        customerWaitingRedisRepository.zRemove(restaurant.getId(), user.getId());
+    }
+
     private Integer findWaitingLastSequence(Long restaurantId) {
         // 1.Redis 마지막 순번 조회
         Optional<Integer> sequence = customerWaitingRedisRepository.zFindLastSequence(restaurantId);
@@ -77,18 +98,6 @@ public class CustomerRestaurantWaitingService {
         // 2. DB 마지막 순번 조회
         return customerWaitingRepository.findTodayLastSequence(restaurantId)
                 .orElse(0);
-    }
-
-    public void cancelWaitingQueue(Long userId, Long restaurantId) {
-        Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
-        isPossibleWaiting(restaurant.getWaitingStatus());
-
-        User user = findUserById(userId);
-
-        Long rank = customerWaitingRedisRepository.findUserRank(user.getId(), restaurant.getId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND));
-
-        customerWaitingRedisRepository.remove(restaurant.getId(), rank);
     }
 
     public WaitingQueueFindUserRankResponse findWaitingQueueUserRank(Long userId, Long restaurantId) {

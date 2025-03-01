@@ -50,12 +50,13 @@ public class CustomerRestaurantWaitingController {
         return ResponseEntity.ok(waitingQueueUserRankResponse);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{waitingId}")
     public ResponseEntity<Void> cancelWaiting(
+            @PathVariable Long waitingId,
             @PathVariable Long restaurantId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        customerRestaurantWaitingService.cancelWaitingQueue(userDetails.getId(), restaurantId);
+        customerRestaurantWaitingService.cancelWaitingQueue(userDetails.getId(), restaurantId, waitingId);
 
         return ResponseEntity.noContent().build();
     }

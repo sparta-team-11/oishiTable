@@ -21,4 +21,6 @@ public interface CustomerWaitingRedisRepository {
     Optional<Integer> zFindLastSequence(Long restaurantId);
 
     Optional<Long> zFindUserRank(Long restaurantId, Long userId);
+
+    void zRemove(Long restaurantId, Long userId);
 }
