@@ -7,9 +7,9 @@ import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingType;
 public record WaitingDetails(
         Long waitingId,
         Long userId,
-        String name,
+        String userName,
         Integer totalCount,
-        String phoneNumber,
+        String userPhoneNumber,
         ReservationStatus status,
         WaitingType type
 ) {

@@ -43,7 +43,12 @@ public class OwnerRestaurantWaitingService {
         String key = getWaitingKey(restaurantId, WaitingType.of(waitingType));
 
         Long totalElements = ownerWaitingRedisRepository.findQueueSize(key);
+
         int totalPages = (int) Math.ceil((double) totalElements / size) - 1;
+
+        if (totalPages < 0) {
+            totalPages = 0;
+        }
 
         List<WaitingDetails> waitingUserDetails = Collections.emptyList();
 
