@@ -10,10 +10,32 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: list files
-        run: |
-          ls -al
-          echo "Done listing"
+
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Gradle build
+        run: ./gradlew clean build --no-daemon -x test
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/oishitable:latest
+
       # 1. Docker Hub에서 최신 이미지를 Pull하도록 배포 서버에 전달할 docker-compose-prod.yaml 파일 복사
       - name: Copy docker-compose-prod.yaml to prod server
         uses: appleboy/scp-action@v0.1.7
