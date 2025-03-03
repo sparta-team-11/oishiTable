@@ -127,8 +127,9 @@ public class Restaurant extends BaseEntity {
 
     public void updateMinMaxPrice() {
         Menus menus = new Menus(this.menus);
-        updateMinPrice(menus.getMinPrice());
-        updateMaxPrice(menus.getMaxPrice());
+
+        this.minPrice = CalculatorUtil.ceilToNearestTenThousand(menus.getMinPrice());
+        this.minPrice = CalculatorUtil.ceilToNearestTenThousand(menus.getMaxPrice());
     }
 
     public void updateMinMaxPrice(List<Menu> newMenus) {

@@ -1,0 +1,69 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ "main" ] # MAIN 에 PUSH / PR 시 발동
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Gradle build
+        run: ./gradlew clean build --no-daemon -x test
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/oishitable:latest
+
+      # 1. Docker Hub에서 최신 이미지를 Pull하도록 배포 서버에 전달할 docker-compose-prod.yaml 파일 복사
+      - name: Copy docker-compose-prod.yaml to prod server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST_PROD }}
+          username: ubuntu
+          key: ${{ secrets.PRIVATE_KEY }}
+          source: "./docker-compose-prod.yaml"
+          target: "~"
+
+      # 2. 프로덕션 서버에 SSH로 접속하여 배포 스크립트 실행
+      - name: Deploy to Production Server
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST_PROD }}
+          username: ubuntu
+          key: ${{ secrets.PRIVATE_KEY }}
+          script: |
+            # 현재 실행 중인 컨테이너 확인
+            docker ps
+            # 기존 컨테이너 중지 및 제거
+            docker-compose -f docker-compose-prod.yaml down
+            # Docker Hub에서 최신 이미지 Pull (이미지가 업데이트 되어 있다면)
+            docker-compose -f docker-compose-prod.yaml pull
+            # 컨테이너를 백그라운드 실행
+            docker-compose -f docker-compose-prod.yaml up -d
+            # 필요 없는 도커 이미지 정리
+            docker image prune -f

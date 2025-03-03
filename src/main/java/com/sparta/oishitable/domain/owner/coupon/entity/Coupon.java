@@ -13,15 +13,22 @@ import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "coupons")
+@Table(name = "coupons",
+        indexes = {
+                @Index(name = "idx_restaurant_id", columnList = "restaurant_id")
+        }
+)
 @Getter
-
 public class Coupon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "coupon_id")
     private Long id;
 
-    @Column(name = "discount", nullable = false)
+    @Column(nullable = false)
+    private String couponName;
+
+    @Column(nullable = false)
     private Integer discount;
 
     @ManyToOne
@@ -33,9 +40,11 @@ public class Coupon {
 
     @Builder
     public Coupon(
+            String couponName,
             Integer discount,
             Restaurant restaurant
     ) {
+        this.couponName = couponName;
         this.discount = discount;
         this.restaurant = restaurant;
     }

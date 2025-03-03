@@ -7,29 +7,51 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+import static com.sparta.oishitable.domain.common.auth.dto.AuthValidationMessage.*;
+
 public record AuthSignupRequest(
-        @NotBlank(message = "이메일 입력은 필수입니다.")
+        @NotBlank(message = EMAIL_BLANK_MESSAGE)
         @Pattern(
-                regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]$",
-                message = "올바른 이메일 형식을 입력해주세요."
+                regexp = EMAIL_REG,
+                message = INVALID_EMAIL_MESSAGE
         )
         String email,
 
-        @NotBlank(message = "비밀번호 입력은 필수입니다.")
-        @Size(min = 8, max = 20, message = "비밀번호는 8자 이상 20자 이내여야 합니다.")
+        @NotBlank(message = PASSWORD_BLANK_MESSAGE)
+        @Size(
+                min = PASSWORD_MIN,
+                max = PASSWORD_MAX,
+                message = PASSWORD_RANGE_MESSAGE)
         @Pattern(
-                regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,20}$",
-                message = "비밀번호는 대소문자, 숫자, 특수문자를 최소 1개씩 포함해야 합니다."
+                regexp = PASSWORD_REG,
+                message = INVALID_PASSWORD_MESSAGE
         )
         String password,
 
-        @NotBlank(message = "이름 입력은 필수입니다.")
+        @NotBlank(message = NAME_BLANK_MESSAGE)
+        @Size(
+                min = NAME_MIN,
+                max = NAME_MAX,
+                message = NAME_RANGE_MESSAGE
+        )
         String name,
 
-        @NotBlank(message = "전화번호 입력은 필수입니다.")
+        @NotBlank(message = NICKNAME_BLANK_MESSAGE)
+        @Size(
+                min = NICKNAME_MIN,
+                max = NICKNAME_MAX,
+                message = NICKNAME_RANGE_MESSAGE
+        )
+        String nickname,
+
+        @NotBlank(message = PHONE_NUMBER_BLANK_MESSAGE)
+        @Pattern(
+                regexp = PHONE_NUMBER_REG,
+                message = INVALID_PHONE_NUMBER_MESSAGE
+        )
         String phoneNumber,
 
-        @NotNull
+        @NotNull(message = ROLE_NULL_MESSAGE)
         UserRole userRole
 ) {
 
@@ -38,6 +60,7 @@ public record AuthSignupRequest(
                 .email(email)
                 .password(encodedPassword)
                 .name(name)
+                .nickname(nickname)
                 .phoneNumber(phoneNumber)
                 .role(userRole)
                 .build();
