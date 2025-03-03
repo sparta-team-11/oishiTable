@@ -29,7 +29,7 @@ public class CustomerRestaurantWaitingController {
         return ResponseEntity.created(null).build();
     }
 
-    @GetMapping("/size")
+    @GetMapping
     public ResponseEntity<WaitingQueueFindSizeResponse> findWaitingQueueSize(
             @PathVariable Long restaurantId
     ) {
