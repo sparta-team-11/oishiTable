@@ -35,9 +35,6 @@ public class CustomerRestaurantWaitingService {
     private final CustomerWaitingRepository customerWaitingRepository;
     private final CustomerWaitingRedisRepository customerWaitingRedisRepository;
 
-    private static final String WAITING_IN_RESTAURANT_QUEUE_PREFIX = "in_restaurant_waiting_queue:";
-    private static final String WAITING_TAKE_OUT_QUEUE_PREFIX = "take_out_waiting_queue:";
-
     @Transactional
     public void joinWaitingQueue(Long userId, Long restaurantId, WaitingJoinRequest waitingQueueCreateRequest) {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
@@ -151,9 +148,7 @@ public class CustomerRestaurantWaitingService {
     }
 
     private String getKeyByWaitingType(Long restaurantId, WaitingType waitingType) {
-        return waitingType == WaitingType.IN
-                ? WAITING_IN_RESTAURANT_QUEUE_PREFIX + restaurantId
-                : WAITING_TAKE_OUT_QUEUE_PREFIX + restaurantId;
+        return waitingType.getPrefix() + restaurantId;
     }
 
     private void isPossibleWaiting(WaitingStatus waitingStatus) {
