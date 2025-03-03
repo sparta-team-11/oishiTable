@@ -1,6 +1,6 @@
 services:
   app:
-    image: oishitable:latest
+    image: ${DOCKER_HUB_USERNAME}/oishitable:latest
     container_name: oishitable-app
     restart: always
     depends_on:
