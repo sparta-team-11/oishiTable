@@ -21,9 +21,6 @@ public class CustomerWaitingQRepositoryImpl implements CustomerWaitingQRepositor
         LocalDateTime startOfToday = LocalDateTime.now().toLocalDate().atStartOfDay();
         LocalDateTime endOfToday = startOfToday.plusDays(1).minusNanos(1);
 
-        log.info("startOfToday: {}", startOfToday);
-        log.info("endOfToday: {}", endOfToday);
-
         return Optional.ofNullable(queryFactory
                 .select(
                         waiting.dailySequence
