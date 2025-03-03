@@ -81,9 +81,7 @@ public class CustomerRestaurantWaitingService {
         isPossibleWaiting(restaurant.getWaitingStatus());
 
         User user = findUserById(userId);
-
-        Waiting waiting = customerWaitingRepository.findById(waitingId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_NOT_FOUND));
+        Waiting waiting = findWaitingById(waitingId);
 
         authService.checkUserAuthority(waiting.getUser().getId(), user.getId());
 
@@ -97,20 +95,19 @@ public class CustomerRestaurantWaitingService {
         customerWaitingRedisRepository.zRemove(key, user.getId());
     }
 
-    public WaitingQueueFindUserRankResponse findWaitingQueueUserRank(Long userId, Long restaurantId) {
+    public WaitingQueueFindUserRankResponse findWaitingQueueUserRank(Long userId, Long restaurantId, Long waitingId) {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
         isPossibleWaiting(restaurant.getWaitingStatus());
 
         User user = findUserById(userId);
+        Waiting waiting = findWaitingById(waitingId);
 
-        String inRestaurantKey = getKeyByWaitingType(restaurant.getId(), WaitingType.IN);
-        String takeOutKey = getKeyByWaitingType(restaurant.getId(), WaitingType.OUT);
+        authService.checkUserAuthority(waiting.getUser().getId(), user.getId());
 
-        Long rank = customerWaitingRedisRepository.zFindUserRank(inRestaurantKey, user.getId())
-                .orElseGet(() ->
-                        customerWaitingRedisRepository.zFindUserRank(takeOutKey, user.getId())
-                                .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND))
-                );
+        String key = getKeyByWaitingType(restaurant.getId(), waiting.getType());
+
+        Long rank = customerWaitingRedisRepository.zFindUserRank(key, user.getId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND));
 
         return WaitingQueueFindUserRankResponse.from(rank);
     }
@@ -163,6 +160,11 @@ public class CustomerRestaurantWaitingService {
         if (waitingStatus.equals(WaitingStatus.CLOSE)) {
             throw new ConflictException(ErrorCode.RESTAURANT_WAITING_IS_CLOSED);
         }
+    }
+
+    private Waiting findWaitingById(Long waitingId) {
+        return customerWaitingRepository.findById(waitingId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_NOT_FOUND));
     }
 
     private User findUserById(Long userId) {

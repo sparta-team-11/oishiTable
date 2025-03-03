@@ -39,13 +39,14 @@ public class CustomerRestaurantWaitingController {
         return ResponseEntity.ok(waitingQueueSizeResponse);
     }
 
-    @GetMapping
+    @GetMapping("/{waitingId}")
     public ResponseEntity<WaitingQueueFindUserRankResponse> findWaitingQueueUserRank(
+            @PathVariable Long waitingId,
             @PathVariable Long restaurantId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         WaitingQueueFindUserRankResponse waitingQueueUserRankResponse
-                = customerRestaurantWaitingService.findWaitingQueueUserRank(userDetails.getId(), restaurantId);
+                = customerRestaurantWaitingService.findWaitingQueueUserRank(userDetails.getId(), restaurantId, waitingId);
 
         return ResponseEntity.ok(waitingQueueUserRankResponse);
     }
