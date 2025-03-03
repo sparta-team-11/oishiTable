@@ -61,8 +61,9 @@ public class KakaoService {
                 .orElseGet(() -> {
                     // 신규 회원 가입
                     User newUser = User.builder()
+                            .nickname(kakaoAccount.getProfile().getNickname())
                             .email(kakaoAccount.getEmail())
-                            .name(kakaoAccount.getProfile().getNickname())
+                            .name(kakaoAccount.getName())
                             .phoneNumber(kakaoAccount.getPhoneNumber())
                             .role(UserRole.CUSTOMER)
                             .build();
