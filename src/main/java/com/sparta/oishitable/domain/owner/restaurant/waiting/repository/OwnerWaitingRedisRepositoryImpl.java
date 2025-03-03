@@ -5,40 +5,37 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
-public class OwnerWaitingRedisRepositoryImpl {
+public class OwnerWaitingRedisRepositoryImpl implements OwnerWaitingRedisRepository {
 
     private final RedisTemplate<String, String> redisTemplate;
-    private static final String WAITING_QUEUE_PREFIX = "restaurant_waiting_queue:";
 
-    public List<Long> findWaitingUsers(Long restaurantId, int page, int size) {
-        String key = WAITING_QUEUE_PREFIX + restaurantId;
-
+    @Override
+    public List<Long> findWaitingUsers(String key, int page, int size) {
         long start = (long) page * size;
         long end = start + size - 1;
 
-        return redisTemplate.opsForList().range(key, start, end).stream()
+        Set<String> queue = redisTemplate.opsForZSet().range(key, start, end);
+
+        if (queue == null || queue.isEmpty()) {
+            return List.of();
+        }
+
+        return queue.stream()
                 .map(Long::parseLong)
                 .toList();
     }
 
-    public Long findQueueSize(Long restaurantId) {
-        String key = WAITING_QUEUE_PREFIX + restaurantId;
-
-        return redisTemplate.opsForList().size(key);
+    @Override
+    public Long findQueueSize(String key) {
+        return redisTemplate.opsForZSet().zCard(key);
     }
 
-    public void clearWaitingQueue(Long restaurantId) {
-        String key = WAITING_QUEUE_PREFIX + restaurantId;
-
-        redisTemplate.delete(key);
-    }
-
-    public Long deleteUserFromWaitingQueue(Long userId, Long restaurantId) {
-        String key = WAITING_QUEUE_PREFIX + restaurantId;
-
-        return redisTemplate.opsForList().remove(key, 1, userId.toString());
+    @Override
+    public Long deleteWaitingUser(String key, Long userId) {
+        return redisTemplate.opsForZSet().remove(key, userId.toString());
     }
 }
