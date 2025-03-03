@@ -21,7 +21,7 @@ public class CustomerWaitingRedisRepositoryImpl implements CustomerWaitingRedisR
 
     @Override
     public Optional<Integer> zFindLastSequence(String key) {
-        Set<ZSetOperations.TypedTuple<String>> records = redisTemplate.opsForZSet().reverseRangeWithScores(key, 1, -1);
+        Set<ZSetOperations.TypedTuple<String>> records = redisTemplate.opsForZSet().reverseRangeWithScores(key, 0, 0);
 
         if (records == null || records.isEmpty()) {
             return Optional.empty();

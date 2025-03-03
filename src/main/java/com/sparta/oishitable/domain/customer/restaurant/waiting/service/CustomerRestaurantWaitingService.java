@@ -135,7 +135,6 @@ public class CustomerRestaurantWaitingService {
     private Integer findWaitingNextSequence(Long restaurantId, WaitingType waitingType) {
         // 1.Redis 마지막 순번 조회
         String key = getWaitingKey(restaurantId, waitingType);
-
         Optional<Integer> sequence = customerWaitingRedisRepository.zFindLastSequence(key);
 
         if (sequence.isPresent()) {
