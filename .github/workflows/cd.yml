@@ -14,9 +14,20 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
+      - name: Create .env file
+        run: |
+            echo "RDS_USERNAME=${{ secrets.RDS_USERNAME  }}" > .env
+            echo "RDS_PASSWORD=${{ secrets.RDS_PASSWORD }}" > .env
+            echo "JWT_SECRET_ACCESS=${{ secrets.JWT_SECRET_ACCESS }}" >> .env
+            echo "JWT_SECRET_REFRESH=${{ secrets.JWT_SECRET_REFRESH }}" >> .env
+            echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" >> .env
+            echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> .env
+            echo "KAKAO_AUTH_CLIENT=${{ secrets.KAKAO_AUTH_CLIENT }}" >> .env
+            echo "KAKAO_API_KEY=${{ secrets.KAKAO_API_KEY }}" >> .env
+
       - name: Make gradlew executable
         run: chmod +x ./gradlew
-        
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
