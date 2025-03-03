@@ -10,6 +10,13 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.HOST_PROD }} >> ~/.ssh/known_hosts
+
       # 1. Docker Hub에서 최신 이미지를 Pull하도록 배포 서버에 전달할 docker-compose-prod.yaml 파일 복사
       - name: Copy docker-compose-prod.yaml to prod server
         uses: appleboy/scp-action@v0.1.7
