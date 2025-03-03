@@ -79,9 +79,16 @@ public class CustomerRestaurantWaitingService {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
         isPossibleWaiting(restaurant.getWaitingStatus());
 
-        User user = findUserById(userId);
         Waiting waiting = findWaitingById(waitingId);
+        if (waiting.getStatus().equals(ReservationStatus.COMPLETED)) {
+            throw new ConflictException(ErrorCode.ALREADY_COMPLETED_WAITING_EXCEPTION);
+        }
 
+        if (waiting.getStatus().equals(ReservationStatus.CANCELED)) {
+            throw new ConflictException(ErrorCode.ALREADY_CANCELED_WAITING_EXCEPTION);
+        }
+
+        User user = findUserById(userId);
         authService.checkUserAuthority(waiting.getUser().getId(), user.getId());
 
         String key = getWaitingKey(waiting.getRestaurant().getId(), waiting.getType());
