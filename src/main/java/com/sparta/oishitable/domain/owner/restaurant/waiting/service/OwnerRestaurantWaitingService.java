@@ -98,6 +98,8 @@ public class OwnerRestaurantWaitingService {
         }
 
         waiting.updateStatus(ReservationStatus.CANCELED);
+
+        // 삭제된 유저에게 취소 됨을 알리는 알림 전송 추가
     }
 
     private String getWaitingKey(Long restaurantId, WaitingType waitingType) {

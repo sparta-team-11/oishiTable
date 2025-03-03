@@ -70,6 +70,8 @@ public class CustomerRestaurantWaitingService {
         customerWaitingRepository.save(waiting);
 
         customerWaitingRedisRepository.zAdd(requestedWaitingKey, user.getId(), waiting.getDailySequence());
+
+        // 유저에게 대기열 등록에 성공함을 알리는 알림 전송 추가
     }
 
     @Transactional
@@ -90,6 +92,8 @@ public class CustomerRestaurantWaitingService {
         waiting.updateStatus(ReservationStatus.CANCELED);
 
         customerWaitingRedisRepository.zRemove(key, user.getId());
+
+        // 유저에게 대기열 취소에 성공함을 알리는 알림 전송 추가
     }
 
     public WaitingQueueFindUserRankResponse findWaitingQueueUserRank(Long userId, Long restaurantId, Long waitingId) {
