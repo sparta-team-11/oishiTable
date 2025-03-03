@@ -10,9 +10,10 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name:
-            Debug: list files
-      - run: ls -al
+      - name: list files
+        run: |
+          ls -al
+          echo "Done listing"
       # 1. Docker Hub에서 최신 이미지를 Pull하도록 배포 서버에 전달할 docker-compose-prod.yaml 파일 복사
       - name: Copy docker-compose-prod.yaml to prod server
         uses: appleboy/scp-action@v0.1.7
