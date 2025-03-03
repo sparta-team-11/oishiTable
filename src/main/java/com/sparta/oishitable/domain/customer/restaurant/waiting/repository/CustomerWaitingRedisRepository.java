@@ -1,26 +1,16 @@
 package com.sparta.oishitable.domain.customer.restaurant.waiting.repository;
 
-import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingRedisDto;
-
 import java.util.Optional;
 
 public interface CustomerWaitingRedisRepository {
 
-    void push(Long restaurantId, WaitingRedisDto waitingRedisDto);
+    void zAdd(String key, Long userId, Integer sequence);
 
-    Optional<WaitingRedisDto> findUser(Long restaurantId, Long userId);
+    Optional<Integer> zFindLastSequence(String key);
 
-    void remove(Long restaurantId, Long idx);
+    Optional<Long> zFindUserRank(String key, Long userId);
 
-    Optional<Long> findUserRank(Long userId, Long restaurantId);
+    void zRemove(String key, Long userId);
 
-    Long findQueueSize(Long restaurantId);
-
-    void zAdd(Long restaurantId, Long userId, Integer sequence);
-
-    Optional<Integer> zFindLastSequence(Long restaurantId);
-
-    Optional<Long> zFindUserRank(Long restaurantId, Long userId);
-
-    void zRemove(Long restaurantId, Long userId);
+    Long zCard(String key);
 }

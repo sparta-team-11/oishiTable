@@ -35,36 +35,44 @@ public class CustomerRestaurantWaitingService {
     private final CustomerWaitingRepository customerWaitingRepository;
     private final CustomerWaitingRedisRepository customerWaitingRedisRepository;
 
+    private static final String WAITING_IN_RESTAURANT_QUEUE_PREFIX = "in_restaurant_waiting_queue:";
+    private static final String WAITING_TAKE_OUT_QUEUE_PREFIX = "take_out_waiting_queue:";
+
     @Transactional
     public void joinWaitingQueue(Long userId, Long restaurantId, WaitingJoinRequest waitingQueueCreateRequest) {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
         isPossibleWaiting(restaurant.getWaitingStatus());
 
-        boolean isRegistered = customerWaitingRedisRepository.zFindUserRank(restaurantId, userId)
-                .isPresent();
-
-        if (isRegistered) {
-            throw new ConflictException(ErrorCode.ALREADY_REGISTERED_USER_IN_WAITING_QUEUE);
-        }
-
         User user = findUserById(userId);
 
-        Integer lastSequence = findWaitingLastSequence(restaurant.getId());
-        Integer sequence = lastSequence + 1;
+        isExistsInWaiting(restaurant.getId(), user.getId(), WaitingType.IN);
+        isExistsInWaiting(restaurant.getId(), user.getId(), WaitingType.OUT);
+
+        WaitingType waitingType = WaitingType.of(waitingQueueCreateRequest.waitingType());
+        String requestedWaitingKey = getKeyByWaitingType(restaurant.getId(), waitingType);
+        // TODO: 동시성 처리
+        Integer sequence = findWaitingNextSequence(restaurant.getId(), waitingType);
+
         log.info("joined user daily sequence: {}", sequence);
+
+        int totalCount = waitingQueueCreateRequest.totalCount();
+
+        if (waitingType.equals(WaitingType.OUT)) {
+            totalCount = 1;
+        }
 
         Waiting waiting = Waiting.builder()
                 .user(user)
                 .restaurant(restaurant)
                 .dailySequence(sequence)
-                .totalCount(waitingQueueCreateRequest.totalCount())
-                .type(WaitingType.of(waitingQueueCreateRequest.waitingType()))
+                .totalCount(totalCount)
+                .type(waitingType)
                 .status(ReservationStatus.RESERVED)
                 .build();
 
         customerWaitingRepository.save(waiting);
 
-        customerWaitingRedisRepository.zAdd(restaurant.getId(), user.getId(), sequence);
+        customerWaitingRedisRepository.zAdd(requestedWaitingKey, user.getId(), waiting.getDailySequence());
     }
 
     @Transactional
@@ -74,30 +82,19 @@ public class CustomerRestaurantWaitingService {
 
         User user = findUserById(userId);
 
-        customerWaitingRedisRepository.zFindUserRank(restaurantId, userId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND));
-
         Waiting waiting = customerWaitingRepository.findById(waitingId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_NOT_FOUND));
 
         authService.checkUserAuthority(waiting.getUser().getId(), user.getId());
 
+        String key = getKeyByWaitingType(waiting.getRestaurant().getId(), waiting.getType());
+
+        customerWaitingRedisRepository.zFindUserRank(key, userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND));
+
         waiting.updateStatus(ReservationStatus.CANCELED);
 
-        customerWaitingRedisRepository.zRemove(restaurant.getId(), user.getId());
-    }
-
-    private Integer findWaitingLastSequence(Long restaurantId) {
-        // 1.Redis 마지막 순번 조회
-        Optional<Integer> sequence = customerWaitingRedisRepository.zFindLastSequence(restaurantId);
-
-        if (sequence.isPresent()) {
-            return sequence.get();
-        }
-
-        // 2. DB 마지막 순번 조회
-        return customerWaitingRepository.findTodayLastSequence(restaurantId)
-                .orElse(0);
+        customerWaitingRedisRepository.zRemove(key, user.getId());
     }
 
     public WaitingQueueFindUserRankResponse findWaitingQueueUserRank(Long userId, Long restaurantId) {
@@ -106,8 +103,14 @@ public class CustomerRestaurantWaitingService {
 
         User user = findUserById(userId);
 
-        Long rank = customerWaitingRedisRepository.findUserRank(user.getId(), restaurant.getId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND));
+        String inRestaurantKey = getKeyByWaitingType(restaurant.getId(), WaitingType.IN);
+        String takeOutKey = getKeyByWaitingType(restaurant.getId(), WaitingType.OUT);
+
+        Long rank = customerWaitingRedisRepository.zFindUserRank(inRestaurantKey, user.getId())
+                .orElseGet(() ->
+                        customerWaitingRedisRepository.zFindUserRank(takeOutKey, user.getId())
+                                .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND))
+                );
 
         return WaitingQueueFindUserRankResponse.from(rank);
     }
@@ -116,13 +119,48 @@ public class CustomerRestaurantWaitingService {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
         isPossibleWaiting(restaurant.getWaitingStatus());
 
-        Long size = customerWaitingRedisRepository.findQueueSize(restaurant.getId());
+        String inRestaurantKey = getKeyByWaitingType(restaurant.getId(), WaitingType.IN);
+        Long inRestaurantWaitingSize = customerWaitingRedisRepository.zCard(inRestaurantKey);
 
-        return WaitingQueueFindSizeResponse.from(size);
+        String takeOutKey = getKeyByWaitingType(restaurant.getId(), WaitingType.OUT);
+        Long takeOutWaitingSize = customerWaitingRedisRepository.zCard(takeOutKey);
+
+        return WaitingQueueFindSizeResponse.from(inRestaurantWaitingSize, takeOutWaitingSize);
+    }
+
+    private void isExistsInWaiting(Long restaurantId, Long userId, WaitingType waitingType) {
+        String inRestaurantKey = getKeyByWaitingType(restaurantId, waitingType);
+        boolean isExists = customerWaitingRedisRepository.zFindUserRank(inRestaurantKey, userId)
+                .isPresent();
+
+        if (isExists) {
+            throw new ConflictException(ErrorCode.ALREADY_REGISTERED_USER_IN_WAITING_QUEUE);
+        }
+    }
+
+    private Integer findWaitingNextSequence(Long restaurantId, WaitingType waitingType) {
+        // 1.Redis 마지막 순번 조회
+        String key = getKeyByWaitingType(restaurantId, waitingType);
+
+        Optional<Integer> sequence = customerWaitingRedisRepository.zFindLastSequence(key);
+
+        if (sequence.isPresent()) {
+            return sequence.get() + 1;
+        }
+
+        // 2. DB 마지막 순번 조회
+        return customerWaitingRepository.findTodayLastSequence(restaurantId, waitingType)
+                .orElse(0) + 1;
+    }
+
+    private String getKeyByWaitingType(Long restaurantId, WaitingType waitingType) {
+        return waitingType == WaitingType.IN
+                ? WAITING_IN_RESTAURANT_QUEUE_PREFIX + restaurantId
+                : WAITING_TAKE_OUT_QUEUE_PREFIX + restaurantId;
     }
 
     private void isPossibleWaiting(WaitingStatus waitingStatus) {
-        if (waitingStatus == WaitingStatus.CLOSE) {
+        if (waitingStatus.equals(WaitingStatus.CLOSE)) {
             throw new ConflictException(ErrorCode.RESTAURANT_WAITING_IS_CLOSED);
         }
     }
