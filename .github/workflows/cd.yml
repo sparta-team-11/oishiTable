@@ -16,7 +16,8 @@ jobs:
 
       - name: Create .env file
         run: |
-            echo "ROOT_PW=${{ secrets.ROOT_PW }}" > .env
+            echo "RDS_USERNAME=${{ secrets.RDS_USERNAME  }}" > .env
+            echo "RDS_PASSWORD=${{ secrets.RDS_PASSWORD }}" > .env
             echo "JWT_SECRET_ACCESS=${{ secrets.JWT_SECRET_ACCESS }}" >> .env
             echo "JWT_SECRET_REFRESH=${{ secrets.JWT_SECRET_REFRESH }}" >> .env
             echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" >> .env

@@ -9,25 +9,25 @@ services:
       - rabbitmq
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://database:3306/oishitable
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: ${{ secrets.ROOT_PW }}
+      SPRING_DATASOURCE_USERNAME: ${RDS_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${RDS_PASSWORD}
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: guest
       SPRING_RABBITMQ_PASSWORD: guest
-      SPRING_JWT_SECRET_ACCESS: ${{ secrets.JWT_SECRET_ACCESS }}
-      SPRING_JWT_SECRET_REFRESH: ${{ secrets.JWT_SECRET_REFRESH }}
+      SPRING_JWT_SECRET_ACCESS: ${JWT_SECRET_ACCESS}
+      SPRING_JWT_SECRET_REFRESH: ${JWT_SECRET_REFRESH}
       SPRING_MAIL_HOST: smtp.gmail.com
       SPRING_MAIL_PORT: 587
-      SPRING_MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
-      SPRING_MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+      SPRING_MAIL_USERNAME: ${MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD}
       SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: true
       SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: true
-      KAKAO_AUTH_CLIENT: ${{ secrets.KAKAO_AUTH_CLIENT }}
+      KAKAO_AUTH_CLIENT: ${KAKAO_AUTH_CLIENT}
       KAKAO_AUTH_REDIRECT: https://oishitable.link/api/auth/kakao/callback
-      KAKAO_API_KEY: ${{ secrets.KAKAO_API_KEY }}
+      KAKAO_API_KEY: ${KAKAO_API_KEY}
     ports:
       - "8080:8080"
     logging:
@@ -40,8 +40,8 @@ services:
     image: mysql:latest
     container_name: mysql-container
     environment:
-      MYSQL_DATABASE: oishitable
-      MYSQL_ROOT_PASSWORD: ${{ secrets.ROOT_PW }}
+      MYSQL_DATABASE: ${RDS_USERNAME}
+      MYSQL_ROOT_PASSWORD: ${RDS_PASSWORD}
       TZ: Asia/Seoul
     ports:
       - "3307:3306"
