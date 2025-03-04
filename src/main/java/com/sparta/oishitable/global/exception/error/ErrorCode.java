@@ -22,6 +22,7 @@ public enum ErrorCode {
 
     // 식당 관련 익셉션
     RESTAURANT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 식당 입니다."),
+    INVALID_DISTANCE_REQUEST(HttpStatus.BAD_REQUEST, "올바르지 않은 거리가 요청에 포함되어 있습니다."),
 
     // SeatType 관련 익셉션
     SEAT_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 좌석 타입 입니다."),
@@ -67,7 +68,6 @@ public enum ErrorCode {
 
     // 게시글 관련 익셉션
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게시글 입니다."),
-
     POST_NOT_EQUAL(HttpStatus.BAD_REQUEST, "해당 게시글이 아닙니다."),
 
     // 댓글 관련 익셉션
@@ -108,8 +108,7 @@ public enum ErrorCode {
     INVALID_WAITING_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 웨이팅 타입입니다."),
     ALREADY_REGISTERED_USER_IN_WAITING_QUEUE(HttpStatus.CONFLICT, "이미 대기열에 등록된 고객입니다."),
     WAITING_QUEUE_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "대기열에 등록되지 않은 고객입니다."),
-    RESTAURANT_WAITING_IS_CLOSED(HttpStatus.BAD_REQUEST, "식당의 대기열이 닫혀있습니다."),
-    ;
+    RESTAURANT_WAITING_IS_CLOSED(HttpStatus.BAD_REQUEST, "식당의 대기열이 닫혀있습니다.");
 
     private final HttpStatus status;
     private final String message;

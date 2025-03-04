@@ -8,15 +8,18 @@ public class RestaurantSimpleResponse {
     private final Long restaurantId;
     private final String restaurantName;
     private final String address;
+    private final Double distance;
 
     @QueryProjection
     public RestaurantSimpleResponse(
             Long restaurantId,
             String restaurantName,
-            String address
+            String address,
+            Double distance
     ) {
         this.restaurantId = restaurantId;
         this.restaurantName = restaurantName;
         this.address = address;
+        this.distance = distance;
     }
 }
