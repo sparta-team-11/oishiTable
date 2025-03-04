@@ -4,11 +4,10 @@ services:
     container_name: oishitable-app
     restart: always
     depends_on:
-      - database
       - redis
       - rabbitmq
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://database:3306/oishitable
+      SPRING_DATASOURCE_URL: jdbc:mysql://${RDS_ENDPOINT}:3306/oishitable
       SPRING_DATASOURCE_USERNAME: ${RDS_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${RDS_PASSWORD}
       SPRING_DATA_REDIS_HOST: redis
@@ -35,21 +34,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-
-  database:
-    image: mysql:latest
-    container_name: mysql-container
-    environment:
-      MYSQL_DATABASE: ${RDS_USERNAME}
-      MYSQL_USER: ${RDS_USERNAME}
-      MYSQL_PASSWORD: ${RDS_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${RDS_PASSWORD}
-      TZ: Asia/Seoul
-    ports:
-      - "3307:3306"
-    volumes:
-      - mysql-data:/var/lib/mysql
-    restart: always
 
   redis:
     image: redis:latest
