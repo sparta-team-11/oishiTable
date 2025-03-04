@@ -3,6 +3,7 @@ package com.sparta.oishitable.domain.owner.restaurant.waiting.repository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.dto.response.QWaitingDetails;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.dto.response.WaitingDetails;
+import com.sparta.oishitable.global.util.DateTimeUtil;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -18,8 +19,8 @@ public class OwnerWaitingQRepositoryImpl implements OwnerWaitingQRepository {
 
     @Override
     public List<WaitingDetails> findWaitingDetails(List<Long> userIds) {
-        LocalDateTime startOfToday = LocalDateTime.now().toLocalDate().atStartOfDay();
-        LocalDateTime endOfToday = startOfToday.plusDays(1).minusNanos(1);
+        LocalDateTime startOfToday = DateTimeUtil.getStartOfToday();
+        LocalDateTime endOfToday = DateTimeUtil.getEndOfToday();
 
         return queryFactory.select(
                         new QWaitingDetails(
