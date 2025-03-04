@@ -41,6 +41,8 @@ services:
     container_name: mysql-container
     environment:
       MYSQL_DATABASE: ${RDS_USERNAME}
+      MYSQL_USER: ${RDS_USERNAME}
+      MYSQL_PASSWORD: ${RDS_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${RDS_PASSWORD}
       TZ: Asia/Seoul
     ports:
