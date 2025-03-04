@@ -21,7 +21,11 @@ import java.util.List;
 @Table(
         name = "restaurants",
         indexes = {
-                @Index(name = "idx_fk_owner_id", columnList = "owner_id")
+                @Index(name = "idx_fk_owner_id", columnList = "owner_id"),
+                @Index(name = "idx_restaurant_min_price", columnList = "minPrice"),
+                @Index(name = "idx_restaurant_max_price", columnList = "maxPrice")
+                // 공간 인덱스(지리적 데이터, 공간 정보를 효율적으로 검색하기 위한 인덱스)
+//                @Index(name = "idx_restaurant_point", columnList = "point")
         })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
