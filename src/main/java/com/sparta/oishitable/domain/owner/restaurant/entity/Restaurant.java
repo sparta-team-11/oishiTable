@@ -73,7 +73,7 @@ public class Restaurant extends BaseEntity {
     @Column(nullable = false)
     @ColumnDefault("'CLOSE'")
     @Enumerated(EnumType.STRING)
-    public WaitingStatus waitingStatus;
+    private WaitingStatus waitingStatus;
 
     private Integer minPrice;
     private Integer maxPrice;
