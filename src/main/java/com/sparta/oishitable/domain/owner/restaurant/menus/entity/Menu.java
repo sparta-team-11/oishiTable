@@ -8,11 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(
-        name = "menus",
-        indexes = {
-                @Index(name = "idx_menu_name", columnList = "name")
-        })
+@Table(name = "menus")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Menu {
