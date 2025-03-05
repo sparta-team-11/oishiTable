@@ -12,6 +12,7 @@ import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserCouponService {
 
@@ -34,6 +36,7 @@ public class UserCouponService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public void downloadCoupon(Long userId, Long couponId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
@@ -53,9 +56,10 @@ public class UserCouponService {
                 .build();
 
         userCouponRepository.save(userCoupon);
-        
+
     }
 
+    @Cacheable(value = "userCoupons", key = "#userId + #cursor + #size")
     public List<UserCouponResponse> findUserCoupons(Long userId, Long cursor, int size) {
 
         List<UserCoupon> userCoupons = userCouponRepository.findByUserIdAndCouponUsedFalseAndIdGreaterThan(userId, cursor, size);
