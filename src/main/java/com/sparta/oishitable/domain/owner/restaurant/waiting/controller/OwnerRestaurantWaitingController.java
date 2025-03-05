@@ -1,6 +1,5 @@
 package com.sparta.oishitable.domain.owner.restaurant.waiting.controller;
 
-import com.sparta.oishitable.domain.owner.restaurant.waiting.dto.request.WaitingQueueDeleteRequest;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.dto.request.WaitingQueueDeleteUserRequest;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.dto.response.WaitingQueueFindUsersResponse;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.service.OwnerRestaurantWaitingService;
@@ -46,10 +45,10 @@ public class OwnerRestaurantWaitingController {
     public ResponseEntity<Void> deleteWaitingUser(
             @PathVariable Long restaurantId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody @Valid WaitingQueueDeleteUserRequest waitingQueueDeleteUserRequest
+            @RequestBody @Valid WaitingQueueDeleteUserRequest request
     ) {
         ownerRestaurantWaitingService
-                .deleteUserFromWaitingQueue(userDetails.getId(), restaurantId, waitingQueueDeleteUserRequest);
+                .deleteUserFromWaitingQueue(userDetails.getId(), restaurantId, request);
 
         return ResponseEntity.noContent().build();
     }

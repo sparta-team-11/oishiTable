@@ -28,15 +28,15 @@ public class CollectionService {
     private final AuthService authService;
 
     @Transactional
-    public Long createCollection(Long userId, CollectionCreateRequest collectionCreateRequest) {
+    public Long createCollection(Long userId, CollectionCreateRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
         Collection collection = Collection.builder()
                 .user(user)
-                .name(collectionCreateRequest.name())
-                .description(collectionCreateRequest.description())
-                .isPublic(collectionCreateRequest.isPublic())
+                .name(request.name())
+                .description(request.description())
+                .isPublic(request.isPublic())
                 .build();
 
         Collection savedCollection = collectionRepository.save(collection);
@@ -70,12 +70,12 @@ public class CollectionService {
     }
 
     @Transactional
-    public void updateCollection(Long userId, Long collectionId, CollectionUpdateRequest collectionUpdateRequest) {
+    public void updateCollection(Long userId, Long collectionId, CollectionUpdateRequest request) {
         Collection collection = findById(collectionId);
 
         authService.checkUserAuthority(collection.getUser().getId(), userId);
 
-        collection.updateCollectionInfo(collectionUpdateRequest);
+        collection.updateCollectionInfo(request);
     }
 
     @Transactional
