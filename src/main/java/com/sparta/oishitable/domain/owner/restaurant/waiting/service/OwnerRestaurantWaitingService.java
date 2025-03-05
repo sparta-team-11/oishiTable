@@ -40,7 +40,7 @@ public class OwnerRestaurantWaitingService {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
         authService.checkUserAuthority(restaurant.getOwner().getId(), ownerId);
 
-        String key = getWaitingKey(restaurantId, WaitingType.of(waitingType));
+        String key = WaitingType.of(waitingType).getWaitingKey(restaurant.getId());
 
         Long totalElements = ownerWaitingRedisRepository.findQueueSize(key);
 
@@ -89,7 +89,7 @@ public class OwnerRestaurantWaitingService {
         }
 
         WaitingType waitingType = waiting.getType();
-        String key = getWaitingKey(restaurantId, waitingType);
+        String key = waitingType.getWaitingKey(restaurant.getId());
 
         Long deleteCount = ownerWaitingRedisRepository.deleteWaitingUser(key, waiting.getUser().getId());
 
@@ -100,10 +100,6 @@ public class OwnerRestaurantWaitingService {
         waiting.updateStatus(ReservationStatus.CANCELED);
 
         // 삭제된 유저에게 취소 됨을 알리는 알림 전송 추가
-    }
-
-    private String getWaitingKey(Long restaurantId, WaitingType waitingType) {
-        return waitingType.getPrefix() + restaurantId;
     }
 
     private Waiting findWaitingById(Long waitingId) {

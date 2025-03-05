@@ -112,7 +112,7 @@ public class CustomerRestaurantWaitingService {
 
         authService.checkUserAuthority(waiting.getUser().getId(), user.getId());
 
-        String key = getWaitingKey(restaurant.getId(), waiting.getType());
+        String key = waiting.getType().getWaitingKey(restaurant.getId());
 
         Long rank = customerWaitingRedisRepository.zFindUserRank(key, user.getId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND));
@@ -124,26 +124,22 @@ public class CustomerRestaurantWaitingService {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
         isPossibleWaiting(restaurant.getWaitingStatus());
 
-        String inRestaurantKey = getWaitingKey(restaurant.getId(), WaitingType.IN);
+        String inRestaurantKey = WaitingType.IN.getWaitingKey(restaurant.getId());
         Long inRestaurantWaitingSize = customerWaitingRedisRepository.zCard(inRestaurantKey);
 
-        String takeOutKey = getWaitingKey(restaurant.getId(), WaitingType.OUT);
+        String takeOutKey = WaitingType.OUT.getWaitingKey(restaurant.getId());
         Long takeOutWaitingSize = customerWaitingRedisRepository.zCard(takeOutKey);
 
         return WaitingQueueFindSizeResponse.from(inRestaurantWaitingSize, takeOutWaitingSize);
     }
 
     private Integer findWaitingNextSequence(Long restaurantId, WaitingType waitingType) {
-        String key = getWaitingKey(restaurantId, waitingType);
+        String key = waitingType.getWaitingKey(restaurantId);
 
         return customerWaitingRedisRepository.zFindLastSequence(key)
                 .map(i -> i + 1)
                 .orElseGet(() -> customerWaitingRepository.findTodayLastSequence(restaurantId, waitingType)
                         .orElse(1));
-    }
-
-    private String getWaitingKey(Long restaurantId, WaitingType waitingType) {
-        return waitingType.getPrefix() + restaurantId;
     }
 
     private void isPossibleWaiting(WaitingStatus waitingStatus) {
