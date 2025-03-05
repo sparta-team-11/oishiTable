@@ -57,7 +57,7 @@ public class UserCouponService {
                 .build();
 
         if (coupon.getSpecialCouponMaxCount() != 0) {
-            int downloadedCount = userCouponRepository.countDownloadedCoupons(couponId);
+            long downloadedCount = userCouponRepository.countByCouponId(couponId);
 
             // 다운로드 한도 초과 여부 체크
             if (downloadedCount >= coupon.getSpecialCouponMaxCount()) {
