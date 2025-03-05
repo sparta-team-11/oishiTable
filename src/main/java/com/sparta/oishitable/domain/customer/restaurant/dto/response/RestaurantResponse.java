@@ -3,6 +3,7 @@ package com.sparta.oishitable.domain.customer.restaurant.dto.response;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import lombok.AccessLevel;
 import lombok.Builder;
+import org.locationtech.jts.geom.Point;
 
 import java.time.LocalTime;
 
@@ -17,10 +18,14 @@ public record RestaurantResponse(
         LocalTime breakTimeEnd,
         String introduce,
         Integer deposit,
-        LocalTime reservationInterval
+        LocalTime reservationInterval,
+        Double latitude,
+        Double longitude
 ) {
 
     public static RestaurantResponse from(Restaurant restaurant) {
+        Point location = restaurant.getLocation();
+
         return RestaurantResponse.builder()
                 .restaurantId(restaurant.getId())
                 .name(restaurant.getName())
@@ -32,6 +37,8 @@ public record RestaurantResponse(
                 .introduce(restaurant.getIntroduce())
                 .deposit(restaurant.getDeposit())
                 .reservationInterval(restaurant.getReservationInterval())
+                .latitude(location.getY())
+                .longitude(location.getX())
                 .build();
     }
 }

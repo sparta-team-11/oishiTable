@@ -1,10 +1,15 @@
 package com.sparta.oishitable.domain.customer.restaurant.repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberTemplate;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.oishitable.domain.customer.restaurant.dto.response.QRestaurantSimpleResponse;
 import com.sparta.oishitable.domain.customer.restaurant.dto.response.RestaurantSimpleResponse;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -28,16 +33,40 @@ public class CustomerRestaurantRepositoryQuerydslImpl implements CustomerRestaur
             String address,
             Integer minPrice,
             Integer maxPrice,
-            String seatTypeName
+            Long seatTypeId,
+            Boolean isUseDistance,
+            Point clientLocation,
+            Integer distance
     ) {
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (keyword != null) {
-            builder.and(restaurant.name.containsIgnoreCase(keyword).or(menu.name.containsIgnoreCase(keyword)));
+        JPAQuery<RestaurantSimpleResponse> query = jpaQueryFactory.select(
+                        new QRestaurantSimpleResponse(
+                                restaurant.id,
+                                restaurant.name,
+                                restaurant.address,
+                                Boolean.TRUE.equals(isUseDistance) ?
+                                        distanceSphereExpression(clientLocation) :
+                                        Expressions.nullExpression(Double.class),
+                                restaurant.location
+                        )
+                )
+                .from(restaurant)
+                .distinct();
+
+        if (Boolean.TRUE.equals(isUseDistance)) {
+            RestaurantSearchDistance.contains(distance);
+
+            builder.and(containsExpression(clientLocation, distance));
+        } else {
+            if (address != null) {
+                builder.and(restaurant.address.contains(address));
+            }
         }
 
-        if (address != null) {
-            builder.and(restaurant.address.contains(address));
+        if (keyword != null) {
+            builder.and(restaurant.name.containsIgnoreCase(keyword).or(menu.name.containsIgnoreCase(keyword)));
+            query.leftJoin(restaurant.menus, menu);
         }
 
         if (minPrice != null && maxPrice != null) {
@@ -48,21 +77,12 @@ public class CustomerRestaurantRepositoryQuerydslImpl implements CustomerRestaur
             builder.and(seatType.name.contains(seatTypeName));
         }
 
-        List<RestaurantSimpleResponse> records = jpaQueryFactory.select(
-                        new QRestaurantSimpleResponse(
-                                restaurant.id,
-                                restaurant.name,
-                                restaurant.address
-                        )
-                )
-                .from(restaurant)
-                .leftJoin(restaurant.menus, menu)
-                .innerJoin(restaurantSeat)
-                .on(restaurantSeat.restaurant.eq(restaurant))
-                .innerJoin(seatType)
-                .on(restaurantSeat.seatType.eq(seatType))
-                .where(builder)
-                .groupBy(restaurant.id)
+        if (seatTypeId != null) {
+            query.innerJoin(restaurantSeat)
+                    .on(restaurantSeat.restaurant.eq(restaurant).and(seatType.id.eq(seatTypeId)));
+        }
+
+        List<RestaurantSimpleResponse> records = query.where(builder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
@@ -74,5 +94,20 @@ public class CustomerRestaurantRepositoryQuerydslImpl implements CustomerRestaur
         }
 
         return new SliceImpl<>(records, pageable, hasNext);
+    }
+
+    private NumberTemplate<Double> distanceSphereExpression(Point clientLocation) {
+        return Expressions.numberTemplate(
+                Double.class,
+                "ST_DISTANCE_SPHERE({0}, {1})",
+                clientLocation, restaurant.location
+        );
+    }
+
+    public BooleanExpression containsExpression(Point clientLocation, Integer distance) {
+        return Expressions.booleanTemplate(
+                "ST_CONTAINS(ST_BUFFER({0}, {1}), {2})",
+                clientLocation, distance, restaurant.location
+        );
     }
 }
