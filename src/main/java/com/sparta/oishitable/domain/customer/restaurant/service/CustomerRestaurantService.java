@@ -27,10 +27,18 @@ public class CustomerRestaurantService {
             String address,
             Integer minPrice,
             Integer maxPrice,
-            String seatTypeName
+            Long seatTypeId,
+            Boolean isUseDistance,
+            Double clientLat,
+            Double clientLon,
+            Integer distance
     ) {
         return restaurantRepository.findRestaurantsByFilters(
-                pageable, keyword, address, minPrice, maxPrice, seatTypeName
+                pageable, keyword,
+                address, minPrice,
+                maxPrice, seatTypeId,
+                isUseDistance, clientLat,
+                clientLon, distance
         );
     }
 
@@ -51,13 +59,15 @@ public class CustomerRestaurantService {
             Double radius,
             Pageable pageable
     ) {
-        Page<Restaurant> restaurants = restaurantRepository.findNearbyRestaurants(lat, lng, radius, pageable);
+//        Page<Restaurant> restaurants = restaurantRepository.findNearbyRestaurants(lat, lng, radius, pageable);
+//
+//        return restaurants.map(restaurant -> {
+//            double distance = calculateDistance(lat, lng, restaurant.getPoint().getLatitude(), restaurant.getPoint().getLongitude());
+//
+//            return NearbyRestaurantResponse.from(restaurant, distance);
+//        });
 
-        return restaurants.map(restaurant -> {
-            double distance = calculateDistance(lat, lng, restaurant.getLatitude(), restaurant.getLongitude());
-
-            return NearbyRestaurantResponse.from(restaurant, distance);
-        });
+        return null;
     }
 
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
