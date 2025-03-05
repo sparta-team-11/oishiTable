@@ -14,6 +14,7 @@ import com.sparta.oishitable.domain.owner.restaurant.entity.WaitingStatus;
 import com.sparta.oishitable.domain.owner.restaurant.service.OwnerRestaurantService;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.Waiting;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingType;
+import com.sparta.oishitable.global.aop.annotation.DistributedLock;
 import com.sparta.oishitable.global.exception.ConflictException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
@@ -33,7 +34,7 @@ public class CustomerRestaurantWaitingService {
     private final CustomerWaitingRepository customerWaitingRepository;
     private final CustomerWaitingRedisRepository customerWaitingRedisRepository;
 
-    @Transactional
+    @DistributedLock(key = "'waiting:' + #restaurantId + ':' + #request.waitingType")
     public void joinWaitingQueue(Long userId, Long restaurantId, WaitingJoinRequest request) {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
         isPossibleWaiting(restaurant.getWaitingStatus());
@@ -41,8 +42,7 @@ public class CustomerRestaurantWaitingService {
         User user = findUserById(userId);
 
         WaitingType waitingType = WaitingType.of(request.waitingType());
-        String requestedWaitingKey = getWaitingKey(restaurant.getId(), waitingType);
-        // TODO: 동시성 처리
+        String requestedWaitingKey = waitingType.getWaitingKey(restaurant.getId());
         Integer sequence = findWaitingNextSequence(restaurant.getId(), waitingType);
 
         int totalCount = request.totalCount();
@@ -64,7 +64,7 @@ public class CustomerRestaurantWaitingService {
                 = customerWaitingRedisRepository.zAdd(requestedWaitingKey, user.getId(), waiting.getDailySequence());
 
         if (!isAdded) {
-            log.error("user {} already registered in waiting queue", user.getId());
+            log.warn("user {} already registered in waiting queue", user.getId());
             throw new ConflictException(ErrorCode.ALREADY_REGISTERED_USER_IN_WAITING_QUEUE);
         }
 
@@ -91,7 +91,7 @@ public class CustomerRestaurantWaitingService {
             throw new ConflictException(ErrorCode.ALREADY_CANCELED_WAITING_EXCEPTION);
         }
 
-        String key = getWaitingKey(waiting.getRestaurant().getId(), waiting.getType());
+        String key = waiting.getType().getWaitingKey(waiting.getRestaurant().getId());
 
         customerWaitingRedisRepository.zFindUserRank(key, userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND));

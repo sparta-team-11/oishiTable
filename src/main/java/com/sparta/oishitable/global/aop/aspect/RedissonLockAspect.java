@@ -16,6 +16,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
@@ -66,15 +67,29 @@ public class RedissonLockAspect {
             context.setVariable(parameterNames[i], args[i]);
         }
 
-        // SpEL로 request.date 가져오기
-        LocalDateTime date = parser.parseExpression("#request.date").getValue(context, LocalDateTime.class);
+        Object request = context.lookupVariable("request");
 
-        if (date != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
-            String formattedDate = date.format(formatter);
-            context.setVariable("formattedDate", formattedDate);
+        // SpEL로 request.date 존재하면 가져오기
+        if (request != null && hasField(request, "date")) {
+            LocalDateTime date = parser.parseExpression("#request.date").getValue(context, LocalDateTime.class);
+
+            if (date != null) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+                String formattedDate = date.format(formatter);
+                context.setVariable("formattedDate", formattedDate);
+            }
         }
 
         return parser.parseExpression(keyExpression).getValue(context, String.class);
+    }
+
+    public boolean hasField(Object object, String fieldName) {
+        for (Field field : object.getClass().getDeclaredFields()) {
+            if (field.getName().equals(fieldName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
