@@ -66,11 +66,11 @@ public class Post extends BaseEntity {
     }
 
     public void update(String title, String content, Region region) {
-        if (title != null) {
+        if (title != null && !title.isEmpty()) {
             this.title = title;
         }
 
-        if (content != null) {
+        if (content != null && !content.isEmpty()) {
             this.content = content;
         }
 

@@ -8,6 +8,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.oishitable.domain.customer.restaurant.dto.response.QRestaurantSimpleResponse;
 import com.sparta.oishitable.domain.customer.restaurant.dto.response.RestaurantSimpleResponse;
+import com.sparta.oishitable.domain.customer.restaurant.model.RestaurantSearchDistance;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Pageable;
@@ -71,10 +72,6 @@ public class CustomerRestaurantRepositoryQuerydslImpl implements CustomerRestaur
 
         if (minPrice != null && maxPrice != null) {
             builder.and(restaurant.minPrice.loe(maxPrice)).and(restaurant.maxPrice.goe(minPrice));
-        }
-
-        if (seatTypeName != null) {
-            builder.and(seatType.name.contains(seatTypeName));
         }
 
         if (seatTypeId != null) {

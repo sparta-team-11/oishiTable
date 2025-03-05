@@ -2,6 +2,7 @@ package com.sparta.oishitable.domain.customer.restaurant.dto.response;
 
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
+import org.locationtech.jts.geom.Point;
 
 @Getter
 public class RestaurantSimpleResponse {

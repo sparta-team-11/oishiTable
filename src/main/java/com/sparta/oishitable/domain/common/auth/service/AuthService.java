@@ -13,7 +13,7 @@ import com.sparta.oishitable.global.exception.InvalidException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import com.sparta.oishitable.global.security.JwtTokenProvider;
-import com.sparta.oishitable.global.security.enums.TokenType;
+import com.sparta.oishitable.global.security.model.TokenType;
 import com.sparta.oishitable.global.security.repository.RedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,7 +40,7 @@ public class AuthService {
             throw new DuplicatedResourceException(ErrorCode.DUPLICATE_EMAIL);
         }
 
-        User user = request.toEntity(passwordEncoder.encode(request.password()));
+        User user = request.toEntity(encodePassword(request.password()));
 
         User savedUser = userRepository.save(user);
 
@@ -99,5 +99,9 @@ public class AuthService {
         if (!userId.equals(loginUserId)) {
             throw new ForbiddenException(ErrorCode.USER_UNAUTHORIZED);
         }
+    }
+
+    public String encodePassword(String password) {
+        return passwordEncoder.encode(password);
     }
 }

@@ -7,7 +7,6 @@ import com.sparta.oishitable.domain.customer.comment.dto.response.CommentPostRes
 import com.sparta.oishitable.domain.customer.comment.dto.response.CommentRepliesResponse;
 import com.sparta.oishitable.domain.customer.comment.dto.response.QCommentPostResponse;
 import com.sparta.oishitable.domain.customer.comment.dto.response.QCommentRepliesResponse;
-import com.sparta.oishitable.domain.customer.comment.entity.Comment;
 import com.sparta.oishitable.domain.customer.comment.entity.QComment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,7 +14,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.sparta.oishitable.domain.customer.comment.entity.QComment.comment;
 import static com.sparta.oishitable.domain.customer.comment.like.entity.QCommentLike.commentLike;
@@ -48,11 +46,11 @@ public class CommentRepositoryQuerydslImpl implements CommentRepositoryQuerydsl 
                                 comment.user.name,
                                 comment.content,
                                 JPAExpressions
-                                        .select(reply.count().coalesce(0L))
+                                        .select(reply.count().coalesce(0L).intValue())
                                         .from(reply)
                                         .where(reply.parent.id.eq(comment.id)),
                                 JPAExpressions
-                                        .select(commentLike.count().coalesce(0L))
+                                        .select(commentLike.count().coalesce(0L).intValue())
                                         .from(commentLike)
                                         .where(commentLike.comment.id.eq(comment.id)),
                                 comment.modifiedAt
@@ -87,7 +85,7 @@ public class CommentRepositoryQuerydslImpl implements CommentRepositoryQuerydsl 
                                 comment.user.name,
                                 comment.content,
                                 JPAExpressions
-                                        .select(commentLike.count().coalesce(0L))
+                                        .select(commentLike.count().coalesce(0L).intValue())
                                         .from(commentLike)
                                         .where(commentLike.comment.id.eq(comment.id)),
                                 comment.modifiedAt
@@ -101,14 +99,5 @@ public class CommentRepositoryQuerydslImpl implements CommentRepositoryQuerydsl 
                 .fetch();
 
         return new PageImpl<>(result, pageable, total);
-    }
-
-    @Override
-    public Optional<Comment> findCommentWithRepliesById(Long commentId) {
-        return Optional.ofNullable(queryFactory
-                .selectFrom(comment)
-                .leftJoin(comment.replies).fetchJoin()
-                .where(comment.id.eq(commentId))
-                .fetchOne());
     }
 }

@@ -16,7 +16,9 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+import static com.sparta.oishitable.domain.customer.comment.entity.QComment.comment;
 import static com.sparta.oishitable.domain.customer.post.entity.QPost.post;
+import static com.sparta.oishitable.domain.customer.post.like.entity.QPostLike.postLike;
 
 @RequiredArgsConstructor
 public class PostRepositoryQuerydslImpl implements PostRepositoryQuerydsl {
@@ -70,6 +72,14 @@ public class PostRepositoryQuerydslImpl implements PostRepositoryQuerydsl {
                                 post.title,
                                 post.content,
                                 post.user.name,
+                                JPAExpressions
+                                        .select(comment.count().coalesce(0L).intValue())
+                                        .from(comment)
+                                        .where(comment.post.id.eq(post.id)),
+                                JPAExpressions
+                                        .select(postLike.count().coalesce(0L).intValue())
+                                        .from(postLike)
+                                        .where(postLike.post.id.eq(post.id)),
                                 post.modifiedAt,
                                 randomValue
                         )
@@ -119,6 +129,14 @@ public class PostRepositoryQuerydslImpl implements PostRepositoryQuerydsl {
                                 post.title,
                                 post.content,
                                 post.user.name,
+                                JPAExpressions
+                                        .select(comment.count().coalesce(0L).intValue())
+                                        .from(comment)
+                                        .where(comment.post.id.eq(post.id)),
+                                JPAExpressions
+                                        .select(postLike.count().coalesce(0L).intValue())
+                                        .from(postLike)
+                                        .where(postLike.post.id.eq(post.id)),
                                 post.modifiedAt
                         )
                 )

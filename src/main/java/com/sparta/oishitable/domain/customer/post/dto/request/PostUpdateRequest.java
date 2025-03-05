@@ -1,16 +1,14 @@
 package com.sparta.oishitable.domain.customer.post.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public record PostUpdateRequest(
-        @NotNull
         Long regionId,
 
-        @NotBlank
+        @Size(max = 20, message = "최대 20자까지 입력가능합니다.")
         String title,
 
-        @NotBlank
+        @Size(max = 300, message = "최대 300자까지 입력가능합니다.")
         String content
 ) {
 }

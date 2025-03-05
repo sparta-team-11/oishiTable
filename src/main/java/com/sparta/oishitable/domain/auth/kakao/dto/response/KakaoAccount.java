@@ -13,6 +13,9 @@ public class KakaoAccount {
     private Profile profile;
     private Boolean profileNicknameNeedsAgreement;
 
+    private String name;
+    private Boolean name_needs_agreement;
+
     private String email;
     private Boolean isEmailValid;
     private Boolean isEmailVerified;
