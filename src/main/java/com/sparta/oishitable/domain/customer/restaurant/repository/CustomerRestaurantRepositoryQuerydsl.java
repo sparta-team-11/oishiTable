@@ -7,7 +7,10 @@ import org.springframework.data.domain.Slice;
 public interface CustomerRestaurantRepositoryQuerydsl {
 
     Slice<RestaurantSimpleResponse> findRestaurantsByFilters(
-            Pageable pageable, String keyword, String address,
-            Integer minPrice, Integer maxPrice, String seatTypeName
+            Pageable pageable, String keyword,
+            String address, Integer minPrice,
+            Integer maxPrice, Long seatTypeId,
+            Boolean isUseDistance, Double clientLat,
+            Double clientLon, Integer distance
     );
 }

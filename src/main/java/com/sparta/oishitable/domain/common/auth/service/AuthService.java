@@ -13,7 +13,7 @@ import com.sparta.oishitable.global.exception.InvalidException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import com.sparta.oishitable.global.security.JwtTokenProvider;
-import com.sparta.oishitable.global.security.enums.TokenType;
+import com.sparta.oishitable.global.security.model.TokenType;
 import com.sparta.oishitable.global.security.repository.RedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
