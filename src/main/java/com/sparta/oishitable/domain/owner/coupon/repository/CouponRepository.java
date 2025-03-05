@@ -8,5 +8,8 @@ import java.util.List;
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
     List<Coupon> findByRestaurantId(Long restaurantId);
+
+//    @Query("SELECT COUNT(uc) FROM UserCoupon uc WHERE uc.coupon.id = :couponId")
+//    int countDownloadedCoupons(@Param("couponId") Long couponId);
 }
 

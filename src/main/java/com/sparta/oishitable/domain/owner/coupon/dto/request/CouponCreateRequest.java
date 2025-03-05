@@ -7,6 +7,9 @@ public record CouponCreateRequest(
         String couponName,
 
         @NotNull
-        Integer discount
+        Integer discount,
+
+        Integer specialCouponMaxCount
+
 ) {
 }

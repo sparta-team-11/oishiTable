@@ -34,10 +34,12 @@ public class OwnerCouponService {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
 
         authService.checkUserAuthority(restaurant.getOwner().getId(), userId);
+        
 
         Coupon createCoupon = Coupon.builder()
                 .couponName(request.couponName())
                 .discount(request.discount())
+                .specialCouponMaxCount(request.specialCouponMaxCount())
                 .restaurant(restaurant)
                 .build();
 

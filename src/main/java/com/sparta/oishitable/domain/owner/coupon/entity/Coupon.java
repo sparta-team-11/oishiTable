@@ -31,6 +31,9 @@ public class Coupon {
     @Column(nullable = false)
     private Integer discount;
 
+    @Column(nullable = true)
+    private Integer specialCouponMaxCount;
+
     @ManyToOne
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
@@ -42,10 +45,18 @@ public class Coupon {
     public Coupon(
             String couponName,
             Integer discount,
-            Restaurant restaurant
+            Restaurant restaurant,
+            Integer specialCouponMaxCount
     ) {
         this.couponName = couponName;
         this.discount = discount;
         this.restaurant = restaurant;
+        this.specialCouponMaxCount = specialCouponMaxCount;
     }
+
+//    public void decreaseSpecialCouponCount() {
+//        if (specialCouponMaxCount != null && specialCouponMaxCount > 0) {
+//            specialCouponMaxCount--;
+//        }
+//    }
 }

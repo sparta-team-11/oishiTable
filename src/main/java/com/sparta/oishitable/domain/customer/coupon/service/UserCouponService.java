@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional(readOnly = true)
+//@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserCouponService {
 
@@ -49,11 +49,21 @@ public class UserCouponService {
             throw new CustomRuntimeException(ErrorCode.COUPON_ALREADY_DOWNLOAD);
         }
 
+
         UserCoupon userCoupon = UserCoupon.builder()
                 .couponUsed(false)
                 .user(user)
                 .coupon(coupon)
                 .build();
+
+        if (coupon.getSpecialCouponMaxCount() != 0) {
+            int downloadedCount = userCouponRepository.countDownloadedCoupons(couponId);
+
+            // 다운로드 한도 초과 여부 체크
+            if (downloadedCount >= coupon.getSpecialCouponMaxCount()) {
+                throw new CustomRuntimeException(ErrorCode.COUPON_LIMIT_EXCEEDED);
+            }
+        }
 
         userCouponRepository.save(userCoupon);
 
@@ -79,5 +89,7 @@ public class UserCouponService {
         }
 
         userCoupon.setCouponUsed(true);
+
+        userCouponRepository.save(userCoupon);
     }
 }
