@@ -67,6 +67,8 @@ dependencies {
 
     // Spring Actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    implementation 'org.hibernate:hibernate-spatial:6.5.2.Final'
 }
 
 tasks.named('test') {
