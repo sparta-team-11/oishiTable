@@ -22,8 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -36,23 +34,18 @@ public class CustomerRestaurantWaitingService {
     private final CustomerWaitingRedisRepository customerWaitingRedisRepository;
 
     @Transactional
-    public void joinWaitingQueue(Long userId, Long restaurantId, WaitingJoinRequest waitingQueueCreateRequest) {
+    public void joinWaitingQueue(Long userId, Long restaurantId, WaitingJoinRequest request) {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
         isPossibleWaiting(restaurant.getWaitingStatus());
 
         User user = findUserById(userId);
 
-        isExistsInWaiting(restaurant.getId(), user.getId(), WaitingType.IN);
-        isExistsInWaiting(restaurant.getId(), user.getId(), WaitingType.OUT);
-
-        WaitingType waitingType = WaitingType.of(waitingQueueCreateRequest.waitingType());
+        WaitingType waitingType = WaitingType.of(request.waitingType());
         String requestedWaitingKey = getWaitingKey(restaurant.getId(), waitingType);
         // TODO: 동시성 처리
         Integer sequence = findWaitingNextSequence(restaurant.getId(), waitingType);
 
-        log.info("joined user daily sequence: {}", sequence);
-
-        int totalCount = waitingQueueCreateRequest.totalCount();
+        int totalCount = request.totalCount();
 
         if (waitingType.equals(WaitingType.OUT)) {
             totalCount = 1;
@@ -67,9 +60,15 @@ public class CustomerRestaurantWaitingService {
                 .status(ReservationStatus.RESERVED)
                 .build();
 
-        customerWaitingRepository.save(waiting);
+        Boolean isAdded
+                = customerWaitingRedisRepository.zAdd(requestedWaitingKey, user.getId(), waiting.getDailySequence());
 
-        customerWaitingRedisRepository.zAdd(requestedWaitingKey, user.getId(), waiting.getDailySequence());
+        if (!isAdded) {
+            log.error("user {} already registered in waiting queue", user.getId());
+            throw new ConflictException(ErrorCode.ALREADY_REGISTERED_USER_IN_WAITING_QUEUE);
+        }
+
+        customerWaitingRepository.save(waiting);
 
         // 유저에게 대기열 등록에 성공함을 알리는 알림 전송 추가
     }
@@ -134,28 +133,13 @@ public class CustomerRestaurantWaitingService {
         return WaitingQueueFindSizeResponse.from(inRestaurantWaitingSize, takeOutWaitingSize);
     }
 
-    private void isExistsInWaiting(Long restaurantId, Long userId, WaitingType waitingType) {
-        String inRestaurantKey = getWaitingKey(restaurantId, waitingType);
-        boolean isExists = customerWaitingRedisRepository.zFindUserRank(inRestaurantKey, userId)
-                .isPresent();
-
-        if (isExists) {
-            throw new ConflictException(ErrorCode.ALREADY_REGISTERED_USER_IN_WAITING_QUEUE);
-        }
-    }
-
     private Integer findWaitingNextSequence(Long restaurantId, WaitingType waitingType) {
-        // 1.Redis 마지막 순번 조회
         String key = getWaitingKey(restaurantId, waitingType);
-        Optional<Integer> sequence = customerWaitingRedisRepository.zFindLastSequence(key);
 
-        if (sequence.isPresent()) {
-            return sequence.get() + 1;
-        }
-
-        // 2. DB 마지막 순번 조회
-        return customerWaitingRepository.findTodayLastSequence(restaurantId, waitingType)
-                .orElse(0) + 1;
+        return customerWaitingRedisRepository.zFindLastSequence(key)
+                .map(i -> i + 1)
+                .orElseGet(() -> customerWaitingRepository.findTodayLastSequence(restaurantId, waitingType)
+                        .orElse(1));
     }
 
     private String getWaitingKey(Long restaurantId, WaitingType waitingType) {

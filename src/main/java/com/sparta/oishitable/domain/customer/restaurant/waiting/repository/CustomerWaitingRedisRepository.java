@@ -4,7 +4,7 @@ import java.util.Optional;
 
 public interface CustomerWaitingRedisRepository {
 
-    void zAdd(String key, Long userId, Integer sequence);
+    Boolean zAdd(String key, Long userId, Integer sequence);
 
     Optional<Integer> zFindLastSequence(String key);
 
