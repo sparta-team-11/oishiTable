@@ -40,9 +40,9 @@ public class CollectionBookmarkService {
     public void createCollectionBookmarks(
             Long userId,
             Long collectionId,
-            CollectionBookmarksCreateRequest collectionBookmarkCreateRequest
+            CollectionBookmarksCreateRequest request
     ) {
-        List<Long> bookmarkIds = collectionBookmarkCreateRequest.bookmarks().stream()
+        List<Long> bookmarkIds = request.bookmarks().stream()
                 .map(CollectionBookmarkCreateRequest::bookmarkId)
                 .toList();
 
@@ -58,7 +58,7 @@ public class CollectionBookmarkService {
 
         // 요청한 id 값들로 조회한 bookmark 레코드들이 가져와졌는지 검사
         // 이후 CollectionBookmark 객체 리스트로 mapping
-        List<CollectionBookmark> collectionBookmarks = collectionBookmarkCreateRequest.bookmarks().stream()
+        List<CollectionBookmark> collectionBookmarks = request.bookmarks().stream()
                 .map(collectionBookmark -> {
                     Bookmark findBookmark = bookmarks.stream()
                             .filter(bookmark -> bookmark.getId().equals(collectionBookmark.bookmarkId()))

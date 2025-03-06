@@ -27,9 +27,9 @@ public class CollectionController {
     @PostMapping
     public ResponseEntity<Void> createCollection(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody @Valid CollectionCreateRequest collectionCreateRequest
+            @RequestBody @Valid CollectionCreateRequest request
     ) {
-        Long collectionId = collectionService.createCollection(userDetails.getId(), collectionCreateRequest);
+        Long collectionId = collectionService.createCollection(userDetails.getId(), request);
         URI location = UriBuilderUtil.create("/api/collections/{collectionId}", collectionId);
 
         return ResponseEntity.created(location).build();
@@ -60,9 +60,9 @@ public class CollectionController {
     public ResponseEntity<Void> updateCollection(
             @PathVariable Long collectionId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody @Valid CollectionUpdateRequest collectionUpdateRequest
+            @RequestBody @Valid CollectionUpdateRequest request
     ) {
-        collectionService.updateCollection(userDetails.getId(), collectionId, collectionUpdateRequest);
+        collectionService.updateCollection(userDetails.getId(), collectionId, request);
 
         return ResponseEntity.ok().build();
     }

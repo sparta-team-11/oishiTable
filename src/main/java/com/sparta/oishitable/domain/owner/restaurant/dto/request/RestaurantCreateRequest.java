@@ -6,6 +6,7 @@ import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurantseat.dto.request.RestaurantSeatCreateRequest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.locationtech.jts.geom.Point;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -46,7 +47,7 @@ public record RestaurantCreateRequest(
         List<RestaurantSeatCreateRequest> restaurantSeatCreateRequestList
 ) {
 
-    public Restaurant toEntity(User owner, double latitude, double longitude) {
+    public Restaurant toEntity(User owner, Point location) {
         return Restaurant.builder()
                 .name(name)
                 .address(address)
@@ -57,8 +58,7 @@ public record RestaurantCreateRequest(
                 .introduce(introduce)
                 .deposit(deposit)
                 .reservationInterval(reservationInterval)
-                .latitude(latitude)
-                .longitude(longitude)
+                .location(location)
                 .owner(owner)
                 .build();
     }

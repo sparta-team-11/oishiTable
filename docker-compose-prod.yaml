@@ -1,18 +1,19 @@
 services:
   app:
-    image: oishitable:latest
+    image: ${DOCKER_HUB_USERNAME}/oishitable:latest
     container_name: oishitable-app
     restart: always
     depends_on:
-      - database
       - redis
       - rabbitmq
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://database:3306/oishitable
+      SPRING_DATASOURCE_URL: jdbc:mysql://${RDS_ENDPOINT}:3306/oishitable
       SPRING_DATASOURCE_USERNAME: ${RDS_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${RDS_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_URL: redis://redis:6379
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: guest
@@ -23,8 +24,8 @@ services:
       SPRING_MAIL_PORT: 587
       SPRING_MAIL_USERNAME: ${MAIL_USERNAME}
       SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD}
-      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: true
-      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: true
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "true"
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "true"
       KAKAO_AUTH_CLIENT: ${KAKAO_AUTH_CLIENT}
       KAKAO_AUTH_REDIRECT: https://oishitable.link/api/auth/kakao/callback
       KAKAO_API_KEY: ${KAKAO_API_KEY}
@@ -35,19 +36,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-
-  database:
-    image: mysql:latest
-    container_name: mysql-container
-    environment:
-      MYSQL_DATABASE: ${RDS_USERNAME}
-      MYSQL_ROOT_PASSWORD: ${RDS_PASSWORD}
-      TZ: Asia/Seoul
-    ports:
-      - "3307:3306"
-    volumes:
-      - mysql-data:/var/lib/mysql
-    restart: always
 
   redis:
     image: redis:latest

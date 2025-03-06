@@ -7,13 +7,13 @@ import java.util.List;
 
 @Builder(access = AccessLevel.PRIVATE)
 public record WaitingQueueFindUsersResponse(
-        List<WaitingUserDetails> users,
+        List<WaitingDetails> users,
         int curPage,
         int totalPages,
         long totalElements
 ) {
 
-    public static WaitingQueueFindUsersResponse from(List<WaitingUserDetails> userDetails, int curPage, int totalPages, Long totalElements) {
+    public static WaitingQueueFindUsersResponse from(List<WaitingDetails> userDetails, int curPage, int totalPages, Long totalElements) {
         return WaitingQueueFindUsersResponse.builder()
                 .users(userDetails)
                 .curPage(curPage)
