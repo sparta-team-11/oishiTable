@@ -13,6 +13,7 @@ import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,7 @@ public class UserCouponService {
     }
 
     @Transactional
+    @CacheEvict(value = "userCoupons", key = "#userId + '0' + '10'")
     public void downloadCoupon(Long userId, Long couponId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
@@ -69,7 +71,7 @@ public class UserCouponService {
 
     }
 
-    @CacheEvict(value = "userCoupons", key = "#userId + #cursor + #size")
+    @Cacheable(value = "userCoupons", key = "#userId + #cursor + #size")
     public List<UserCouponResponse> findUserCoupons(Long userId, Long cursor, int size) {
 
         List<UserCoupon> userCoupons = userCouponRepository.findByUserIdAndCouponUsedFalseAndIdGreaterThan(userId, cursor, size);
@@ -80,6 +82,7 @@ public class UserCouponService {
     }
 
     @Transactional
+    @CacheEvict(value = "userCoupons", key = "#userId + '0' + '10'")
     public void useCoupon(Long userId, Long couponId) {
         UserCoupon userCoupon = userCouponRepository.findByUserIdAndCouponId(userId, couponId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.COUPON_NOT_FOUND));
