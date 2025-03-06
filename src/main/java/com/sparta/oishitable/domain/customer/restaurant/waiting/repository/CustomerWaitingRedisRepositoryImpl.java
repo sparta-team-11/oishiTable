@@ -15,8 +15,8 @@ public class CustomerWaitingRedisRepositoryImpl implements CustomerWaitingRedisR
     private final RedisTemplate<String, String> redisTemplate;
 
     @Override
-    public void zAdd(String key, Long userId, Integer sequence) {
-        redisTemplate.opsForZSet().add(key, userId.toString(), sequence);
+    public Boolean zAdd(String key, Long userId, Integer sequence) {
+        return redisTemplate.opsForZSet().add(key, userId.toString(), sequence);
     }
 
     @Override

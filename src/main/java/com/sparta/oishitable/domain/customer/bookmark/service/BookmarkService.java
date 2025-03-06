@@ -59,11 +59,11 @@ public class BookmarkService {
     }
 
     @Transactional
-    public void updateBookmarkMemo(Long userId, Long bookmarkId, BookmarkUpdateRequest bookmarkUpdateRequest) {
+    public void updateBookmarkMemo(Long userId, Long bookmarkId, BookmarkUpdateRequest request) {
         Bookmark bookmark = findById(bookmarkId);
         authService.checkUserAuthority(bookmark.getUser().getId(), userId);
 
-        bookmark.updateMemo(bookmarkUpdateRequest.updateMemo());
+        bookmark.updateMemo(request.updateMemo());
     }
 
     @Transactional
