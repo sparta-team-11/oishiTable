@@ -88,6 +88,5 @@ public class UserCouponService {
 
         userCoupon.setCouponUsed(true);
 
-        userCouponRepository.save(userCoupon);
     }
 }
