@@ -1,5 +1,6 @@
 package com.sparta.oishitable.domain.owner.coupon.dto.request;
 
+import com.sparta.oishitable.domain.owner.coupon.entity.CouponType;
 import jakarta.validation.constraints.NotNull;
 
 public record CouponCreateRequest(
@@ -9,7 +10,11 @@ public record CouponCreateRequest(
         @NotNull
         Integer discount,
 
-        Integer specialCouponMaxCount
+        @NotNull
+        Integer firstComeCouponMaxCount,
+
+        @NotNull
+        CouponType type
 
 ) {
 }
