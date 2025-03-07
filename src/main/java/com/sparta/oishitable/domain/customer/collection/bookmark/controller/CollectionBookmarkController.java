@@ -27,10 +27,10 @@ public class CollectionBookmarkController {
     public ResponseEntity<Void> createCollectionBookmarks(
             @PathVariable Long collectionId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody @Valid CollectionBookmarksCreateRequest collectionBookmarksCreateRequest
+            @RequestBody @Valid CollectionBookmarksCreateRequest request
     ) {
         collectionBookmarkService
-                .createCollectionBookmarks(userDetails.getId(), collectionId, collectionBookmarksCreateRequest);
+                .createCollectionBookmarks(userDetails.getId(), collectionId, request);
         URI location = UriBuilderUtil.create("/api/customer/collections/{collectionId}", collectionId);
 
         return ResponseEntity.created(location).build();

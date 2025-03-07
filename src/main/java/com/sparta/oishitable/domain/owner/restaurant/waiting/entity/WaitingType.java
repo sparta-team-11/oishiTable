@@ -10,8 +10,8 @@ import java.util.Arrays;
 @Getter
 @RequiredArgsConstructor
 public enum WaitingType {
-    IN("in_restaurant_waiting_queue:"),
-    OUT("take_out_waiting_queue:");
+    IN("waiting:in:"),
+    OUT("waiting:out:");
 
     private final String prefix;
 
@@ -20,6 +20,10 @@ public enum WaitingType {
                 .filter(w -> w.name().equalsIgnoreCase(waitingType))
                 .findFirst()
                 .orElseThrow(() -> new BadRequest(ErrorCode.INVALID_WAITING_TYPE));
+    }
+
+    public String getWaitingKey(Long restaurantId) {
+        return this.prefix + restaurantId;
     }
 }
 

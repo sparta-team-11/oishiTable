@@ -21,9 +21,9 @@ public class CustomerRestaurantWaitingController {
     public ResponseEntity<Void> joinWaitingQueue(
             @PathVariable Long restaurantId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody WaitingJoinRequest waitingQueueCreateRequest
+            @RequestBody WaitingJoinRequest request
     ) {
-        customerRestaurantWaitingService.joinWaitingQueue(userDetails.getId(), restaurantId, waitingQueueCreateRequest);
+        customerRestaurantWaitingService.joinWaitingQueue(userDetails.getId(), restaurantId, request);
 
         // redirect uri: 유저 - 나의 예약 목록 조회 API  예정
         return ResponseEntity.created(null).build();

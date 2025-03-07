@@ -1,6 +1,7 @@
 package com.sparta.oishitable.domain.customer.restaurant.repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -9,6 +10,7 @@ import com.sparta.oishitable.domain.customer.restaurant.dto.response.QRestaurant
 import com.sparta.oishitable.domain.customer.restaurant.dto.response.RestaurantSimpleResponse;
 import com.sparta.oishitable.domain.customer.restaurant.model.RestaurantSearchDistance;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -34,24 +36,20 @@ public class CustomerRestaurantRepositoryQuerydslImpl implements CustomerRestaur
             Integer maxPrice,
             Long seatTypeId,
             Boolean isUseDistance,
-            Double clientLat,
-            Double clientLon,
+            Point clientLocation,
             Integer distance
     ) {
         BooleanBuilder builder = new BooleanBuilder();
-
-        NumberTemplate<Double> distanceExpression = Expressions.numberTemplate(
-                Double.class,
-                "ST_Distance_Sphere(Point({0}, {1}), Point({2}, {3}))",
-                clientLon, clientLat, restaurant.longitude, restaurant.latitude
-        );
 
         JPAQuery<RestaurantSimpleResponse> query = jpaQueryFactory.select(
                         new QRestaurantSimpleResponse(
                                 restaurant.id,
                                 restaurant.name,
                                 restaurant.address,
-                                Boolean.TRUE.equals(isUseDistance) ? distanceExpression : Expressions.nullExpression(Double.class)
+                                Boolean.TRUE.equals(isUseDistance) ?
+                                        distanceSphereExpression(clientLocation) :
+                                        Expressions.nullExpression(Double.class),
+                                restaurant.location
                         )
                 )
                 .from(restaurant)
@@ -60,7 +58,7 @@ public class CustomerRestaurantRepositoryQuerydslImpl implements CustomerRestaur
         if (Boolean.TRUE.equals(isUseDistance)) {
             RestaurantSearchDistance.contains(distance);
 
-            builder.and(distanceExpression.loe(distance));
+            builder.and(containsExpression(clientLocation, distance));
         } else {
             if (address != null) {
                 builder.and(restaurant.address.contains(address));
@@ -77,11 +75,8 @@ public class CustomerRestaurantRepositoryQuerydslImpl implements CustomerRestaur
         }
 
         if (seatTypeId != null) {
-            builder.and(seatType.id.eq(seatTypeId));
             query.innerJoin(restaurantSeat)
-                    .on(restaurantSeat.restaurant.eq(restaurant))
-                    .innerJoin(seatType)
-                    .on(restaurantSeat.seatType.eq(seatType));
+                    .on(restaurantSeat.restaurant.eq(restaurant).and(seatType.id.eq(seatTypeId)));
         }
 
         List<RestaurantSimpleResponse> records = query.where(builder)
@@ -96,5 +91,20 @@ public class CustomerRestaurantRepositoryQuerydslImpl implements CustomerRestaur
         }
 
         return new SliceImpl<>(records, pageable, hasNext);
+    }
+
+    private NumberTemplate<Double> distanceSphereExpression(Point clientLocation) {
+        return Expressions.numberTemplate(
+                Double.class,
+                "ST_DISTANCE_SPHERE({0}, {1})",
+                clientLocation, restaurant.location
+        );
+    }
+
+    public BooleanExpression containsExpression(Point clientLocation, Integer distance) {
+        return Expressions.booleanTemplate(
+                "ST_CONTAINS(ST_BUFFER({0}, {1}), {2})",
+                clientLocation, distance, restaurant.location
+        );
     }
 }

@@ -26,12 +26,12 @@ public class BookmarkController {
     @PostMapping
     public ResponseEntity<Void> createBookmark(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody @Valid BookmarkCreateRequest bookmarkCreateReq
+            @RequestBody @Valid BookmarkCreateRequest request
     ) {
-        bookmarkService.createBookmark(userDetails.getId(), bookmarkCreateReq.restaurantId());
+        bookmarkService.createBookmark(userDetails.getId(), request.restaurantId());
 
         String path = "/customer/api/restaurants/{restaurantsId}";
-        URI location = UriBuilderUtil.create(path, bookmarkCreateReq.restaurantId());
+        URI location = UriBuilderUtil.create(path, request.restaurantId());
 
         return ResponseEntity.created(location).build();
     }
@@ -50,9 +50,9 @@ public class BookmarkController {
     public ResponseEntity<Void> updateBookmark(
             @PathVariable Long bookmarkId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody BookmarkUpdateRequest bookmarkUpdateRequest
+            @RequestBody BookmarkUpdateRequest request
     ) {
-        bookmarkService.updateBookmarkMemo(userDetails.getId(), bookmarkId, bookmarkUpdateRequest);
+        bookmarkService.updateBookmarkMemo(userDetails.getId(), bookmarkId, request);
 
         return ResponseEntity.ok().build();
     }

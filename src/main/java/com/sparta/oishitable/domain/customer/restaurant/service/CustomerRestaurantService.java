@@ -1,14 +1,13 @@
 package com.sparta.oishitable.domain.customer.restaurant.service;
 
-import com.sparta.oishitable.domain.customer.restaurant.dto.response.NearbyRestaurantResponse;
 import com.sparta.oishitable.domain.customer.restaurant.dto.response.RestaurantResponse;
 import com.sparta.oishitable.domain.customer.restaurant.dto.response.RestaurantSimpleResponse;
 import com.sparta.oishitable.domain.customer.restaurant.repository.CustomerRestaurantRepository;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
+import com.sparta.oishitable.global.util.GeometryUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -37,8 +36,8 @@ public class CustomerRestaurantService {
                 pageable, keyword,
                 address, minPrice,
                 maxPrice, seatTypeId,
-                isUseDistance, clientLat,
-                clientLon, distance
+                isUseDistance, GeometryUtil.createPoint(clientLat, clientLon),
+                distance
         );
     }
 
@@ -51,23 +50,6 @@ public class CustomerRestaurantService {
     private Restaurant findById(Long restaurantId) {
         return restaurantRepository.findById(restaurantId)
                 .orElseThrow(() -> new CustomRuntimeException(ErrorCode.RESTAURANT_NOT_FOUND));
-    }
-
-    public Page<NearbyRestaurantResponse> findNearbyRestaurants(
-            Double lat,
-            Double lng,
-            Double radius,
-            Pageable pageable
-    ) {
-//        Page<Restaurant> restaurants = restaurantRepository.findNearbyRestaurants(lat, lng, radius, pageable);
-//
-//        return restaurants.map(restaurant -> {
-//            double distance = calculateDistance(lat, lng, restaurant.getPoint().getLatitude(), restaurant.getPoint().getLongitude());
-//
-//            return NearbyRestaurantResponse.from(restaurant, distance);
-//        });
-
-        return null;
     }
 
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
