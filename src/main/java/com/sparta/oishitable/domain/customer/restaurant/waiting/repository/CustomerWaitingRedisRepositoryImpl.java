@@ -2,11 +2,11 @@ package com.sparta.oishitable.domain.customer.restaurant.waiting.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
@@ -15,25 +15,26 @@ public class CustomerWaitingRedisRepositoryImpl implements CustomerWaitingRedisR
     private final RedisTemplate<String, String> redisTemplate;
 
     @Override
-    public Boolean zAdd(String key, Long userId, Integer sequence) {
-        return redisTemplate.opsForZSet().add(key, userId.toString(), sequence);
-    }
+    public Long join(String queueKey, String sequenceKey, Long userId) {
+        String script = """
+                local queue_key = KEYS[1]
+                local sequence_key = KEYS[2]
+                local user_id = ARGV[1]
+                
+                -- 마지막 순번 INCR
+                local last_seq = redis.call("INCR", sequence_key)
+                
+                -- 저장
+                redis.call("ZADD", queue_key, last_seq, user_id)
+                redis.call("SET", sequence_key, last_seq)
+                
+                return last_seq
+                """;
 
-    @Override
-    public Optional<Integer> zFindLastSequence(String key) {
-        Set<ZSetOperations.TypedTuple<String>> records = redisTemplate.opsForZSet().reverseRangeWithScores(key, 0, 0);
-
-        if (records == null || records.isEmpty()) {
-            return Optional.empty();
-        }
-
-        Double score = records.iterator().next().getScore();
-
-        if (score == null) {
-            return Optional.empty();
-        }
-
-        return Optional.of(score.intValue());
+        return redisTemplate.execute(
+                new DefaultRedisScript<>(script, Long.class),
+                List.of(queueKey, sequenceKey),
+                userId.toString());
     }
 
     @Override

@@ -23,7 +23,11 @@ public enum WaitingType {
     }
 
     public String getWaitingKey(Long restaurantId) {
-        return this.prefix + restaurantId;
+        return this.prefix + "queue:" + restaurantId;
+    }
+
+    public String getSequenceKey(Long restaurantId) {
+        return this.prefix + "sequence:" + restaurantId;
     }
 }
 

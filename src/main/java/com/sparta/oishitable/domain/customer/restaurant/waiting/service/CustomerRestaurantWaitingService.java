@@ -4,6 +4,7 @@ import com.sparta.oishitable.domain.common.auth.service.AuthService;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.domain.customer.reservation.entity.ReservationStatus;
+import com.sparta.oishitable.domain.customer.restaurant.repository.CustomerRestaurantRepository;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.request.WaitingJoinRequest;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueFindSizeResponse;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueFindUserRankResponse;
@@ -11,10 +12,8 @@ import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.Custo
 import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.CustomerWaitingRepository;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.entity.WaitingStatus;
-import com.sparta.oishitable.domain.owner.restaurant.service.OwnerRestaurantService;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.Waiting;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingType;
-import com.sparta.oishitable.global.aop.annotation.DistributedLock;
 import com.sparta.oishitable.global.exception.ConflictException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
@@ -30,20 +29,27 @@ public class CustomerRestaurantWaitingService {
 
     private final AuthService authService;
     private final UserRepository userRepository;
-    private final OwnerRestaurantService ownerRestaurantService;
     private final CustomerWaitingRepository customerWaitingRepository;
+    private final CustomerRestaurantRepository customerRestaurantRepository;
     private final CustomerWaitingRedisRepository customerWaitingRedisRepository;
 
-    @DistributedLock(key = "'waiting:' + #restaurantId + ':' + #request.waitingType")
+    @Transactional
     public void joinWaitingQueue(Long userId, Long restaurantId, WaitingJoinRequest request) {
-        Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
+        Restaurant restaurant = findRestaurantById(restaurantId);
         isPossibleWaiting(restaurant.getWaitingStatus());
 
         User user = findUserById(userId);
 
         WaitingType waitingType = WaitingType.of(request.waitingType());
-        String requestedWaitingKey = waitingType.getWaitingKey(restaurant.getId());
-        Integer sequence = findWaitingNextSequence(restaurant.getId(), waitingType);
+        String waitingKey = waitingType.getWaitingKey(restaurant.getId());
+        String sequenceKey = waitingType.getSequenceKey(restaurant.getId());
+
+        boolean isExists = customerWaitingRedisRepository.zFindUserRank(waitingKey, user.getId())
+                .isPresent();
+
+        if (isExists) {
+            throw new ConflictException(ErrorCode.ALREADY_REGISTERED_USER_IN_WAITING_QUEUE);
+        }
 
         int totalCount = request.totalCount();
 
@@ -51,22 +57,16 @@ public class CustomerRestaurantWaitingService {
             totalCount = 1;
         }
 
+        Long result = customerWaitingRedisRepository.join(waitingKey, sequenceKey, user.getId());
+
         Waiting waiting = Waiting.builder()
                 .user(user)
                 .restaurant(restaurant)
-                .dailySequence(sequence)
+                .dailySequence(result.intValue())
                 .totalCount(totalCount)
                 .type(waitingType)
                 .status(ReservationStatus.RESERVED)
                 .build();
-
-        Boolean isAdded
-                = customerWaitingRedisRepository.zAdd(requestedWaitingKey, user.getId(), waiting.getDailySequence());
-
-        if (!isAdded) {
-            log.warn("user {} already registered in waiting queue", user.getId());
-            throw new ConflictException(ErrorCode.ALREADY_REGISTERED_USER_IN_WAITING_QUEUE);
-        }
 
         customerWaitingRepository.save(waiting);
 
@@ -75,7 +75,7 @@ public class CustomerRestaurantWaitingService {
 
     @Transactional
     public void cancelWaitingQueue(Long userId, Long restaurantId, Long waitingId) {
-        Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
+        Restaurant restaurant = findRestaurantById(restaurantId);
         isPossibleWaiting(restaurant.getWaitingStatus());
 
         Waiting waiting = findWaitingById(waitingId);
@@ -104,7 +104,7 @@ public class CustomerRestaurantWaitingService {
     }
 
     public WaitingQueueFindUserRankResponse findWaitingQueueUserRank(Long userId, Long restaurantId, Long waitingId) {
-        Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
+        Restaurant restaurant = findRestaurantById(restaurantId);
         isPossibleWaiting(restaurant.getWaitingStatus());
 
         User user = findUserById(userId);
@@ -121,7 +121,7 @@ public class CustomerRestaurantWaitingService {
     }
 
     public WaitingQueueFindSizeResponse findWaitingQueueSize(Long restaurantId) {
-        Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
+        Restaurant restaurant = findRestaurantById(restaurantId);
         isPossibleWaiting(restaurant.getWaitingStatus());
 
         String inRestaurantKey = WaitingType.IN.getWaitingKey(restaurant.getId());
@@ -131,15 +131,6 @@ public class CustomerRestaurantWaitingService {
         Long takeOutWaitingSize = customerWaitingRedisRepository.zCard(takeOutKey);
 
         return WaitingQueueFindSizeResponse.from(inRestaurantWaitingSize, takeOutWaitingSize);
-    }
-
-    private Integer findWaitingNextSequence(Long restaurantId, WaitingType waitingType) {
-        String key = waitingType.getWaitingKey(restaurantId);
-
-        return customerWaitingRedisRepository.zFindLastSequence(key)
-                .map(i -> i + 1)
-                .orElseGet(() -> customerWaitingRepository.findTodayLastSequence(restaurantId, waitingType)
-                        .orElse(1));
     }
 
     private void isPossibleWaiting(WaitingStatus waitingStatus) {
@@ -156,5 +147,10 @@ public class CustomerRestaurantWaitingService {
     private User findUserById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private Restaurant findRestaurantById(Long restaurantId) {
+        return customerRestaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.RESTAURANT_NOT_FOUND));
     }
 }
