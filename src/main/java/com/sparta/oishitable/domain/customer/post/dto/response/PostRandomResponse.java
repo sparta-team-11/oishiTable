@@ -13,7 +13,7 @@ public class PostRandomResponse {
     private final Long regionId;
     private final String title;
     private final String content;
-    private final String username;
+    private final String nickname;
     private final Integer commentCount;
     private final Integer likeCount;
     private final LocalDateTime modifiedAt;
@@ -26,7 +26,7 @@ public class PostRandomResponse {
             Long regionId,
             String title,
             String content,
-            String username,
+            String nickname,
             Integer commentCount,
             Integer likeCount,
             LocalDateTime modifiedAt,
@@ -37,7 +37,7 @@ public class PostRandomResponse {
         this.regionId = regionId;
         this.title = title;
         this.content = content;
-        this.username = username;
+        this.nickname = nickname;
         this.commentCount = commentCount;
         this.likeCount = likeCount;
         this.modifiedAt = modifiedAt;
