@@ -12,6 +12,7 @@ import com.sparta.oishitable.domain.customer.post.dto.response.PostKeywordRespon
 import com.sparta.oishitable.domain.customer.post.dto.response.PostRandomResponse;
 import com.sparta.oishitable.domain.customer.post.dto.response.QPostKeywordResponse;
 import com.sparta.oishitable.domain.customer.post.dto.response.QPostRandomResponse;
+import com.sparta.oishitable.domain.customer.post.entity.Post;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -33,7 +34,6 @@ public class PostRepositoryQuerydslImpl implements PostRepositoryQuerydsl {
             int limit,
             int randomSeed
     ) {
-        //TODO 팔로우 기능 추가되면 조건 넣기
 
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -145,6 +145,17 @@ public class PostRepositoryQuerydslImpl implements PostRepositoryQuerydsl {
                 // 내림차순(최신순) 정렬
                 .orderBy(post.id.desc())
                 .limit(limit)
+                .fetch();
+    }
+
+    public List<Post> findAllByIdWithCommentsAndLikes(List<Long> postIds) {
+
+        return queryFactory
+                .selectDistinct(post)
+                .from(post)
+                .leftJoin(post.comments).fetchJoin()
+                .leftJoin(post.likes).fetchJoin()
+                .where(post.id.in(postIds))
                 .fetch();
     }
 }
