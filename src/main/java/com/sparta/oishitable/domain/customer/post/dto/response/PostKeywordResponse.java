@@ -1,11 +1,15 @@
 package com.sparta.oishitable.domain.customer.post.dto.response;
 
 import com.querydsl.core.annotations.QueryProjection;
+import com.sparta.oishitable.domain.customer.post.entity.PostDocument;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Builder(access = AccessLevel.PRIVATE)
 public class PostKeywordResponse {
 
     private final Long postId;
@@ -13,7 +17,7 @@ public class PostKeywordResponse {
     private final Long regionId;
     private final String title;
     private final String content;
-    private final String username;
+    private final String nickname;
     private final Integer commentCount;
     private final Integer likeCount;
     private final LocalDateTime modifiedAt;
@@ -25,18 +29,33 @@ public class PostKeywordResponse {
             Long regionId,
             String title,
             String content,
-            String username,
+            String nickname,
             Integer commentCount,
             Integer likeCount,
-            LocalDateTime modifiedAt) {
+            LocalDateTime modifiedAt
+    ) {
         this.postId = postId;
         this.userId = userId;
         this.regionId = regionId;
         this.title = title;
         this.content = content;
-        this.username = username;
+        this.nickname = nickname;
         this.commentCount = commentCount;
         this.likeCount = likeCount;
         this.modifiedAt = modifiedAt;
+    }
+
+    public static PostKeywordResponse from(PostDocument post, Integer commentCount, Integer likeCount){
+        return PostKeywordResponse.builder()
+                .postId(Long.valueOf(post.getId()))
+                .userId(post.getUserId())
+                .nickname(post.getNickname())
+                .regionId(post.getRegionId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .likeCount(likeCount)
+                .commentCount(commentCount)
+                .modifiedAt(post.getModifiedAt())
+                .build();
     }
 }

@@ -56,6 +56,11 @@ public class KakaoService {
         // 액세스 토큰으로 카카오 사용자 정보 받아오기
         KakaoAccount kakaoAccount = getKakaoUserInfo(accessToken);
 
+        // 전화번호 변환: "+82 10-xxxx-xxxx" -> "010xxxxxxxx"
+        String kakaoPhoneNumber = kakaoAccount.getPhoneNumber();
+        String phoneNumber = kakaoPhoneNumber.replace("+82", "0").replaceAll("[\\s-]", "");
+
+
         // 기존 사용자 확인 후 회원가입 후 로그인 처리
         User user = userRepository.findByEmail(kakaoAccount.getEmail())
                 .orElseGet(() -> {
@@ -64,7 +69,7 @@ public class KakaoService {
                             .nickname(kakaoAccount.getProfile().getNickname())
                             .email(kakaoAccount.getEmail())
                             .name(kakaoAccount.getName())
-                            .phoneNumber(kakaoAccount.getPhoneNumber())
+                            .phoneNumber(phoneNumber)
                             .role(UserRole.CUSTOMER)
                             .build();
                     return userRepository.save(newUser);

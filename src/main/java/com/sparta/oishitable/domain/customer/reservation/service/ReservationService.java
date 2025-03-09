@@ -2,6 +2,7 @@ package com.sparta.oishitable.domain.customer.reservation.service;
 
 import com.sparta.oishitable.domain.common.auth.service.AuthService;
 import com.sparta.oishitable.domain.common.notification.event.ReservationEvent;
+import com.sparta.oishitable.domain.common.notification.producer.EventProducer;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.service.UserService;
 import com.sparta.oishitable.domain.customer.reservation.dto.ReservationCreateRequest;
@@ -30,6 +31,7 @@ public class ReservationService {
     private final UserService userService;
     private final RestaurantSeatService restaurantSeatService;
     private final ReservationRepository reservationRepository;
+    private final EventProducer eventProducer;
 
     @DistributedLock(key = "'reservation:' + #request.restaurantId + ':' + #request.seatTypeId + ':' + #formattedDate")
     public Long createReservation(Long userId, ReservationCreateRequest request) {
@@ -76,7 +78,7 @@ public class ReservationService {
 
         // 예약 생성 후 이벤트 발행
         ReservationEvent event = new ReservationEvent(reservation.getId(), user.getId());
-//        eventProducer.sendReservationEvent(event);
+        eventProducer.sendReservationEvent(event);
 
         return reservation.getId();
     }

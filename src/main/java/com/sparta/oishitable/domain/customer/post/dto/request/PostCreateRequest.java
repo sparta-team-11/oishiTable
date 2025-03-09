@@ -1,5 +1,8 @@
 package com.sparta.oishitable.domain.customer.post.dto.request;
 
+import com.sparta.oishitable.domain.common.user.entity.User;
+import com.sparta.oishitable.domain.customer.post.entity.Post;
+import com.sparta.oishitable.domain.customer.post.region.entity.Region;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -16,4 +19,12 @@ public record PostCreateRequest(
         @Size(max = 300, message = "최대 300자까지 입력 가능합니다.")
         String content
 ) {
+        public Post toEntity(User user, Region region) {
+                return Post.builder()
+                        .user(user)
+                        .region(region)
+                        .title(title)
+                        .content(content)
+                        .build();
+        }
 }
