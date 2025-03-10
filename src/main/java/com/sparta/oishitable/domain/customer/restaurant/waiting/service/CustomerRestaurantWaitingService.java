@@ -61,16 +61,11 @@ public class CustomerRestaurantWaitingService {
 
         WaitingType waitingType = WaitingType.of(request.waitingType());
         String waitingKey = waitingType.getWaitingKey(restaurant.getId());
-        int totalCount = request.totalCount();
-
-        if (waitingType.equals(WaitingType.OUT)) {
-            totalCount = 1;
-        }
 
         Waiting waiting = Waiting.builder()
                 .user(user)
                 .restaurant(restaurant)
-                .totalCount(totalCount)
+                .totalCount(request.totalCount())
                 .type(waitingType)
                 .status(ReservationStatus.RESERVED)
                 .build();
@@ -142,13 +137,10 @@ public class CustomerRestaurantWaitingService {
         Restaurant restaurant = findRestaurantById(restaurantId);
         isPossibleWaiting(restaurant.getWaitingStatus());
 
-        String inRestaurantKey = WaitingType.IN.getWaitingKey(restaurant.getId());
-        Long inRestaurantWaitingSize = customerWaitingRedisRepository.zCard(inRestaurantKey);
+        String waitingKey = WaitingType.IN.getWaitingKey(restaurant.getId());
+        Long waitingQueueSize = customerWaitingRedisRepository.zCard(waitingKey);
 
-        String takeOutKey = WaitingType.OUT.getWaitingKey(restaurant.getId());
-        Long takeOutWaitingSize = customerWaitingRedisRepository.zCard(takeOutKey);
-
-        return WaitingQueueFindSizeResponse.from(inRestaurantWaitingSize, takeOutWaitingSize);
+        return WaitingQueueFindSizeResponse.from(waitingQueueSize);
     }
 
     private void isPossibleWaiting(WaitingStatus waitingStatus) {
