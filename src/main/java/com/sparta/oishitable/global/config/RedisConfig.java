@@ -1,44 +1,30 @@
 package com.sparta.oishitable.global.config;
 
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-
-import java.util.List;
 
 @Slf4j
 @Configuration
 public class RedisConfig {
 
-    // cluster 노드 목록을 리스트로 바인딩
-    @Value("${spring.data.redis.cluster.nodes}")
-    private List<String> clusterNodes;
+    @Value("${spring.redis.host}")
+    private String redisHost;
 
-    @Value("${spring.data.redis.cluster.max-redirects}")
-    private int maxRedirects;
-
-    @PostConstruct
-    public void init() {
-        log.info("Cluster nodes: {}", clusterNodes);
-    }
+    @Value("${spring.redis.port}")
+    private int redisPort;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-
-        // 클러스터 설정 구성
-        RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration(clusterNodes);
-        clusterConfiguration.setMaxRedirects(maxRedirects);
-
-        // LettuceConnectionFactory에 클러스터 설정 주입
-        return new LettuceConnectionFactory(clusterConfiguration);
+        // 단일 노드(Standalone) 구성
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(redisHost, redisPort);
+        return new LettuceConnectionFactory(config);
     }
 
     @Bean
@@ -48,10 +34,5 @@ public class RedisConfig {
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new StringRedisSerializer());
         return template;
-    }
-
-    @Bean
-    public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory connectionFactory) {
-        return new StringRedisTemplate(connectionFactory);
     }
 }
