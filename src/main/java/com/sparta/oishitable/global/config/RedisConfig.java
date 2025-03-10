@@ -15,11 +15,11 @@ import java.util.List;
 public class RedisConfig {
 
     // cluster 노드 목록을 리스트로 바인딩
-    @Value("${spring.redis.cluster.nodes}")
+    @Value("${spring.data.redis.cluster.nodes}")
     private List<String> clusterNodes;
 
     //
-    @Value("${spring.redis.cluster.max-redirects}")
+    @Value("${spring.data.redis.cluster.max-redirects}")
     private int maxRedirects;
 
     @Bean
