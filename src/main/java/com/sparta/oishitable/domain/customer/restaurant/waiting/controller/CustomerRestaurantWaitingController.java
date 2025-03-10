@@ -3,7 +3,6 @@ package com.sparta.oishitable.domain.customer.restaurant.waiting.controller;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.request.WaitingJoinRequest;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueFindSizeResponse;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueFindUserRankResponse;
-import com.sparta.oishitable.domain.customer.restaurant.waiting.service.CustomerRestaurantWaitingFacade;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.service.CustomerRestaurantWaitingService;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CustomerRestaurantWaitingController {
 
-    private final CustomerRestaurantWaitingFacade customerRestaurantWaitingFacade;
     private final CustomerRestaurantWaitingService customerRestaurantWaitingService;
 
     @PostMapping
@@ -25,7 +23,7 @@ public class CustomerRestaurantWaitingController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody WaitingJoinRequest request
     ) {
-        customerRestaurantWaitingFacade.join(userDetails.getId(), restaurantId, request);
+        customerRestaurantWaitingService.join(userDetails.getId(), restaurantId, request);
 
         // redirect uri: 유저 - 나의 예약 목록 조회 API  예정
         return ResponseEntity.created(null).build();

@@ -14,7 +14,6 @@ import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.entity.WaitingStatus;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.Waiting;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingType;
-import com.sparta.oishitable.global.aop.annotation.DistributedLock;
 import com.sparta.oishitable.global.exception.ConflictException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
@@ -23,21 +22,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.time.ZoneId;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CustomerRestaurantWaitingService {
 
     private final AuthService authService;
+    private final CustomerRestaurantWaitingJoinService customerRestaurantWaitingJoinService;
     private final UserRepository userRepository;
     private final CustomerWaitingRepository customerWaitingRepository;
     private final CustomerRestaurantRepository customerRestaurantRepository;
     private final CustomerWaitingRedisRepository customerWaitingRedisRepository;
 
-    public void validateJoin(Long userId, Long restaurantId) {
+    public void join(Long userId, Long restaurantId, WaitingJoinRequest request) {
         Restaurant restaurant = findRestaurantById(restaurantId);
         isPossibleWaiting(restaurant.getWaitingStatus());
 
@@ -51,38 +48,8 @@ public class CustomerRestaurantWaitingService {
         if (isExists) {
             throw new ConflictException(ErrorCode.ALREADY_REGISTERED_USER_IN_WAITING_QUEUE);
         }
-    }
 
-    @DistributedLock(key = "'waiting:' + #restaurantId")
-    public void joinWaitingQueue(Long userId, Long restaurantId, WaitingJoinRequest request) {
-        Restaurant restaurant = findRestaurantById(restaurantId);
-        User user = findUserById(userId);
-
-        WaitingType waitingType = WaitingType.IN;
-        String waitingKey = waitingType.getWaitingKey(restaurant.getId());
-
-        Waiting waiting = Waiting.builder()
-                .user(user)
-                .restaurant(restaurant)
-                .totalCount(request.totalCount())
-                .type(waitingType)
-                .status(ReservationStatus.RESERVED)
-                .build();
-
-        customerWaitingRepository.save(waiting);
-
-        Instant requestedAt = waiting.getCreatedAt()
-                .atZone(ZoneId.of("Asia/Seoul"))
-                .toInstant();
-
-        long epochSecond = requestedAt
-                .getEpochSecond();
-
-        int nano = requestedAt.getNano();
-
-        double score = epochSecond + (nano / 1_000_000_000.0);
-
-        customerWaitingRedisRepository.join(waitingKey, user.getId(), score);
+        customerRestaurantWaitingJoinService.joinWaitingQueue(user.getId(), restaurant.getId(), request);
     }
 
     @Transactional
