@@ -3,23 +3,34 @@ package com.sparta.oishitable.global.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.util.List;
+
 @Configuration
 public class RedisConfig {
 
-    @Value("${spring.data.redis.host}")
-    private String host;
+    // cluster 노드 목록을 리스트로 바인딩
+    @Value("${spring.redis.cluster.nodes}")
+    private List<String> clusterNodes;
 
-    @Value("${spring.data.redis.port}")
-    private int port;
+    //
+    @Value("${spring.redis.cluster.max-redirects}")
+    private int maxRedirects;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        return new LettuceConnectionFactory(host, port);
+
+        // 클러스터 설정 구성
+        RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration(clusterNodes);
+        clusterConfiguration.setMaxRedirects(maxRedirects);
+
+        // LettuceConnectionFactory에 클러스터 설정 주입
+        return new LettuceConnectionFactory(clusterConfiguration);
     }
 
     @Bean
