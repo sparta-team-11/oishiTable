@@ -22,13 +22,13 @@ public class RedisConfig {
     @Value("${spring.data.redis.cluster.nodes}")
     private List<String> clusterNodes;
 
+    @Value("${spring.data.redis.cluster.max-redirects}")
+    private int maxRedirects;
+
     @PostConstruct
     public void init() {
         log.info("Cluster nodes: {}", clusterNodes);
     }
-
-    @Value("${spring.data.redis.cluster.max-redirects}")
-    private int maxRedirects;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
