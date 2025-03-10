@@ -31,6 +31,20 @@ public class UserCouponService {
         List<Coupon> coupons = couponRepository.findByRestaurantId(restaurantId);
 
         return coupons.stream()
+                .filter(coupon -> {
+                    if (coupon.getType() == CouponType.FIRST_COME) {
+                        Integer maxCount = coupon.getFirstComeCouponMaxCount();
+
+                        if (maxCount == null) {
+                            maxCount = 0;
+                        }
+
+                        // 선착순 이벤트가 끝난 쿠폰은 유저가 조회하면 안된다.
+                        long downloadedCount = userCouponRepository.countByCouponIdAndCouponUsedFalse(coupon.getId());
+                        return downloadedCount < maxCount;
+                    }
+                    return true;
+                })
                 .map(CouponResponse::from)
                 .toList();
     }
@@ -60,6 +74,7 @@ public class UserCouponService {
 
             // 다운로드 한도 초과 여부 체크
             if (downloadedCount >= coupon.getFirstComeCouponMaxCount()) {
+                userCoupon.setCouponUsed(true);
                 throw new CustomRuntimeException(ErrorCode.COUPON_LIMIT_EXCEEDED);
             }
         }
