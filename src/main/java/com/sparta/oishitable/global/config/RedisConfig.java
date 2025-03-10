@@ -1,5 +1,7 @@
 package com.sparta.oishitable.global.config;
 
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +13,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.util.List;
 
+@Slf4j
 @Configuration
 public class RedisConfig {
 
@@ -18,7 +21,11 @@ public class RedisConfig {
     @Value("${spring.data.redis.cluster.nodes}")
     private List<String> clusterNodes;
 
-    //
+    @PostConstruct
+    public void init() {
+        log.info("Cluster nodes: {}", clusterNodes);
+    }
+
     @Value("${spring.data.redis.cluster.max-redirects}")
     private int maxRedirects;
 
