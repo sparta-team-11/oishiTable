@@ -14,7 +14,7 @@ import java.util.List;
 public class RedissonConfig {
 
     // application.properties에 쉼표로 구분된 노드 정보가 List<String>으로 바인딩됩니다.
-    @Value("${spring.redis.cluster.nodes}")
+    @Value("${spring.data.redis.cluster.nodes}")
     private List<String> clusterNodes;
 
     @Bean
