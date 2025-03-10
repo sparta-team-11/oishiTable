@@ -37,14 +37,13 @@ public class CustomerRestaurantWaitingService {
     private final CustomerRestaurantRepository customerRestaurantRepository;
     private final CustomerWaitingRedisRepository customerWaitingRedisRepository;
 
-    public void validateJoin(Long userId, Long restaurantId, WaitingJoinRequest request) {
+    public void validateJoin(Long userId, Long restaurantId) {
         Restaurant restaurant = findRestaurantById(restaurantId);
         isPossibleWaiting(restaurant.getWaitingStatus());
 
         User user = findUserById(userId);
 
-        WaitingType waitingType = WaitingType.of(request.waitingType());
-        String waitingKey = waitingType.getWaitingKey(restaurant.getId());
+        String waitingKey = WaitingType.IN.getWaitingKey(restaurant.getId());
 
         boolean isExists = customerWaitingRedisRepository.zFindUserRank(waitingKey, user.getId())
                 .isPresent();
@@ -59,7 +58,7 @@ public class CustomerRestaurantWaitingService {
         Restaurant restaurant = findRestaurantById(restaurantId);
         User user = findUserById(userId);
 
-        WaitingType waitingType = WaitingType.of(request.waitingType());
+        WaitingType waitingType = WaitingType.IN;
         String waitingKey = waitingType.getWaitingKey(restaurant.getId());
 
         Waiting waiting = Waiting.builder()

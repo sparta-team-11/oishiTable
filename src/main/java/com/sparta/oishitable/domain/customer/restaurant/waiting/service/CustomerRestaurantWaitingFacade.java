@@ -13,7 +13,7 @@ public class CustomerRestaurantWaitingFacade {
 
     @Transactional
     public void join(Long userId, Long restaurantId, WaitingJoinRequest request) {
-        customerRestaurantWaitingService.validateJoin(userId, restaurantId, request);
+        customerRestaurantWaitingService.validateJoin(userId, restaurantId);
         customerRestaurantWaitingService.joinWaitingQueue(userId, restaurantId, request);
         // 유저에게 대기열 등록에 성공함을 알리는 알림 전송 추가
     }
