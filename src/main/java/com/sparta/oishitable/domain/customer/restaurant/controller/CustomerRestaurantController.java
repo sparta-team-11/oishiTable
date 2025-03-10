@@ -29,7 +29,8 @@ public class CustomerRestaurantController {
             @RequestParam(required = false) Boolean isUseDistance,
             @RequestParam(required = false) Double clientLat,
             @RequestParam(required = false) Double clientLon,
-            @RequestParam(required = false) Integer distance
+            @RequestParam(required = false) Integer distance,
+            @RequestParam(required = false) String order
     ) {
         Slice<RestaurantSimpleResponse> response = customerRestaurantService.findRestaurants(
                 pageable,
@@ -41,7 +42,8 @@ public class CustomerRestaurantController {
                 isUseDistance,
                 clientLat,
                 clientLon,
-                distance
+                distance,
+                order
         );
 
         return ResponseEntity.ok(response);
