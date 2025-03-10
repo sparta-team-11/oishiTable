@@ -15,8 +15,10 @@ public class RedissonConfig {
 
     @Bean
     public RedissonClient redissonClient() {
+
+        String changedUrl = redisUrl.replaceAll("^\\[|\\]$", "");
         Config config = new Config();
-        config.useSingleServer().setAddress(redisUrl);
+        config.useSingleServer().setAddress(changedUrl);
         return Redisson.create(config);
     }
 }
