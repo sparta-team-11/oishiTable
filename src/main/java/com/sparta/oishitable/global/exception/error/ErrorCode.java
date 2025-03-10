@@ -95,6 +95,9 @@ public enum ErrorCode {
     COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 쿠폰입니다."),
     COUPON_ALREADY_USED(HttpStatus.CONFLICT, "이미 사용한 쿠폰입니다."),
     COUPON_ALREADY_DOWNLOAD(HttpStatus.CONFLICT, "이미 다운로드한 쿠폰입니다."),
+    COUPON_LIMIT_EXCEEDED(HttpStatus.CONFLICT, "쿠폰 이벤트가 끝났습니다."),
+    COUPON_REQUEST_INVALID(HttpStatus.CONFLICT, "선착순 쿠폰은 firstComeCouponMaxCount가 1 이상이어야 합니다"),
+    COUPON_GENERAL_REQUEST_INVALID(HttpStatus.CONFLICT, " 일반 쿠폰은 firstComeCouponMaxCount가 null이나 0이어야 합니다."),
 
     // 알림 관련 익셉션
     EMAIL_SENDING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "메일 전송에 실패했습니다."),
