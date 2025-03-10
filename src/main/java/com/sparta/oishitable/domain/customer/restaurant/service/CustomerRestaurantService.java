@@ -30,14 +30,16 @@ public class CustomerRestaurantService {
             Boolean isUseDistance,
             Double clientLat,
             Double clientLon,
-            Integer distance
+            Integer distance,
+            String order
     ) {
         return restaurantRepository.findRestaurantsByFilters(
                 pageable, keyword,
                 address, minPrice,
                 maxPrice, seatTypeId,
-                isUseDistance, GeometryUtil.createPoint(clientLat, clientLon),
-                distance
+                isUseDistance, clientLat,
+                clientLon, distance,
+                order
         );
     }
 

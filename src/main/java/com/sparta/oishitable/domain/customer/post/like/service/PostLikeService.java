@@ -31,10 +31,13 @@ public class PostLikeService {
 
             postLikeRepository.delete(postLike);
         } else {
+
             PostLike postLike = PostLike.builder()
                     .post(post)
                     .user(user)
                     .build();
+
+            post.addLike(postLike);
 
             postLikeRepository.save(postLike);
         }

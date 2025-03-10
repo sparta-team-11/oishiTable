@@ -31,6 +31,13 @@ public class Coupon {
     @Column(nullable = false)
     private Integer discount;
 
+    @Column(nullable = true)
+    private Integer firstComeCouponMaxCount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CouponType type;
+
     @ManyToOne
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
@@ -42,10 +49,15 @@ public class Coupon {
     public Coupon(
             String couponName,
             Integer discount,
-            Restaurant restaurant
+            Restaurant restaurant,
+            Integer firstComeCouponMaxCount,
+            CouponType type
     ) {
         this.couponName = couponName;
         this.discount = discount;
         this.restaurant = restaurant;
+        this.firstComeCouponMaxCount = firstComeCouponMaxCount;
+        this.type = type;
     }
+
 }

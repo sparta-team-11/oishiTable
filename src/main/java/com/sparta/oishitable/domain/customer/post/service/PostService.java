@@ -7,8 +7,10 @@ import com.sparta.oishitable.domain.customer.post.dto.request.PostUpdateRequest;
 import com.sparta.oishitable.domain.customer.post.dto.response.PostKeywordResponse;
 import com.sparta.oishitable.domain.customer.post.dto.response. PostRandomResponse;
 import com.sparta.oishitable.domain.customer.post.entity.Post;
+import com.sparta.oishitable.domain.customer.post.entity.PostDocument;
 import com.sparta.oishitable.domain.customer.post.region.entity.Region;
 import com.sparta.oishitable.domain.customer.post.region.repository.RegionRepository;
+import com.sparta.oishitable.domain.customer.post.repository.PostElasticRepository;
 import com.sparta.oishitable.domain.customer.post.repository.PostRepository;
 import com.sparta.oishitable.global.exception.ForbiddenException;
 import com.sparta.oishitable.global.exception.NotFoundException;
@@ -30,6 +32,7 @@ import java.util.Objects;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final PostElasticRepository postElasticRepository;
     private final UserRepository userRepository;
     private final RegionRepository regionRepository;
 
@@ -39,14 +42,14 @@ public class PostService {
         User user = findUserById(userId);
         Region region = findRegionById(request.regionId());
 
-        Post post = Post.builder()
-                .user(user)
-                .region(region)
-                .title(request.title())
-                .content(request.content())
-                .build();
+        Post post = request.toEntity(user, region);
 
         postRepository.save(post);
+
+        PostDocument postDocument = PostDocument.from(post, region, user);
+
+        postElasticRepository.save(postDocument);
+
         return post.getId();
     }
 
@@ -104,9 +107,15 @@ public class PostService {
 
         isPostOwner(post.getUser().getId(), userId);
 
+        User user = findUserById(userId);
+
         Region region = regionRepository.findById(request.regionId()).orElse(null);
 
         post.update(request.title(), request.content(), region);
+
+        PostDocument postDocument = PostDocument.from(post, post.getRegion(), user);
+
+        postElasticRepository.save(postDocument);
     }
 
     @Transactional
@@ -116,6 +125,8 @@ public class PostService {
         isPostOwner(post.getUser().getId(), userId);
 
         postRepository.delete(post);
+
+        postElasticRepository.deleteById(String.valueOf(post.getId()));
     }
 
     // 헬퍼
