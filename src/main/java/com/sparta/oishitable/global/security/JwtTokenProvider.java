@@ -3,7 +3,7 @@ package com.sparta.oishitable.global.security;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.entity.UserRole;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
-import com.sparta.oishitable.global.security.enums.TokenType;
+import com.sparta.oishitable.global.security.model.TokenType;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

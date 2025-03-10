@@ -4,9 +4,11 @@ import com.sparta.oishitable.domain.common.auth.service.AuthService;
 import com.sparta.oishitable.domain.owner.coupon.dto.request.CouponCreateRequest;
 import com.sparta.oishitable.domain.owner.coupon.dto.request.CouponResponse;
 import com.sparta.oishitable.domain.owner.coupon.entity.Coupon;
+import com.sparta.oishitable.domain.owner.coupon.entity.CouponType;
 import com.sparta.oishitable.domain.owner.coupon.repository.CouponRepository;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.service.OwnerRestaurantService;
+import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class OwnerCouponService {
 
@@ -34,10 +36,22 @@ public class OwnerCouponService {
 
         authService.checkUserAuthority(restaurant.getOwner().getId(), userId);
 
+        //(null or 0) 일때 FIRST_COME 이 생성 안되도록 한다.
+        if (request.type() == CouponType.FIRST_COME && (request.firstComeCouponMaxCount() == null || request.firstComeCouponMaxCount() <= 0)) {
+            throw new CustomRuntimeException(ErrorCode.COUPON_REQUEST_INVALID);
+        }
+
+        if (request.type() == CouponType.GENERAL && request.firstComeCouponMaxCount() != null && request.firstComeCouponMaxCount() >= 1) {
+            throw new CustomRuntimeException(ErrorCode.COUPON_GENERAL_REQUEST_INVALID);
+        }
+
+
         Coupon createCoupon = Coupon.builder()
                 .couponName(request.couponName())
                 .discount(request.discount())
+                .firstComeCouponMaxCount(request.firstComeCouponMaxCount() != null ? request.firstComeCouponMaxCount() : 0)
                 .restaurant(restaurant)
+                .type(request.type())
                 .build();
 
         Coupon savedCoupon = couponRepository.save(createCoupon);
@@ -51,7 +65,7 @@ public class OwnerCouponService {
         List<Coupon> coupons = couponRepository.findByRestaurantId(restaurantId);
         return coupons.stream()
                 .map(CouponResponse::from)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional

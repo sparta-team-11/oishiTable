@@ -3,7 +3,7 @@ package com.sparta.oishitable.global.security.filter;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.global.security.JwtTokenProvider;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
-import com.sparta.oishitable.global.security.enums.TokenType;
+import com.sparta.oishitable.global.security.model.TokenType;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+import org.locationtech.jts.geom.Point;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -21,7 +22,9 @@ import java.util.List;
 @Table(
         name = "restaurants",
         indexes = {
-                @Index(name = "idx_fk_owner_id", columnList = "owner_id")
+                @Index(name = "idx_fk_owner_id", columnList = "owner_id"),
+                @Index(name = "idx_restaurant_min_price", columnList = "minPrice"),
+                @Index(name = "idx_restaurant_max_price", columnList = "maxPrice")
         })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -64,11 +67,8 @@ public class Restaurant extends BaseEntity {
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
-    @Column(nullable = false)
-    private Double latitude;
-
-    @Column(nullable = false)
-    private Double longitude;
+    @Column(columnDefinition = "POINT SRID 4326", nullable = false)
+    private Point location;
 
     @Column(nullable = false)
     @ColumnDefault("'CLOSE'")
@@ -93,8 +93,7 @@ public class Restaurant extends BaseEntity {
             LocalTime reservationInterval,
             User owner,
             String address,
-            Double latitude,
-            Double longitude
+            Point location
     ) {
         this.name = name;
         this.openTime = openTime;
@@ -106,8 +105,7 @@ public class Restaurant extends BaseEntity {
         this.reservationInterval = reservationInterval;
         this.owner = owner;
         this.address = address;
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.location = location;
         initializePrice();
     }
 

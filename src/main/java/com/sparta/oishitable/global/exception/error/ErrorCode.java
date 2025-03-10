@@ -22,6 +22,7 @@ public enum ErrorCode {
 
     // 식당 관련 익셉션
     RESTAURANT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 식당 입니다."),
+    INVALID_DISTANCE_REQUEST(HttpStatus.BAD_REQUEST, "올바르지 않은 거리가 요청에 포함되어 있습니다."),
 
     // SeatType 관련 익셉션
     SEAT_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 좌석 타입 입니다."),
@@ -68,7 +69,6 @@ public enum ErrorCode {
 
     // 게시글 관련 익셉션
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게시글 입니다."),
-
     POST_NOT_EQUAL(HttpStatus.BAD_REQUEST, "해당 게시글이 아닙니다."),
 
     // 댓글 관련 익셉션
@@ -95,6 +95,9 @@ public enum ErrorCode {
     COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 쿠폰입니다."),
     COUPON_ALREADY_USED(HttpStatus.CONFLICT, "이미 사용한 쿠폰입니다."),
     COUPON_ALREADY_DOWNLOAD(HttpStatus.CONFLICT, "이미 다운로드한 쿠폰입니다."),
+    COUPON_LIMIT_EXCEEDED(HttpStatus.CONFLICT, "쿠폰 이벤트가 끝났습니다."),
+    COUPON_REQUEST_INVALID(HttpStatus.CONFLICT, "선착순 쿠폰은 firstComeCouponMaxCount가 1 이상이어야 합니다"),
+    COUPON_GENERAL_REQUEST_INVALID(HttpStatus.CONFLICT, " 일반 쿠폰은 firstComeCouponMaxCount가 null이나 0이어야 합니다."),
 
     // 알림 관련 익셉션
     EMAIL_SENDING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "메일 전송에 실패했습니다."),
@@ -112,8 +115,7 @@ public enum ErrorCode {
     WAITING_NOT_FOUND(HttpStatus.NOT_FOUND, "대기열 데이터가 존재하지 않습니다."),
     RESTAURANT_WAITING_IS_CLOSED(HttpStatus.BAD_REQUEST, "식당의 대기열이 닫혀있습니다."),
     ALREADY_COMPLETED_WAITING_EXCEPTION(HttpStatus.CONFLICT, "이미 완료된 웨이팅입니다."),
-    ALREADY_CANCELED_WAITING_EXCEPTION(HttpStatus.CONFLICT, "이미 완료된 웨이팅입니다."),
-    ;
+    ALREADY_CANCELED_WAITING_EXCEPTION(HttpStatus.CONFLICT, "이미 완료된 웨이팅입니다.");
 
     private final HttpStatus status;
     private final String message;

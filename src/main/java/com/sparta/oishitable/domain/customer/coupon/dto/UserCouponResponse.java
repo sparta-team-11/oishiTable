@@ -3,6 +3,8 @@ package com.sparta.oishitable.domain.customer.coupon.dto;
 import com.sparta.oishitable.domain.customer.coupon.entity.UserCoupon;
 import jakarta.validation.constraints.NotNull;
 
+import java.io.Serializable;
+
 public record UserCouponResponse(
         @NotNull
         Long couponId,
@@ -15,7 +17,7 @@ public record UserCouponResponse(
 
         @NotNull
         Boolean couponUsed
-) {
+) implements Serializable {
 
     public static UserCouponResponse from(UserCoupon usercoupon) {
         return new UserCouponResponse(

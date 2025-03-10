@@ -12,6 +12,7 @@ import com.sparta.oishitable.domain.owner.restaurantseat.service.RestaurantSeatS
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
+import com.sparta.oishitable.global.util.GeometryUtil;
 import com.sparta.oishitable.global.util.geocode.GeocodingClient;
 import com.sparta.oishitable.global.util.geocode.GeocodingResponse;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,10 @@ public class OwnerRestaurantService {
         Mono<GeocodingResponse.Document> coordinatesResult = findCoordinates(restaurantCreateRequest.address());
         GeocodingResponse.Document coordinates = coordinatesResult.block();
 
-        Restaurant restaurant = restaurantCreateRequest.toEntity(owner, coordinates.latitude(), coordinates.longitude());
+        Restaurant restaurant = restaurantCreateRequest.toEntity(
+                owner, GeometryUtil.createPoint(coordinates.latitude(), coordinates.longitude())
+        );
+
         Restaurant savedRestaurant = restaurantRepository.save(restaurant);
 
         restaurantSeatService.createAllRestaurantSeat(
