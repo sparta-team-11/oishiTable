@@ -151,7 +151,7 @@ async function submitSocialSignup() {
 }
 
 function goToStore(storeId) {
-    window.location.href = 'store.html?id=' + storeId;
+    window.location.href = 'restaurant.html?id=' + storeId;
 }
 
 async function searchStores() {
@@ -651,7 +651,7 @@ async function refreshWaiting() {
 window.onload = () => {
     if (window.location.pathname.includes('collection.html')) {
         displayBookmarkedStores();
-    } else if (window.location.pathname.includes('posts.html')) {
+    } else if (window.location.pathname.includes('post.html')) {
         searchPosts();
     } else if (window.location.pathname.includes('history.html')) {
         displayReservations();
