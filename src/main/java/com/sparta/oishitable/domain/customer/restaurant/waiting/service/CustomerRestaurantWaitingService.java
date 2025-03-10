@@ -14,6 +14,7 @@ import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.entity.WaitingStatus;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.Waiting;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingType;
+import com.sparta.oishitable.global.aop.annotation.DistributedLock;
 import com.sparta.oishitable.global.exception.ConflictException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
@@ -21,6 +22,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.time.ZoneId;
 
 @Slf4j
 @Service
@@ -33,8 +37,7 @@ public class CustomerRestaurantWaitingService {
     private final CustomerRestaurantRepository customerRestaurantRepository;
     private final CustomerWaitingRedisRepository customerWaitingRedisRepository;
 
-    @Transactional
-    public void joinWaitingQueue(Long userId, Long restaurantId, WaitingJoinRequest request) {
+    public void validateJoin(Long userId, Long restaurantId, WaitingJoinRequest request) {
         Restaurant restaurant = findRestaurantById(restaurantId);
         isPossibleWaiting(restaurant.getWaitingStatus());
 
@@ -42,7 +45,6 @@ public class CustomerRestaurantWaitingService {
 
         WaitingType waitingType = WaitingType.of(request.waitingType());
         String waitingKey = waitingType.getWaitingKey(restaurant.getId());
-        String sequenceKey = waitingType.getSequenceKey(restaurant.getId());
 
         boolean isExists = customerWaitingRedisRepository.zFindUserRank(waitingKey, user.getId())
                 .isPresent();
@@ -50,19 +52,24 @@ public class CustomerRestaurantWaitingService {
         if (isExists) {
             throw new ConflictException(ErrorCode.ALREADY_REGISTERED_USER_IN_WAITING_QUEUE);
         }
+    }
 
+    @DistributedLock(key = "'waiting:' + #restaurantId")
+    public void joinWaitingQueue(Long userId, Long restaurantId, WaitingJoinRequest request) {
+        Restaurant restaurant = findRestaurantById(restaurantId);
+        User user = findUserById(userId);
+
+        WaitingType waitingType = WaitingType.of(request.waitingType());
+        String waitingKey = waitingType.getWaitingKey(restaurant.getId());
         int totalCount = request.totalCount();
 
         if (waitingType.equals(WaitingType.OUT)) {
             totalCount = 1;
         }
 
-        Long result = customerWaitingRedisRepository.join(waitingKey, sequenceKey, user.getId());
-
         Waiting waiting = Waiting.builder()
                 .user(user)
                 .restaurant(restaurant)
-                .dailySequence(result.intValue())
                 .totalCount(totalCount)
                 .type(waitingType)
                 .status(ReservationStatus.RESERVED)
@@ -70,7 +77,18 @@ public class CustomerRestaurantWaitingService {
 
         customerWaitingRepository.save(waiting);
 
-        // 유저에게 대기열 등록에 성공함을 알리는 알림 전송 추가
+        Instant requestedAt = waiting.getCreatedAt()
+                .atZone(ZoneId.of("Asia/Seoul"))
+                .toInstant();
+
+        long epochSecond = requestedAt
+                .getEpochSecond();
+
+        int nano = requestedAt.getNano();
+
+        double score = epochSecond + (nano / 1_000_000_000.0);
+
+        customerWaitingRedisRepository.join(waitingKey, user.getId(), score);
     }
 
     @Transactional

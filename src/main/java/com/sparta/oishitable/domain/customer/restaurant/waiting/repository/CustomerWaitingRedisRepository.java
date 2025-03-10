@@ -4,7 +4,7 @@ import java.util.Optional;
 
 public interface CustomerWaitingRedisRepository {
 
-    Long join(String queueKey, String sequenceKey, Long userId);
+    void join(String queueKey, Long userId, double score);
 
     Optional<Long> zFindUserRank(String key, Long userId);
 
