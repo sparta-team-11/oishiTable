@@ -9,7 +9,7 @@ import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
-public class OwnerWaitingRedisRepositoryImpl implements OwnerWaitingRedisRepository {
+public class OwnerRestaurantWaitingRedisRepositoryImpl implements OwnerRestaurantWaitingRedisRepository {
 
     private final RedisTemplate<String, String> redisTemplate;
 

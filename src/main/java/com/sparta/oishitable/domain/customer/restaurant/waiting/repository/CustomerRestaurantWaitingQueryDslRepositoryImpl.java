@@ -11,7 +11,7 @@ import java.util.Optional;
 import static com.sparta.oishitable.domain.owner.restaurant.waiting.entity.QWaiting.waiting;
 
 @RequiredArgsConstructor
-public class CustomerWaitingQueryDslRepositoryImpl implements CustomerWaitingQueryDslRepository {
+public class CustomerRestaurantWaitingQueryDslRepositoryImpl implements CustomerRestaurantWaitingQueryDslRepository {
 
     private final JPAQueryFactory queryFactory;
 

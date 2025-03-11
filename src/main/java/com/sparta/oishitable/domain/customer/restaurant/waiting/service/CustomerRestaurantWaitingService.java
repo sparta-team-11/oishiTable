@@ -8,8 +8,8 @@ import com.sparta.oishitable.domain.customer.restaurant.repository.CustomerResta
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.request.WaitingJoinRequest;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueFindSizeResponse;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueFindUserRankResponse;
-import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.CustomerWaitingRedisRepository;
-import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.CustomerWaitingRepository;
+import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.CustomerRestaurantWaitingRedisRepository;
+import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.CustomerRestaurantWaitingRepository;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.entity.WaitingStatus;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.Waiting;
@@ -29,10 +29,11 @@ public class CustomerRestaurantWaitingService {
 
     private final AuthService authService;
     private final CustomerRestaurantWaitingJoinService customerRestaurantWaitingJoinService;
+
     private final UserRepository userRepository;
-    private final CustomerWaitingRepository customerWaitingRepository;
     private final CustomerRestaurantRepository customerRestaurantRepository;
-    private final CustomerWaitingRedisRepository customerWaitingRedisRepository;
+    private final CustomerRestaurantWaitingRepository customerRestaurantWaitingRepository;
+    private final CustomerRestaurantWaitingRedisRepository customerRestaurantWaitingRedisRepository;
 
     public void join(Long userId, Long restaurantId, WaitingJoinRequest request) {
         Restaurant restaurant = findRestaurantById(restaurantId);
@@ -42,7 +43,7 @@ public class CustomerRestaurantWaitingService {
 
         String waitingKey = WaitingType.IN.getWaitingKey(restaurant.getId());
 
-        boolean isExists = customerWaitingRedisRepository.zFindUserRank(waitingKey, user.getId())
+        boolean isExists = customerRestaurantWaitingRedisRepository.zFindUserRank(waitingKey, user.getId())
                 .isPresent();
 
         if (isExists) {
@@ -72,12 +73,12 @@ public class CustomerRestaurantWaitingService {
 
         String key = waiting.getType().getWaitingKey(waiting.getRestaurant().getId());
 
-        customerWaitingRedisRepository.zFindUserRank(key, userId)
+        customerRestaurantWaitingRedisRepository.zFindUserRank(key, userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND));
 
         waiting.updateStatus(ReservationStatus.CANCELED);
 
-        customerWaitingRedisRepository.zRemove(key, user.getId());
+        customerRestaurantWaitingRedisRepository.zRemove(key, user.getId());
 
         // 유저에게 대기열 취소에 성공함을 알리는 알림 전송 추가
     }
@@ -93,7 +94,7 @@ public class CustomerRestaurantWaitingService {
 
         String key = waiting.getType().getWaitingKey(restaurant.getId());
 
-        Long rank = customerWaitingRedisRepository.zFindUserRank(key, user.getId())
+        Long rank = customerRestaurantWaitingRedisRepository.zFindUserRank(key, user.getId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND));
 
         return WaitingQueueFindUserRankResponse.from(rank);
@@ -104,7 +105,7 @@ public class CustomerRestaurantWaitingService {
         isPossibleWaiting(restaurant.getWaitingStatus());
 
         String waitingKey = WaitingType.IN.getWaitingKey(restaurant.getId());
-        Long waitingQueueSize = customerWaitingRedisRepository.zCard(waitingKey);
+        Long waitingQueueSize = customerRestaurantWaitingRedisRepository.zCard(waitingKey);
 
         return WaitingQueueFindSizeResponse.from(waitingQueueSize);
     }
@@ -116,7 +117,7 @@ public class CustomerRestaurantWaitingService {
     }
 
     private Waiting findWaitingById(Long waitingId) {
-        return customerWaitingRepository.findById(waitingId)
+        return customerRestaurantWaitingRepository.findById(waitingId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_NOT_FOUND));
     }
 

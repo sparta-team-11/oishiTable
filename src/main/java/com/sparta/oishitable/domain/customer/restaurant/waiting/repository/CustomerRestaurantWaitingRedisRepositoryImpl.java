@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
-public class CustomerWaitingRedisRepositoryImpl implements CustomerWaitingRedisRepository {
+public class CustomerRestaurantWaitingRedisRepositoryImpl implements CustomerRestaurantWaitingRedisRepository {
 
     private final RedisTemplate<String, String> redisTemplate;
 

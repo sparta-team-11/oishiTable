@@ -2,7 +2,7 @@ package com.sparta.oishitable.domain.customer.restaurant.waiting.repository;
 
 import java.util.Optional;
 
-public interface CustomerWaitingRedisRepository {
+public interface CustomerRestaurantWaitingRedisRepository {
 
     void join(String queueKey, Long userId, Integer score);
 

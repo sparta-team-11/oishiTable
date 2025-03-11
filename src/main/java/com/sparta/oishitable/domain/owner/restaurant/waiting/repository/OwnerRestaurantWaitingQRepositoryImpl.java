@@ -13,7 +13,7 @@ import static com.sparta.oishitable.domain.common.user.entity.QUser.user;
 import static com.sparta.oishitable.domain.owner.restaurant.waiting.entity.QWaiting.waiting;
 
 @RequiredArgsConstructor
-public class OwnerWaitingQRepositoryImpl implements OwnerWaitingQRepository {
+public class OwnerRestaurantWaitingQRepositoryImpl implements OwnerRestaurantWaitingQRepository {
 
     private final JPAQueryFactory queryFactory;
 

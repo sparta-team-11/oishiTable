@@ -4,7 +4,7 @@ import com.sparta.oishitable.domain.owner.restaurant.waiting.dto.response.Waitin
 
 import java.util.List;
 
-public interface OwnerWaitingQRepository {
+public interface OwnerRestaurantWaitingQRepository {
 
     List<WaitingDetails> findWaitingDetails(List<Long> userIds);
 }

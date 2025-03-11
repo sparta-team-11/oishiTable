@@ -5,8 +5,8 @@ import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.domain.customer.reservation.entity.ReservationStatus;
 import com.sparta.oishitable.domain.customer.restaurant.repository.CustomerRestaurantRepository;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.request.WaitingJoinRequest;
-import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.CustomerWaitingRedisRepository;
-import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.CustomerWaitingRepository;
+import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.CustomerRestaurantWaitingRedisRepository;
+import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.CustomerRestaurantWaitingRepository;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.Waiting;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingType;
@@ -23,9 +23,9 @@ import org.springframework.stereotype.Component;
 public class CustomerRestaurantWaitingJoinService {
 
     private final UserRepository userRepository;
-    private final CustomerWaitingRepository customerWaitingRepository;
     private final CustomerRestaurantRepository customerRestaurantRepository;
-    private final CustomerWaitingRedisRepository customerWaitingRedisRepository;
+    private final CustomerRestaurantWaitingRepository customerRestaurantWaitingRepository;
+    private final CustomerRestaurantWaitingRedisRepository customerRestaurantWaitingRedisRepository;
 
     @DistributedLock(key = "'waiting:' + #restaurantId")
     public void joinWaitingQueue(Long userId, Long restaurantId, WaitingJoinRequest request) {
@@ -47,17 +47,17 @@ public class CustomerRestaurantWaitingJoinService {
                 .status(ReservationStatus.RESERVED)
                 .build();
 
-        customerWaitingRepository.save(waiting);
+        customerRestaurantWaitingRepository.save(waiting);
 
-        customerWaitingRedisRepository.join(waitingKey, user.getId(), dailySequence);
+        customerRestaurantWaitingRedisRepository.join(waitingKey, user.getId(), dailySequence);
     }
 
     private Integer findWaitingNextSequence(Long restaurantId, WaitingType waitingType) {
         String waitingKey = waitingType.getWaitingKey(restaurantId);
 
-        return customerWaitingRedisRepository.zFindLastSequence(waitingKey)
+        return customerRestaurantWaitingRedisRepository.zFindLastSequence(waitingKey)
                 .map(i -> i + 1)
-                .orElseGet(() -> customerWaitingRepository.findTodayLastSequence(restaurantId, waitingType)
+                .orElseGet(() -> customerRestaurantWaitingRepository.findTodayLastSequence(restaurantId, waitingType)
                         .orElse(1));
     }
 
