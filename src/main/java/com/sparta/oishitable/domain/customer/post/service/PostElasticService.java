@@ -18,6 +18,8 @@ import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -57,9 +59,13 @@ public class PostElasticService {
 
         PageRequest pageRequest = PageRequest.of(0, limit + 1, Sort.by(Sort.Direction.DESC, "post_id"));
 
+        String base64EncodedQuery = Base64.getEncoder().encodeToString(
+                boolQuery.toString().getBytes(StandardCharsets.UTF_8)
+        );
+
         // NativeQueryBuilder를 사용하여 쿼리 생성 (최신 API)
         NativeQuery query = new NativeQueryBuilder()
-                .withQuery(q -> q.wrapper(w -> w.query(boolQuery.toString())))
+                .withQuery(q -> q.wrapper(w -> w.query(base64EncodedQuery)))
                 .withPageable(pageRequest)
                 .build();
 
