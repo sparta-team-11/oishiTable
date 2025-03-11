@@ -4,6 +4,7 @@ services:
     container_name: oishitable-app
     restart: always
     environment:
+      DEBUG: true
       SPRING_DATASOURCE_URL: jdbc:mysql://${RDS_ENDPOINT}:3306/oishitable
       SPRING_DATASOURCE_USERNAME: ${RDS_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${RDS_PASSWORD}
