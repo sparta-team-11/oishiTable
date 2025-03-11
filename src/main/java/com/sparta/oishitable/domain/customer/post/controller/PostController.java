@@ -80,14 +80,12 @@ public class PostController {
 
     @GetMapping("/keyword/elastic")
     public ResponseEntity<Slice<PostKeywordResponse>> findPostsByKeywordWithElastic(
-            @RequestParam(required = false) Long userId,
             @RequestParam(required = false) Long regionId,
             @RequestParam(required = false) Long cursorValue,
             @RequestParam String keyword,
             @RequestParam(defaultValue = "10") int limit
     ) {
         Slice<PostKeywordResponse> response = postElasticService.findPostsByKeywordWithElastic(
-                userId,
                 regionId,
                 cursorValue,
                 keyword,
