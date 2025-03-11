@@ -33,6 +33,9 @@ public class Waiting extends BaseEntity {
     private Integer totalCount;
 
     @Column(nullable = false)
+    private Integer dailySequence;
+
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private WaitingType type;
 
@@ -50,13 +53,22 @@ public class Waiting extends BaseEntity {
     private Restaurant restaurant;
 
     @Builder
-    public Waiting(Long id, Integer totalCount, WaitingType type, ReservationStatus status, User user, Restaurant restaurant) {
+    public Waiting(
+            Long id,
+            Integer totalCount,
+            WaitingType type,
+            ReservationStatus status,
+            User user,
+            Restaurant restaurant,
+            Integer dailySequence
+    ) {
         this.id = id;
         this.totalCount = totalCount;
         this.type = type;
         this.status = status;
         this.user = user;
         this.restaurant = restaurant;
+        this.dailySequence = dailySequence;
     }
 
     public void updateStatus(ReservationStatus status) {

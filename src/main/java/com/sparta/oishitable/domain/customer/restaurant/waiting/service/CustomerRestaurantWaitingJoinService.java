@@ -14,11 +14,10 @@ import com.sparta.oishitable.global.aop.annotation.DistributedLock;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
-import java.time.ZoneId;
-
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CustomerRestaurantWaitingJoinService {
@@ -36,28 +35,30 @@ public class CustomerRestaurantWaitingJoinService {
         WaitingType waitingType = WaitingType.IN;
         String waitingKey = waitingType.getWaitingKey(restaurant.getId());
 
+        Integer dailySequence = findWaitingNextSequence(restaurant.getId(), waitingType);
+        log.info("daily sequence is {}", dailySequence);
+
         Waiting waiting = Waiting.builder()
                 .user(user)
                 .restaurant(restaurant)
                 .totalCount(request.totalCount())
+                .dailySequence(dailySequence)
                 .type(waitingType)
                 .status(ReservationStatus.RESERVED)
                 .build();
 
         customerWaitingRepository.save(waiting);
 
-        Instant requestedAt = waiting.getCreatedAt()
-                .atZone(ZoneId.of("Asia/Seoul"))
-                .toInstant();
+        customerWaitingRedisRepository.join(waitingKey, user.getId(), dailySequence);
+    }
 
-        long epochSecond = requestedAt
-                .getEpochSecond();
+    private Integer findWaitingNextSequence(Long restaurantId, WaitingType waitingType) {
+        String waitingKey = waitingType.getWaitingKey(restaurantId);
 
-        int nano = requestedAt.getNano();
-
-        double score = epochSecond + (nano / 1_000_000_000.0);
-
-        customerWaitingRedisRepository.join(waitingKey, user.getId(), score);
+        return customerWaitingRedisRepository.zFindLastSequence(waitingKey)
+                .map(i -> i + 1)
+                .orElseGet(() -> customerWaitingRepository.findTodayLastSequence(restaurantId, waitingType)
+                        .orElse(1));
     }
 
     private User findUserById(Long userId) {
