@@ -3,7 +3,6 @@ package com.sparta.oishitable.domain.customer.post.service;
 import com.sparta.oishitable.domain.customer.post.dto.response.PostKeywordResponse;
 import com.sparta.oishitable.domain.customer.post.entity.Post;
 import com.sparta.oishitable.domain.customer.post.entity.PostDocument;
-import com.sparta.oishitable.domain.customer.post.repository.PostElasticRepository;
 import com.sparta.oishitable.domain.customer.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -30,12 +29,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostElasticService {
 
-    private final PostElasticRepository postElasticRepository;
     private final ElasticsearchOperations elasticsearchOperations;
     private final PostRepository postRepository;
 
     public Slice<PostKeywordResponse> findPostsByKeywordWithElastic(
-            Long userId,
             Long regionId,
             Long cursorValue,
             String keyword,
@@ -62,8 +59,9 @@ public class PostElasticService {
 
         PageRequest pageRequest = PageRequest.of(0, limit + 1, Sort.by(Sort.Direction.DESC, "post_id"));
 
-        // boolQuery.toString()으로 생성된 JSON 문자열을 Base64로 인코딩
-        String base64EncodedQuery = Base64.getEncoder().encodeToString(boolQuery.toString().getBytes(StandardCharsets.UTF_8));
+        String base64EncodedQuery = Base64.getEncoder().encodeToString(
+                boolQuery.toString().getBytes(StandardCharsets.UTF_8)
+        );
 
         // NativeQueryBuilder를 사용하여 쿼리 생성 (최신 API)
         NativeQuery query = new NativeQueryBuilder()
