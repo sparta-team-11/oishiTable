@@ -30,7 +30,8 @@ public class OwnerWaitingQRepositoryImpl implements OwnerWaitingQRepository {
                                 waiting.totalCount,
                                 waiting.user.phoneNumber,
                                 waiting.status,
-                                waiting.type
+                                waiting.type,
+                                waiting.dailySequence
                         )
                 )
                 .from(waiting)
