@@ -10,6 +10,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Getter
 @Document(indexName = "posts")
@@ -47,6 +48,8 @@ public class PostDocument {
     public static PostDocument from(Post post, Region region, User user) {
 
         String id = String.valueOf(post.getId());
+        LocalDateTime modifiedAt = post.getModifiedAt().truncatedTo(ChronoUnit.SECONDS);
+
         return new PostDocument(
                 id,
                 post.getId(),
@@ -56,7 +59,7 @@ public class PostDocument {
                 region.getName(),
                 user.getNickname(),
                 post.getContent(),
-                post.getModifiedAt()
+                modifiedAt
         );
     }
 }
