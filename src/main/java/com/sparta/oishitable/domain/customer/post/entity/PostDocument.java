@@ -18,6 +18,9 @@ public class PostDocument {
     @Id
     private String id;
 
+    @Field(name = "post_id", type = FieldType.Long)
+    private Long postId;
+
     @Field(name = "user_id", type = FieldType.Long)
     private Long userId;
 
@@ -44,6 +47,7 @@ public class PostDocument {
         String id = String.valueOf(post.getId());
         return new PostDocument(
                 id,
+                post.getId(),
                 user.getId(),
                 region.getId(),
                 post.getTitle(),
