@@ -5,12 +5,14 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.core.types.dsl.StringPath;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.oishitable.domain.customer.restaurant.dto.response.QRestaurantSimpleResponse;
 import com.sparta.oishitable.domain.customer.restaurant.dto.response.RestaurantSimpleResponse;
 import com.sparta.oishitable.domain.customer.restaurant.model.RestaurantSearchDistance;
 import com.sparta.oishitable.domain.customer.restaurant.model.RestaurantSearchOrder;
+import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import com.sparta.oishitable.global.util.GeometryUtil;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
@@ -19,6 +21,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.querydsl.core.types.dsl.Expressions.*;
 import static com.sparta.oishitable.domain.admin.seatType.entity.QSeatType.seatType;
@@ -34,6 +37,7 @@ public class CustomerRestaurantRepositoryQuerydslImpl implements CustomerRestaur
 
     @Override
     public Slice<RestaurantSimpleResponse> findRestaurantsByFilters(
+            CustomUserDetails userDetails,
             Pageable pageable,
             String keyword,
             String address,
@@ -66,6 +70,11 @@ public class CustomerRestaurantRepositoryQuerydslImpl implements CustomerRestaur
                                 restaurant.id,
                                 restaurant.name,
                                 restaurant.address,
+                                restaurant.openTime,
+                                restaurant.closeTime,
+                                restaurant.minPrice,
+                                restaurant.maxPrice,
+                                isBookmarked(userDetails),
                                 Boolean.TRUE.equals(isUseDistance) ?
                                         distanceSphereExpression(clientLocation) :
                                         nullExpression(Double.class),
@@ -145,5 +154,17 @@ public class CustomerRestaurantRepositoryQuerydslImpl implements CustomerRestaur
                 yield new OrderSpecifier<?>[]{bookmark.count().desc(), restaurant.id.desc()};
             }
         };
+    }
+
+    private BooleanExpression isBookmarked(CustomUserDetails userDetails) {
+        return Optional.ofNullable(userDetails)
+                .map(user -> JPAExpressions
+                        .select(bookmark.count())
+                        .from(bookmark)
+                        .where(bookmark.restaurant.id.eq(restaurant.id)
+                                .and(bookmark.user.id.eq(user.getId()))
+                        )
+                        .gt(0L))
+                .orElse(null);
     }
 }
