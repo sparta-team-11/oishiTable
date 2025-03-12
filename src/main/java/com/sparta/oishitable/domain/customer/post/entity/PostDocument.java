@@ -4,11 +4,13 @@ import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.customer.post.region.entity.Region;
 import jakarta.persistence.Id;
 import lombok.*;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Getter
 @Document(indexName = "posts")
@@ -39,12 +41,15 @@ public class PostDocument {
     @Field(type = FieldType.Text)
     private String content;
 
-    @Field(name = "modified_at", type = FieldType.Date)
+    @Field(name = "modified_at", type = FieldType.Date,
+    format = DateFormat.basic_date_time_no_millis, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime modifiedAt;
 
     public static PostDocument from(Post post, Region region, User user) {
 
         String id = String.valueOf(post.getId());
+        LocalDateTime modifiedAt = post.getModifiedAt().truncatedTo(ChronoUnit.SECONDS);
+
         return new PostDocument(
                 id,
                 post.getId(),
@@ -54,7 +59,7 @@ public class PostDocument {
                 region.getName(),
                 user.getNickname(),
                 post.getContent(),
-                post.getModifiedAt()
+                modifiedAt
         );
     }
 }
