@@ -10,13 +10,13 @@ import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
-public class CustomerWaitingRedisRepositoryImpl implements CustomerWaitingRedisRepository {
+public class CustomerRestaurantWaitingRedisRepositoryImpl implements CustomerRestaurantWaitingRedisRepository {
 
     private final RedisTemplate<String, String> redisTemplate;
 
     @Override
-    public Boolean zAdd(String key, Long userId, Integer sequence) {
-        return redisTemplate.opsForZSet().add(key, userId.toString(), sequence);
+    public void join(String queueKey, Long userId, Integer score) {
+        redisTemplate.opsForZSet().add(queueKey, userId.toString(), score);
     }
 
     @Override

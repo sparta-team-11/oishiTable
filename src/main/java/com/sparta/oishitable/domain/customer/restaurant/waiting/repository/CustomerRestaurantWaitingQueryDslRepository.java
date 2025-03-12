@@ -4,7 +4,7 @@ import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingType;
 
 import java.util.Optional;
 
-public interface CustomerWaitingQRepository {
+public interface CustomerRestaurantWaitingQueryDslRepository {
 
     Optional<Integer> findTodayLastSequence(Long restaurantId, WaitingType waitingType);
 }

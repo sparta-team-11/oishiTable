@@ -10,8 +10,7 @@ import java.util.Arrays;
 @Getter
 @RequiredArgsConstructor
 public enum WaitingType {
-    IN("waiting:in:"),
-    OUT("waiting:out:");
+    IN("waiting:in:");
 
     private final String prefix;
 
@@ -23,7 +22,7 @@ public enum WaitingType {
     }
 
     public String getWaitingKey(Long restaurantId) {
-        return this.prefix + restaurantId;
+        return this.prefix + "queue:" + restaurantId;
     }
 }
 

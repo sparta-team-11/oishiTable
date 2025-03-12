@@ -12,8 +12,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
-import java.time.LocalDate;
-
 @Getter
 @Entity
 @Table(
@@ -35,6 +33,9 @@ public class Waiting extends BaseEntity {
     private Integer totalCount;
 
     @Column(nullable = false)
+    private Integer dailySequence;
+
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private WaitingType type;
 
@@ -51,12 +52,16 @@ public class Waiting extends BaseEntity {
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
-    @Column(nullable = false)
-    private Integer dailySequence;
-
-
     @Builder
-    public Waiting(Long id, Integer totalCount, WaitingType type, ReservationStatus status, User user, Restaurant restaurant, Integer dailySequence) {
+    public Waiting(
+            Long id,
+            Integer totalCount,
+            WaitingType type,
+            ReservationStatus status,
+            User user,
+            Restaurant restaurant,
+            Integer dailySequence
+    ) {
         this.id = id;
         this.totalCount = totalCount;
         this.type = type;

@@ -2,7 +2,7 @@ package com.sparta.oishitable.domain.owner.restaurant.waiting.repository;
 
 import java.util.List;
 
-public interface OwnerWaitingRedisRepository {
+public interface OwnerRestaurantWaitingRedisRepository {
 
     List<Long> findWaitingUsers(String key, int page, int size);
 
