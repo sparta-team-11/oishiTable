@@ -13,11 +13,12 @@ function checkAuthAndRefresh() {
     const refreshToken = localStorage.getItem('refreshToken');
     const accessTokenExpiryTime = localStorage.getItem('accessTokenExpiryTime');
 
-    if (!accessToken) {
+    if (!accessToken || accessToken.trim() === '') {
         window.location.href = '/login?error=unauthorized';  // 로그인 화면으로 이동
     } else if (currentTime > accessTokenExpiryTime) {
         if (refreshToken) {
             api.refreshToken(accessToken, refreshToken).then(response => {
+                console.log(response); // 서버 응답 확인
                 const newAccessToken = response.accessToken;
                 const newRefreshToken = response.refreshToken;
                 const newExpiryTime = response.accessTokenExpiryTime;
@@ -26,10 +27,11 @@ function checkAuthAndRefresh() {
                 localStorage.setItem('refreshToken', newRefreshToken);
                 localStorage.setItem('accessTokenExpiryTime', newExpiryTime);
             }).catch(error => {
-                window.location.href = '/login';  // 로그인 화면으로 이동
+                console.error(error); // 오류 로그 확인
+                window.location.href = '/login?error=unauthorized';  // 로그인 화면으로 이동
             });
         } else {
-            window.location.href = '/login';  // 로그인 화면으로 이동
+            window.location.href = '/login?error=unauthorized';  // 로그인 화면으로 이동
         }
     }
 }
@@ -44,7 +46,7 @@ const api = {
             },
             body: JSON.stringify(
                 {
-                    accessToken: accessToken,
+                    accessToken: `Bearer ${accessToken}`,
                     refreshToken: refreshToken
                 }
             )
@@ -124,19 +126,19 @@ async function searchStores(reset = true) {
 }
 
 async function fetchRestaurants(keyword, address, minPrice, maxPrice, seatType, isUseDistance, clientLat, clientLon, order) {
-    const params = new URLSearchParams({
-        keyword: keyword || "",
-        address: address || "",
-        minPrice: minPrice || "",
-        maxPrice: maxPrice || "",
-        seatTypeId: seatType || "",
-        isUseDistance: isUseDistance ? "true" : "false",
-        clientLat: clientLat || "",
-        clientLon: clientLon || "",
-        order: order,
-        page: currentPage,
-        size: 30 // 한 번에 가져올 데이터 개수
-    });
+    const params = new URLSearchParams();
+
+    if (keyword !== undefined && keyword !== null) params.append("keyword", keyword);
+    if (address !== undefined && address !== null) params.append("address", address);
+    if (minPrice !== undefined && minPrice !== null) params.append("minPrice", minPrice);
+    if (maxPrice !== undefined && maxPrice !== null) params.append("maxPrice", maxPrice);
+    if (seatType !== undefined && seatType !== null) params.append("seatTypeId", seatType);
+    if (isUseDistance !== undefined && isUseDistance !== null) params.append("isUseDistance", isUseDistance ? "true" : "false");
+    if (clientLat !== undefined && clientLat !== null) params.append("clientLat", clientLat);
+    if (clientLon !== undefined && clientLon !== null) params.append("clientLon", clientLon);
+    if (order !== undefined && order !== null) params.append("order", order);
+
+    params.append("page", currentPage);
 
     const accessToken = localStorage.getItem('accessToken');
 
@@ -159,6 +161,8 @@ async function fetchRestaurants(keyword, address, minPrice, maxPrice, seatType, 
 function displayRestaurants(restaurants) {
     const storeList = document.getElementById("store-list");
 
+    console.log(restaurants);
+    console.log("들어옴");
     restaurants.forEach(restaurant => {
         const storeItem = document.createElement("div");
         storeItem.classList.add('store-item');
@@ -195,3 +199,44 @@ window.addEventListener("scroll", () => {
         }
     }, 200);  // 200ms마다 호출
 });
+
+// 필터 검색
+function openSortModal() {
+    document.getElementById("sort-modal").style.display = "flex";
+}
+
+function closeSortModal() {
+    document.getElementById("sort-modal").style.display = "none";
+}
+
+function selectSort(event) {
+    const selectedOption = event.currentTarget;
+    if (!selectedOption) return;
+
+    const sortValue = selectedOption.dataset.sort;
+    console.log("선택된 정렬 기준:", sortValue);
+
+    document.querySelectorAll('.sort-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+
+    selectedOption.classList.add('selected');
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".sort-option").forEach(option => {
+        option.addEventListener("click", selectSort);
+    });
+});
+
+function openFilterModal() {
+    document.getElementById("filter-modal").style.display = "flex";
+}
+
+function closeFilterModal() {
+    document.getElementById("filter-modal").style.display = "none";
+}
+
+function applyFilters() {
+    closeFilterModal();
+}

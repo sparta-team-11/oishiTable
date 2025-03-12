@@ -1,4 +1,4 @@
-Kakao.init('ba33a667b3286f103e25aad5ed702281');
+Kakao.init('ba33a667b3286f103e25aad5ed702281');y
 
 async function toggleBookmark(restaurantId, buttonElement) {
     const accessToken = localStorage.getItem('accessToken');

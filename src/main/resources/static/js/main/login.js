@@ -87,7 +87,12 @@ async function login() {
             const responseData = await response.json();
             const accessToken = responseData.accessToken;
             const refreshToken = responseData.refreshToken;
-            const accessTokenExpiryTime = response.accessTokenExpiryTime;
+            const accessTokenExpiryTime = Date.now() + responseData.accessTokenExpiryTime;
+
+            console.log(accessToken);
+            console.log(refreshToken);
+            console.log(accessTokenExpiryTime)
+            console.log(!accessToken);
 
             localStorage.setItem('accessToken', accessToken);
             localStorage.setItem('refreshToken', refreshToken);
@@ -150,9 +155,11 @@ async function sendKakaoLoginToBackend(accessToken) {
             const responseData = await response.json();
             const accessToken = responseData.accessToken;
             const refreshToken = responseData.refreshToken;
+            const accessTokenExpiryTime = responseData.accessTokenExpiryTime;
 
             localStorage.setItem('accessToken', accessToken);
             localStorage.setItem('refreshToken', refreshToken);
+            localStorage.setItem('accessTokenExpiryTime', accessTokenExpiryTime);
 
             alert('카카오 로그인 성공!');
             window.location.href = '/';
