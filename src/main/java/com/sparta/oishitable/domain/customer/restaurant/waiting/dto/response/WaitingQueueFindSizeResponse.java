@@ -5,14 +5,12 @@ import lombok.Builder;
 
 @Builder(access = AccessLevel.PRIVATE)
 public record WaitingQueueFindSizeResponse(
-        Long inRestaurantWaitingSize,
-        Long takeOutWaitingSize
+        Long waitingQueueSize
 ) {
 
-    public static WaitingQueueFindSizeResponse from(Long inRestaurantWaitingSize, Long takeOutWaitingSize) {
+    public static WaitingQueueFindSizeResponse from(Long waitingQueueSize) {
         return WaitingQueueFindSizeResponse.builder()
-                .inRestaurantWaitingSize(inRestaurantWaitingSize)
-                .takeOutWaitingSize(takeOutWaitingSize)
+                .waitingQueueSize(waitingQueueSize)
                 .build();
     }
 }

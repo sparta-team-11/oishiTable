@@ -11,7 +11,8 @@ public record WaitingDetails(
         Integer totalCount,
         String userPhoneNumber,
         ReservationStatus status,
-        WaitingType type
+        WaitingType type,
+        Integer sequence
 ) {
 
     @QueryProjection

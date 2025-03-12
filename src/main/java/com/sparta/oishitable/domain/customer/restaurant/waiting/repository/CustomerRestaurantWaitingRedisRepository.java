@@ -2,9 +2,9 @@ package com.sparta.oishitable.domain.customer.restaurant.waiting.repository;
 
 import java.util.Optional;
 
-public interface CustomerWaitingRedisRepository {
+public interface CustomerRestaurantWaitingRedisRepository {
 
-    Boolean zAdd(String key, Long userId, Integer sequence);
+    void join(String queueKey, Long userId, Integer score);
 
     Optional<Integer> zFindLastSequence(String key);
 

@@ -3,43 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>회원가입 및 로그인</title>
-    <link rel="stylesheet" href="../../static/css/front.css">
-    <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+    <title>메인 페이지</title>
+    <link rel="stylesheet" href="/css/front.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+          integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
 </head>
 <body>
-<div class="container">
-    <div id="login-form">
-        <h2>로그인</h2>
-        <input type="text" id="login-email" placeholder="이메일">
-        <input type="password" id="login-password" placeholder="비밀번호">
-        <button onclick="login()">로그인</button>
-        <p>계정이 없으신가요? <a href="#" onclick="showSignupForm()">회원가입</a></p>
-        <button onclick="kakaoLogin()">카카오 로그인</button>
+<div class="main-container">
+    <h1>메인 페이지</h1>
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="맛집 검색">
+        <div class="filter-container">
+            <button id="sort-btn" onclick="openSortModal()">정렬</button>
+            <button id="filter-btn" onclick="openFilterModal()">필터</button>
+            <button id="nearby-btn">내 주변</button>
+        </div>
+        <button onclick="searchStores()">검색</button>
     </div>
 
-    <div id="signup-form" style="display:none;">
-        <h2>회원가입</h2>
-        <input type="text" id="signup-email" placeholder="이메일">
-        <input type="password" id="signup-password" placeholder="비밀번호">
-        <input type="text" id="signup-name" placeholder="이름">
-        <input type="text" id="signup-nickname" placeholder="닉네임">
-        <input type="text" id="signup-phone" placeholder="전화번호">
-        <select id="signup-role">
-            <option value="CUSTOMER">고객</option>
-            <option value="SELLER">사장님</option>
-        </select>
-        <button onclick="signup()">회원가입</button>
-        <p>이미 계정이 있으신가요? <a href="#" onclick="showLoginForm()">로그인</a></p>
+    <!-- 정렬 모달 -->
+    <div id="sort-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSortModal()">&times;</span>
+            <h3>정렬 기준</h3>
+            <div class="sort-option" data-sort="popularity">
+                <span>✔</span> <span>인기순</span>
+            </div>
+            <div class="sort-option" data-sort="distance">
+                <span>✔</span> <span>거리순</span>
+            </div>
+        </div>
     </div>
 
-    <div id="social-signup-form" style="display: none;">
-        <h2>소셜 회원가입 추가 정보 입력</h2>
-        <input type="text" id="social-phone" placeholder="휴대폰 번호">
-        <input type="text" id="social-verification-code" placeholder="인증 번호">
-        <button onclick="submitSocialSignup()">다음</button>
+    <!-- 필터 모달 -->
+    <div id="filter-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeFilterModal()">&times;</span>
+            <h3>필터 선택</h3>
+
+            <!-- 주소 필터 -->
+            <input type="text" id="address" placeholder="주소 입력">
+
+            <!-- 가격 필터 -->
+            <input type="range" id="min-price" min="0" max="400000" step="1000" value="0">
+            <input type="range" id="max-price" min="0" max="400000" step="1000" value="400000">
+            <div>최소 가격: <span id="min-price-display">0</span>원 / 최대 가격: <span id="max-price-display">400000</span>원
+            </div>
+
+            <!-- 좌석 유형 필터 -->
+            <select id="seat-type">
+                <option value="">선택</option>
+                <option value="1">홀</option>
+                <option value="2">바</option>
+                <option value="3">테라스</option>
+                <option value="4">룸</option>
+            </select>
+
+            <button onclick="applyFilters()">적용</button>
+        </div>
     </div>
+
+    <div class="store-list" id="store-list">
+        <!-- 가게 목록이 여기에 동적으로 추가됩니다. -->
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="/collection">컬렉션</a>
+        <a href="/">홈</a>
+        <a href="/user/history">내역</a>
+        <a href="/post">게시글</a>
+    </nav>
 </div>
-<script src="../../static/js/script.js"></script>
+
+<script type="text/javascript" src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+<script src="/js/main/index.js"></script>
 </body>
 </html>

@@ -9,8 +9,8 @@ import com.sparta.oishitable.domain.owner.restaurant.waiting.dto.response.Waitin
 import com.sparta.oishitable.domain.owner.restaurant.waiting.dto.response.WaitingQueueFindUsersResponse;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.Waiting;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingType;
-import com.sparta.oishitable.domain.owner.restaurant.waiting.repository.OwnerWaitingRedisRepository;
-import com.sparta.oishitable.domain.owner.restaurant.waiting.repository.OwnerWaitingRepository;
+import com.sparta.oishitable.domain.owner.restaurant.waiting.repository.OwnerRestaurantWaitingRedisRepository;
+import com.sparta.oishitable.domain.owner.restaurant.waiting.repository.OwnerRestaurantWaitingRepository;
 import com.sparta.oishitable.global.exception.ConflictException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
@@ -27,8 +27,9 @@ public class OwnerRestaurantWaitingService {
 
     private final AuthService authService;
     private final OwnerRestaurantService ownerRestaurantService;
-    private final OwnerWaitingRepository ownerWaitingRepository;
-    private final OwnerWaitingRedisRepository ownerWaitingRedisRepository;
+
+    private final OwnerRestaurantWaitingRepository ownerRestaurantWaitingRepository;
+    private final OwnerRestaurantWaitingRedisRepository ownerRestaurantWaitingRedisRepository;
 
     public WaitingQueueFindUsersResponse findWaitingUsers(
             Long ownerId,
@@ -42,7 +43,7 @@ public class OwnerRestaurantWaitingService {
 
         String key = WaitingType.of(waitingType).getWaitingKey(restaurant.getId());
 
-        Long totalElements = ownerWaitingRedisRepository.findQueueSize(key);
+        Long totalElements = ownerRestaurantWaitingRedisRepository.findQueueSize(key);
 
         int totalPages = (int) Math.ceil((double) totalElements / size) - 1;
 
@@ -56,10 +57,10 @@ public class OwnerRestaurantWaitingService {
             return WaitingQueueFindUsersResponse.from(waitingUserDetails, page, totalPages, totalElements);
         }
 
-        List<Long> userIds = ownerWaitingRedisRepository.findWaitingUsers(key, page, size);
+        List<Long> userIds = ownerRestaurantWaitingRedisRepository.findWaitingUsers(key, page, size);
 
         if (!userIds.isEmpty()) {
-            waitingUserDetails = ownerWaitingRepository.findWaitingDetails(userIds);
+            waitingUserDetails = ownerRestaurantWaitingRepository.findWaitingDetails(userIds);
         }
 
         return WaitingQueueFindUsersResponse.from(waitingUserDetails, page, totalPages, totalElements);
@@ -91,7 +92,7 @@ public class OwnerRestaurantWaitingService {
         WaitingType waitingType = waiting.getType();
         String key = waitingType.getWaitingKey(restaurant.getId());
 
-        Long deleteCount = ownerWaitingRedisRepository.deleteWaitingUser(key, waiting.getUser().getId());
+        Long deleteCount = ownerRestaurantWaitingRedisRepository.deleteWaitingUser(key, waiting.getUser().getId());
 
         if (deleteCount == 0) {
             throw new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND);
@@ -103,7 +104,7 @@ public class OwnerRestaurantWaitingService {
     }
 
     private Waiting findWaitingById(Long waitingId) {
-        return ownerWaitingRepository.findById(waitingId)
+        return ownerRestaurantWaitingRepository.findById(waitingId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_NOT_FOUND));
     }
 }
