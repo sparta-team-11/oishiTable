@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
@@ -46,6 +47,9 @@ public class PostKeywordResponse {
     }
 
     public static PostKeywordResponse from(PostDocument post, Integer commentCount, Integer likeCount){
+
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(post.getModifiedAt().toInstant(), ZoneId.systemDefault());
+
         return PostKeywordResponse.builder()
                 .postId(Long.valueOf(post.getId()))
                 .userId(post.getUserId())
@@ -55,7 +59,7 @@ public class PostKeywordResponse {
                 .content(post.getContent())
                 .likeCount(likeCount)
                 .commentCount(commentCount)
-                .modifiedAt(post.getModifiedAt())
+                .modifiedAt(localDateTime)
                 .build();
     }
 }

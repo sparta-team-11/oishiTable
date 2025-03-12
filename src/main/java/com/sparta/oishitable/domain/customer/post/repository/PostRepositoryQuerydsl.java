@@ -1,5 +1,6 @@
 package com.sparta.oishitable.domain.customer.post.repository;
 
+import com.sparta.oishitable.domain.customer.post.dto.response.PostCounts;
 import com.sparta.oishitable.domain.customer.post.dto.response.PostKeywordResponse;
 import com.sparta.oishitable.domain.customer.post.dto.response.PostRandomResponse;
 import com.sparta.oishitable.domain.customer.post.entity.Post;
@@ -12,5 +13,5 @@ public interface PostRepositoryQuerydsl {
 
     List<PostKeywordResponse> findPostsByKeyword(Long userId, Long regionId, Long cursorValue, String keyword, int limit);
 
-    List<Post> findAllByIdWithCommentsAndLikes(List<Long> postIds);
+    List<PostCounts> findAllByIdWithCommentsAndLikes(List<Long> postIds);
 }
