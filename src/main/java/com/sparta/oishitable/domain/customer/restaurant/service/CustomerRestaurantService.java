@@ -6,7 +6,7 @@ import com.sparta.oishitable.domain.customer.restaurant.repository.CustomerResta
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
-import com.sparta.oishitable.global.util.GeometryUtil;
+import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -21,6 +21,7 @@ public class CustomerRestaurantService {
     private static final double EARTH_RADIUS = 6371;
 
     public Slice<RestaurantSimpleResponse> findRestaurants(
+            CustomUserDetails userDetails,
             Pageable pageable,
             String keyword,
             String address,
@@ -34,12 +35,12 @@ public class CustomerRestaurantService {
             String order
     ) {
         return restaurantRepository.findRestaurantsByFilters(
-                pageable, keyword,
-                address, minPrice,
-                maxPrice, seatTypeId,
-                isUseDistance, clientLat,
-                clientLon, distance,
-                order
+                userDetails, pageable,
+                keyword, address,
+                minPrice, maxPrice,
+                seatTypeId, isUseDistance,
+                clientLat, clientLon,
+                distance, order
         );
     }
 
