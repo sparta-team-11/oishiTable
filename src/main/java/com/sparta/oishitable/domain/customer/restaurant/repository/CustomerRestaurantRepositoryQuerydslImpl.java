@@ -19,6 +19,7 @@ import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -60,7 +61,7 @@ public class CustomerRestaurantRepositoryQuerydslImpl implements CustomerRestaur
 
             builder.and(containsExpression(clientLocation, distance));
         } else {
-            if (address != null) {
+            if (StringUtils.hasText(address)) {
                 builder.and(fullTextExpression(restaurant.address, address).gt(0));
             }
         }
@@ -83,7 +84,7 @@ public class CustomerRestaurantRepositoryQuerydslImpl implements CustomerRestaur
                 )
                 .from(restaurant);
 
-        if (keyword != null) {
+        if (StringUtils.hasText(keyword)) {
             builder.and(
                     fullTextExpression(restaurant.name, keyword).gt(0)
                             .or(fullTextExpression(menu.name, keyword).gt(0))
