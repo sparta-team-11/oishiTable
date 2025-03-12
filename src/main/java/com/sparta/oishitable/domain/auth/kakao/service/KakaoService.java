@@ -48,10 +48,10 @@ public class KakaoService {
 
     private final long DURATION = Duration.ofDays(3).toMillis();
 
-    public AuthLoginResponse kakaoLogin(String code) {
+    public AuthLoginResponse kakaoLogin(String accessToken) {
 
         // 코드로 카카오에서 액세스 토큰 받아오기
-        String accessToken = getAccessTokenFromKakao(code);
+//        String accessToken = getAccessTokenFromKakao(code);
 
         // 액세스 토큰으로 카카오 사용자 정보 받아오기
         KakaoAccount kakaoAccount = getKakaoUserInfo(accessToken);
@@ -84,10 +84,12 @@ public class KakaoService {
         String jwtAccessToken = jwtTokenProvider.generateAccessToken(userId, user.getRole().getValue());
         String jwtRefreshToken = jwtTokenProvider.generateRefreshToken();
 
-        // refresh token 저장 (redis 등)
-         redisRepository.setDataWithExpire(userId, jwtRefreshToken, DURATION);
+        final long accessTokenExpiryTime = jwtTokenProvider.getAccessTokenExpiryTime();
 
-        return AuthLoginResponse.of(jwtAccessToken, jwtRefreshToken);
+        // refresh token 저장 (redis 등)
+        redisRepository.setDataWithExpire(userId, jwtRefreshToken, DURATION);
+
+        return AuthLoginResponse.of(jwtAccessToken, jwtRefreshToken, accessTokenExpiryTime);
     }
 
     // 액세스 토큰 교환 메소드
@@ -134,7 +136,7 @@ public class KakaoService {
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
         // 헤더로 요청값 생성
-        HttpEntity<MultiValueMap<String,String>> kakaoProfileRequest = new HttpEntity<>(headers);
+        HttpEntity<MultiValueMap<String, String>> kakaoProfileRequest = new HttpEntity<>(headers);
 
         // 카카오 사용자 정보 엔드포인트 호출
         ResponseEntity<String> response = restTemplate.exchange(
