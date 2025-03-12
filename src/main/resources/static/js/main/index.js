@@ -11,25 +11,34 @@ function checkAuthAndRefresh() {
     const currentTime = Date.now();
     const accessToken = localStorage.getItem('accessToken');
     const refreshToken = localStorage.getItem('refreshToken');
-    const accessTokenExpiryTime = localStorage.getItem('accessTokenExpiryTime');
+    const accessTokenExpiryTime = parseInt(localStorage.getItem('accessTokenExpiryTime'), 10); // 숫자로 변환
 
-    if (!accessToken || accessToken.trim() === '') {
+    if (typeof accessToken == "undefined" || !accessToken || accessToken.trim() === '') {
         window.location.href = '/login?error=unauthorized';  // 로그인 화면으로 이동
-    } else if (currentTime > accessTokenExpiryTime) {
-        if (refreshToken) {
-            api.refreshToken(accessToken, refreshToken).then(response => {
-                console.log(response); // 서버 응답 확인
-                const newAccessToken = response.accessToken;
-                const newRefreshToken = response.refreshToken;
-                const newExpiryTime = response.accessTokenExpiryTime;
+        return;
+    }
 
-                localStorage.setItem('accessToken', newAccessToken);
-                localStorage.setItem('refreshToken', newRefreshToken);
-                localStorage.setItem('accessTokenExpiryTime', newExpiryTime);
-            }).catch(error => {
-                console.error(error); // 오류 로그 확인
-                window.location.href = '/login?error=unauthorized';  // 로그인 화면으로 이동
-            });
+    if (isNaN(accessTokenExpiryTime) || currentTime > accessTokenExpiryTime) {
+        if (typeof refreshToken !== "undefined" || refreshToken || refreshToken.trim() !== '') {
+            api.refreshToken(refreshToken)
+                .then(response => {
+                    console.log(response); // 서버 응답 확인
+                    if (!response || !response.accessToken) {
+                        throw new Error("Invalid token response");
+                    }
+
+                    const newAccessToken = response.accessToken;
+                    const newRefreshToken = response.refreshToken;
+                    const newExpiryTime = response.accessTokenExpiryTime;
+
+                    localStorage.setItem('accessToken', newAccessToken);
+                    localStorage.setItem('refreshToken', newRefreshToken);
+                    localStorage.setItem('accessTokenExpiryTime', newExpiryTime);
+                })
+                .catch(error => {
+                    console.error(error); // 오류 로그 확인
+                    window.location.href = '/login?error=unauthorized';  // 로그인 화면으로 이동
+                });
         } else {
             window.location.href = '/login?error=unauthorized';  // 로그인 화면으로 이동
         }
@@ -38,7 +47,7 @@ function checkAuthAndRefresh() {
 
 // api.js
 const api = {
-    refreshToken: (accessToken, refreshToken) => {
+    refreshToken: (refreshToken) => {
         return fetch('/api/auth/refresh', {
             method: 'POST',
             headers: {
@@ -46,13 +55,11 @@ const api = {
             },
             body: JSON.stringify(
                 {
-                    accessToken: `Bearer ${accessToken}`,
                     refreshToken: refreshToken
                 }
             )
         })
             .then(response => response.json())
-            .then(data => data);  // 새로 발급된 토큰들 반환
     },
 
     fetchRestaurants: async (accessToken, params) => {
@@ -88,6 +95,7 @@ function goToStore(storeId) {
     window.location.href = '/restaurant?id=' + storeId;
 }
 
+// 검색 시 거리값 함께 전송
 async function searchStores(reset = true) {
     checkAuthAndRefresh();
 
@@ -102,11 +110,21 @@ async function searchStores(reset = true) {
 
     const keyword = document.getElementById("search-input").value;
     const address = document.getElementById("address").value;
-    const minPrice = document.getElementById("min-price").value;
-    const maxPrice = document.getElementById("max-price").value;
+    const minPrice = parseInt(minPriceSlider.value);
+    const maxPrice = parseInt(maxPriceSlider.value);
     const seatType = document.getElementById("seat-type").value;
     const isUseDistance = document.getElementById("nearby-btn").classList.contains("active");
     const order = document.querySelector(".sort-option.selected")?.dataset.sort || "popularity";
+    const distance = getSelectedDistance();
+
+    console.log(keyword);
+    console.log(address);
+    console.log(minPrice);
+    console.log(maxPrice);
+    console.log(seatType);
+    console.log(isUseDistance);
+    console.log(order);
+    console.log(distance);
 
     let clientLat = null;
     let clientLon = null;
@@ -115,17 +133,17 @@ async function searchStores(reset = true) {
         navigator.geolocation.getCurrentPosition((position) => {
             clientLat = position.coords.latitude;
             clientLon = position.coords.longitude;
-            fetchRestaurants(keyword, address, minPrice, maxPrice, seatType, isUseDistance, clientLat, clientLon, order);
+            fetchRestaurants(keyword, address, minPrice, maxPrice, seatType, isUseDistance, clientLat, clientLon, order, distance);
         }, (error) => {
             console.error("위치 정보를 가져오는 데 실패했습니다.", error);
-            fetchRestaurants(keyword, address, minPrice, maxPrice, seatType, isUseDistance, clientLat, clientLon, order);
+            fetchRestaurants(keyword, address, minPrice, maxPrice, seatType, isUseDistance, clientLat, clientLon, order, distance);
         });
     } else {
-        fetchRestaurants(keyword, address, minPrice, maxPrice, seatType, isUseDistance, clientLat, clientLon, order);
+        fetchRestaurants(keyword, address, minPrice, maxPrice, seatType, isUseDistance, clientLat, clientLon, order, distance);
     }
 }
 
-async function fetchRestaurants(keyword, address, minPrice, maxPrice, seatType, isUseDistance, clientLat, clientLon, order) {
+async function fetchRestaurants(keyword, address, minPrice, maxPrice, seatType, isUseDistance, clientLat, clientLon, order, distance) {
     const params = new URLSearchParams();
 
     if (keyword !== undefined && keyword !== null) params.append("keyword", keyword);
@@ -133,10 +151,29 @@ async function fetchRestaurants(keyword, address, minPrice, maxPrice, seatType, 
     if (minPrice !== undefined && minPrice !== null) params.append("minPrice", minPrice);
     if (maxPrice !== undefined && maxPrice !== null) params.append("maxPrice", maxPrice);
     if (seatType !== undefined && seatType !== null) params.append("seatTypeId", seatType);
-    if (isUseDistance !== undefined && isUseDistance !== null) params.append("isUseDistance", isUseDistance ? "true" : "false");
-    if (clientLat !== undefined && clientLat !== null) params.append("clientLat", clientLat);
-    if (clientLon !== undefined && clientLon !== null) params.append("clientLon", clientLon);
     if (order !== undefined && order !== null) params.append("order", order);
+    if (isUseDistance !== undefined && isUseDistance !== null) {
+        params.append("isUseDistance", isUseDistance ? "true" : "false");
+
+        // isUseDistance가 true일 때, 필요한 값들이 모두 존재하는지 확인
+        if (isUseDistance) {
+            console.log("내 주변 검색")
+            if (clientLat === undefined || clientLat === null) {
+                throw new Error("clientLat is required when isUseDistance is true");
+            }
+            if (clientLon === undefined || clientLon === null) {
+                throw new Error("clientLon is required when isUseDistance is true");
+            }
+            if (distance === undefined || distance === null) {
+                throw new Error("distance is required when isUseDistance is true");
+            }
+
+            // 값이 모두 존재하면 params에 추가
+            params.append("clientLat", clientLat);
+            params.append("clientLon", clientLon);
+            params.append("distance", distance);
+        }
+    }
 
     params.append("page", currentPage);
 
@@ -144,9 +181,11 @@ async function fetchRestaurants(keyword, address, minPrice, maxPrice, seatType, 
 
     try {
         const data = await api.fetchRestaurants(accessToken, params);
+        console.log("가게 조회 완료")
 
         if (data.content.length === 0) {
             hasMoreData = false; // 더 이상 가져올 데이터 없음
+            console.log("가게 목록 없음")
         } else {
             displayRestaurants(data.content);
             currentPage++; // 페이지 번호 증가
@@ -160,9 +199,8 @@ async function fetchRestaurants(keyword, address, minPrice, maxPrice, seatType, 
 
 function displayRestaurants(restaurants) {
     const storeList = document.getElementById("store-list");
+    console.log("가게 목록")
 
-    console.log(restaurants);
-    console.log("들어옴");
     restaurants.forEach(restaurant => {
         const storeItem = document.createElement("div");
         storeItem.classList.add('store-item');
@@ -239,4 +277,58 @@ function closeFilterModal() {
 
 function applyFilters() {
     closeFilterModal();
+}
+
+// 가격 조정
+const minPriceSlider = document.getElementById('min-price');
+const maxPriceSlider = document.getElementById('max-price');
+const minPriceDisplay = document.getElementById('min-price-display');
+const maxPriceDisplay = document.getElementById('max-price-display');
+
+function updatePriceDisplay() {
+    let minPrice = parseInt(minPriceSlider.value);
+    let maxPrice = parseInt(maxPriceSlider.value);
+
+    // 두 슬라이더의 값이 겹치지 않도록 조정
+    if (minPrice >= maxPrice) {
+        minPriceSlider.value = maxPrice - 10000; // 최소값은 최대값보다 10000 작게 설정
+    }
+
+    if (maxPrice <= minPrice) {
+        maxPriceSlider.value = minPrice + 10000; // 최대값은 최소값보다 10000 크게 설정
+    }
+
+    // 값 표시 업데이트
+    minPriceDisplay.textContent = minPrice;
+    maxPriceDisplay.textContent = maxPrice;
+}
+
+const nearbyBtn = document.getElementById('nearby-btn');
+const distanceSlider = document.getElementById('distance');
+const distanceDisplay = document.getElementById('distance-display');
+const values = [100, 200, 500, 1000, 2000, 3000];
+
+// 슬라이더의 값이 변경될 때마다 텍스트 업데이트
+distanceSlider.addEventListener("input", function () {
+    const selectedValue = values[distanceSlider.value];  // 슬라이더 값에 해당하는 값 선택
+
+    if (selectedValue <= 1000) {
+        distanceDisplay.textContent = `${selectedValue}m`;
+    } else {
+        distanceDisplay.textContent = `${selectedValue / 1000}km`;
+    }
+});
+
+// '내 주변' 버튼 클릭 시 거리 선택 영역 표시
+nearbyBtn.addEventListener('click', () => {
+    // 버튼에 active 클래스를 토글 (선택된 상태로 만들기)
+    nearbyBtn.classList.toggle('active');
+
+    // '내 주변' 선택 시 distance 영역 표시
+    const distanceContainer = document.getElementById('distance-container');
+    distanceContainer.style.display = nearbyBtn.classList.contains('active') ? 'block' : 'none';
+});
+
+function getSelectedDistance() {
+    return values[distanceSlider.value];
 }

@@ -84,10 +84,10 @@ public class KakaoService {
         String jwtAccessToken = jwtTokenProvider.generateAccessToken(userId, user.getRole().getValue());
         String jwtRefreshToken = jwtTokenProvider.generateRefreshToken();
 
-        final long accessTokenExpiryTime = jwtTokenProvider.getAccessTokenExpiryTime();
+        final long accessTokenExpiryTime = jwtTokenProvider.getAccessTokenExpiryTime(jwtAccessToken);
 
         // refresh token 저장 (redis 등)
-        redisRepository.setDataWithExpire(userId, jwtRefreshToken, DURATION);
+        redisRepository.setDataWithExpire(jwtRefreshToken, userId, DURATION);
 
         return AuthLoginResponse.of(jwtAccessToken, jwtRefreshToken, accessTokenExpiryTime);
     }
