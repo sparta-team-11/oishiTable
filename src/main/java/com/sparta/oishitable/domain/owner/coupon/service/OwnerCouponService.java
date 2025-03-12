@@ -8,6 +8,7 @@ import com.sparta.oishitable.domain.owner.coupon.entity.CouponType;
 import com.sparta.oishitable.domain.owner.coupon.repository.CouponRepository;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.service.OwnerRestaurantService;
+import com.sparta.oishitable.global.aop.annotation.DistributedLock;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
@@ -26,7 +27,7 @@ public class OwnerCouponService {
     private final OwnerRestaurantService ownerRestaurantService;
     private final AuthService authService;
 
-    @Transactional
+    @DistributedLock(key = "'coupon:' + #restaurantId")
     public CouponResponse createCoupon(
             Long userId,
             Long restaurantId,
