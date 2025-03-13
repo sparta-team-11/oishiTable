@@ -3,6 +3,7 @@ package com.sparta.oishitable.domain.customer.post.entity;
 import com.sparta.oishitable.domain.common.BaseEntity;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.customer.comment.entity.Comment;
+import com.sparta.oishitable.domain.customer.post.like.entity.PostLike;
 import com.sparta.oishitable.domain.customer.post.region.entity.Region;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -39,7 +40,10 @@ public class Post extends BaseEntity {
     private Region region;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
+    private final List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<PostLike> likes = new ArrayList<>();
 
     @Builder
     public Post(
@@ -58,6 +62,11 @@ public class Post extends BaseEntity {
     public void addComment(Comment comment) {
         comments.add(comment);
         comment.setPost(this);
+    }
+
+    public void addLike(PostLike postLike) {
+        likes.add(postLike);
+        postLike.setPost(this);
     }
 
     public void removeComment(Comment comment) {

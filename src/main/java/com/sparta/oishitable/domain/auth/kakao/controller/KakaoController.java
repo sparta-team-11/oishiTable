@@ -18,9 +18,9 @@ public class KakaoController {
     private final KakaoService kakaoService;
 
     @GetMapping("/callback")
-    public ResponseEntity<AuthLoginResponse> getToken(@RequestParam("code") String code) {
+    public ResponseEntity<AuthLoginResponse> getToken(@RequestParam("access_token") String accessToken) {
 
-        AuthLoginResponse response = kakaoService.kakaoLogin(code);
+        AuthLoginResponse response = kakaoService.kakaoLogin(accessToken);
 
         return ResponseEntity.ok(response);
     }

@@ -61,9 +61,11 @@ public class AuthService {
         String accessToken = jwtTokenProvider.generateAccessToken(userId, user.getRole().getValue());
         String refreshToken = jwtTokenProvider.generateRefreshToken();
 
+        final long accessTokenExpiryTime = jwtTokenProvider.getAccessTokenExpiryTime();
+
         redisRepository.setDataWithExpire(userId, refreshToken, DURATION);
 
-        return AuthLoginResponse.of(accessToken, refreshToken);
+        return AuthLoginResponse.of(accessToken, refreshToken, accessTokenExpiryTime);
     }
 
     @Transactional
@@ -90,9 +92,11 @@ public class AuthService {
         String newAccessToken = jwtTokenProvider.generateAccessToken(userId, user.getRole().getValue());
         String newRefreshToken = jwtTokenProvider.generateRefreshToken();
 
+        final long accessTokenExpiryTime = jwtTokenProvider.getAccessTokenExpiryTime();
+
         redisRepository.setDataWithExpire(userId, newRefreshToken, DURATION);
 
-        return AuthLoginResponse.of(newAccessToken, newRefreshToken);
+        return AuthLoginResponse.of(newAccessToken, newRefreshToken, accessTokenExpiryTime);
     }
 
     public void checkUserAuthority(Long userId, Long loginUserId) {

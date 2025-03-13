@@ -6,13 +6,15 @@ import lombok.Builder;
 @Builder(access = AccessLevel.PRIVATE)
 public record AuthLoginResponse(
         String accessToken,
-        String refreshToken
+        String refreshToken,
+        long accessTokenExpiryTime
 ) {
 
-    public static AuthLoginResponse of(String accessToken, String refreshToken) {
+    public static AuthLoginResponse of(String accessToken, String refreshToken, long accessTokenExpiryTime) {
         return AuthLoginResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .accessTokenExpiryTime(accessTokenExpiryTime)
                 .build();
     }
 }

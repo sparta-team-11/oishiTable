@@ -4,6 +4,7 @@ import com.sparta.oishitable.domain.customer.post.dto.request.PostCreateRequest;
 import com.sparta.oishitable.domain.customer.post.dto.request.PostUpdateRequest;
 import com.sparta.oishitable.domain.customer.post.dto.response.PostKeywordResponse;
 import com.sparta.oishitable.domain.customer.post.dto.response.PostRandomResponse;
+import com.sparta.oishitable.domain.customer.post.service.PostElasticService;
 import com.sparta.oishitable.domain.customer.post.service.PostService;
 import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import com.sparta.oishitable.global.util.UriBuilderUtil;
@@ -23,6 +24,7 @@ import java.util.Random;
 public class PostController {
 
     private final PostService postService;
+    private final PostElasticService postElasticService;
 
     @PostMapping
     public ResponseEntity<Void> createPost(
@@ -72,6 +74,22 @@ public class PostController {
                 keyword,
                 limit
         );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/keyword/elastic")
+    public ResponseEntity<Slice<PostKeywordResponse>> findPostsByKeywordWithElastic(
+            @RequestParam(required = false) Long regionId,
+            @RequestParam(required = false) Long cursorValue,
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        Slice<PostKeywordResponse> response = postElasticService.findPostsByKeywordWithElastic(
+                regionId,
+                cursorValue,
+                keyword,
+                limit);
 
         return ResponseEntity.ok(response);
     }

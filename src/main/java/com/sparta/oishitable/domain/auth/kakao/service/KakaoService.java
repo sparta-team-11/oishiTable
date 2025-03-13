@@ -48,13 +48,22 @@ public class KakaoService {
 
     private final long DURATION = Duration.ofDays(3).toMillis();
 
-    public AuthLoginResponse kakaoLogin(String code) {
+    public AuthLoginResponse kakaoLogin(String accessToken) {
 
         // 코드로 카카오에서 액세스 토큰 받아오기
-        String accessToken = getAccessTokenFromKakao(code);
+//        String accessToken = getAccessTokenFromKakao(code);
 
         // 액세스 토큰으로 카카오 사용자 정보 받아오기
         KakaoAccount kakaoAccount = getKakaoUserInfo(accessToken);
+
+        // 전화번호 변환: "+82 10-xxxx-xxxx" -> "010xxxxxxxx"
+        String kakaoPhoneNumber = kakaoAccount.getPhoneNumber();
+
+        log.info("Kakao로부터 받은 전화번호: {}", kakaoPhoneNumber);
+
+        String phoneNumber = kakaoPhoneNumber.replace("+82", "0").replaceAll("[\\s-]", "");
+
+        log.info("변환 된 전화번호 : {}", phoneNumber);
 
         // 기존 사용자 확인 후 회원가입 후 로그인 처리
         User user = userRepository.findByEmail(kakaoAccount.getEmail())
@@ -64,7 +73,7 @@ public class KakaoService {
                             .nickname(kakaoAccount.getProfile().getNickname())
                             .email(kakaoAccount.getEmail())
                             .name(kakaoAccount.getName())
-                            .phoneNumber(kakaoAccount.getPhoneNumber())
+                            .phoneNumber(phoneNumber)
                             .role(UserRole.CUSTOMER)
                             .build();
                     return userRepository.save(newUser);
@@ -75,10 +84,12 @@ public class KakaoService {
         String jwtAccessToken = jwtTokenProvider.generateAccessToken(userId, user.getRole().getValue());
         String jwtRefreshToken = jwtTokenProvider.generateRefreshToken();
 
-        // refresh token 저장 (redis 등)
-         redisRepository.setDataWithExpire(userId, jwtRefreshToken, DURATION);
+        final long accessTokenExpiryTime = jwtTokenProvider.getAccessTokenExpiryTime();
 
-        return AuthLoginResponse.of(jwtAccessToken, jwtRefreshToken);
+        // refresh token 저장 (redis 등)
+        redisRepository.setDataWithExpire(userId, jwtRefreshToken, DURATION);
+
+        return AuthLoginResponse.of(jwtAccessToken, jwtRefreshToken, accessTokenExpiryTime);
     }
 
     // 액세스 토큰 교환 메소드
@@ -125,7 +136,7 @@ public class KakaoService {
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
         // 헤더로 요청값 생성
-        HttpEntity<MultiValueMap<String,String>> kakaoProfileRequest = new HttpEntity<>(headers);
+        HttpEntity<MultiValueMap<String, String>> kakaoProfileRequest = new HttpEntity<>(headers);
 
         // 카카오 사용자 정보 엔드포인트 호출
         ResponseEntity<String> response = restTemplate.exchange(

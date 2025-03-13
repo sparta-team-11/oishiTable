@@ -3,11 +3,13 @@ package com.sparta.oishitable.domain.customer.restaurant.controller;
 import com.sparta.oishitable.domain.customer.restaurant.dto.response.RestaurantResponse;
 import com.sparta.oishitable.domain.customer.restaurant.dto.response.RestaurantSimpleResponse;
 import com.sparta.oishitable.domain.customer.restaurant.service.CustomerRestaurantService;
+import com.sparta.oishitable.global.security.entity.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -20,6 +22,7 @@ public class CustomerRestaurantController {
 
     @GetMapping
     public ResponseEntity<Slice<RestaurantSimpleResponse>> findRestaurants(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PageableDefault(size = 30) Pageable pageable,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String address,
@@ -29,9 +32,11 @@ public class CustomerRestaurantController {
             @RequestParam(required = false) Boolean isUseDistance,
             @RequestParam(required = false) Double clientLat,
             @RequestParam(required = false) Double clientLon,
-            @RequestParam(required = false) Integer distance
+            @RequestParam(required = false) Integer distance,
+            @RequestParam(required = false) String order
     ) {
         Slice<RestaurantSimpleResponse> response = customerRestaurantService.findRestaurants(
+                userDetails,
                 pageable,
                 keyword,
                 address,
@@ -41,7 +46,8 @@ public class CustomerRestaurantController {
                 isUseDistance,
                 clientLat,
                 clientLon,
-                distance
+                distance,
+                order
         );
 
         return ResponseEntity.ok(response);

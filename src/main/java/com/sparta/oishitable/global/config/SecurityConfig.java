@@ -44,12 +44,14 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index", "/actuator/health", "/api/auth/**")
+                        .requestMatchers("/", "/login", "/actuator/health", "/api/auth/**", "/js/**", "/css/**")
                         .permitAll()
                         .requestMatchers("/customer/api/**").hasRole("CUSTOMER")
                         .requestMatchers("/owner/api/**").hasRole("OWNER")
                         .requestMatchers("/admin/api/**").hasRole("ADMIN")
-                        .anyRequest().authenticated())
+                        .anyRequest()
+                        .authenticated()
+                )
 
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
 

@@ -8,10 +8,7 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.oishitable.domain.customer.follow.entity.QFollow;
-import com.sparta.oishitable.domain.customer.post.dto.response.PostKeywordResponse;
-import com.sparta.oishitable.domain.customer.post.dto.response.PostRandomResponse;
-import com.sparta.oishitable.domain.customer.post.dto.response.QPostKeywordResponse;
-import com.sparta.oishitable.domain.customer.post.dto.response.QPostRandomResponse;
+import com.sparta.oishitable.domain.customer.post.dto.response.*;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -33,7 +30,6 @@ public class PostRepositoryQuerydslImpl implements PostRepositoryQuerydsl {
             int limit,
             int randomSeed
     ) {
-        //TODO 팔로우 기능 추가되면 조건 넣기
 
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -145,6 +141,22 @@ public class PostRepositoryQuerydslImpl implements PostRepositoryQuerydsl {
                 // 내림차순(최신순) 정렬
                 .orderBy(post.id.desc())
                 .limit(limit)
+                .fetch();
+    }
+
+    public List<PostCounts> findAllByIdWithCommentsAndLikes(List<Long> postIds) {
+
+        return queryFactory.select(
+                        new QPostCounts(post.id,
+                                JPAExpressions.select(comment.count().intValue())
+                                        .from(comment)
+                                        .where(comment.post.eq(post)),
+                                JPAExpressions.select(postLike.count().intValue())
+                                        .from(postLike)
+                                        .where(postLike.post.eq(post)))
+                )
+                .from(post)
+                .where(post.id.in(postIds))
                 .fetch();
     }
 }
