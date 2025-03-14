@@ -2,10 +2,6 @@
 // 토큰 검사를 페이지가 언로드될 때 처리
 Kakao.init('b5d8b9f0f40b2d55397786378ae4b1a4');
 
-window.addEventListener('beforeunload', () => {
-    checkAuthAndRefresh();
-});
-
 // 토큰 검사 및 리프레시
 function checkAuthAndRefresh() {
     const currentTime = Date.now();
@@ -13,13 +9,13 @@ function checkAuthAndRefresh() {
     const refreshToken = localStorage.getItem('refreshToken');
     const accessTokenExpiryTime = parseInt(localStorage.getItem('accessTokenExpiryTime'), 10); // 숫자로 변환
 
-    if (typeof accessToken == "undefined" || !accessToken || accessToken.trim() === '') {
+    if (typeof accessToken === "undefined" || !accessToken || accessToken.trim() === '') {
         window.location.href = '/login?error=unauthorized';  // 로그인 화면으로 이동
         return;
     }
 
     if (isNaN(accessTokenExpiryTime) || currentTime > accessTokenExpiryTime) {
-        if (typeof refreshToken !== "undefined" || refreshToken || refreshToken.trim() !== '') {
+        if (typeof refreshToken !== "undefined" && refreshToken && refreshToken.trim() !== '') {
             api.refreshToken(refreshToken)
                 .then(response => {
                     console.log(response); // 서버 응답 확인
