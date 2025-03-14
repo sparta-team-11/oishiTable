@@ -8,11 +8,7 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.oishitable.domain.customer.follow.entity.QFollow;
-import com.sparta.oishitable.domain.customer.post.dto.response.PostKeywordResponse;
-import com.sparta.oishitable.domain.customer.post.dto.response.PostRandomResponse;
-import com.sparta.oishitable.domain.customer.post.dto.response.QPostKeywordResponse;
-import com.sparta.oishitable.domain.customer.post.dto.response.QPostRandomResponse;
-import com.sparta.oishitable.domain.customer.post.entity.Post;
+import com.sparta.oishitable.domain.customer.post.dto.response.*;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -148,13 +144,18 @@ public class PostRepositoryQuerydslImpl implements PostRepositoryQuerydsl {
                 .fetch();
     }
 
-    public List<Post> findAllByIdWithCommentsAndLikes(List<Long> postIds) {
+    public List<PostCounts> findAllByIdWithCommentsAndLikes(List<Long> postIds) {
 
-        return queryFactory
-                .selectDistinct(post)
+        return queryFactory.select(
+                        new QPostCounts(post.id,
+                                JPAExpressions.select(comment.count().intValue())
+                                        .from(comment)
+                                        .where(comment.post.eq(post)),
+                                JPAExpressions.select(postLike.count().intValue())
+                                        .from(postLike)
+                                        .where(postLike.post.eq(post)))
+                )
                 .from(post)
-                .leftJoin(post.comments).fetchJoin()
-                .leftJoin(post.likes).fetchJoin()
                 .where(post.id.in(postIds))
                 .fetch();
     }

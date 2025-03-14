@@ -9,6 +9,7 @@ import com.sparta.oishitable.domain.owner.coupon.dto.request.CouponResponse;
 import com.sparta.oishitable.domain.owner.coupon.entity.Coupon;
 import com.sparta.oishitable.domain.owner.coupon.entity.CouponType;
 import com.sparta.oishitable.domain.owner.coupon.repository.CouponRepository;
+import com.sparta.oishitable.global.aop.annotation.DistributedLock;
 import com.sparta.oishitable.global.exception.CustomRuntimeException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
@@ -49,6 +50,7 @@ public class UserCouponService {
                 .toList();
     }
 
+    @DistributedLock(key = "'coupon:' + #couponId")
     @Transactional
     public void downloadCoupon(Long userId, Long couponId) {
         User user = userRepository.findById(userId)
