@@ -80,14 +80,14 @@ public class OwnerRestaurantWaitingService {
             throw new ConflictException(ErrorCode.WAITING_STATUS_CHANGE_NOT_ALLOWED);
         }
 
-        Long userId = ownerRestaurantWaitingRedisRepository.findFirstRankedUser(key)
+        Long firstRankedUserId = ownerRestaurantWaitingRedisRepository.findFirstRankedUser(key)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_NOT_FOUND));
 
-        if (!waiting.getUser().getId().equals(userId)) {
+        if (!waiting.getUser().getId().equals(firstRankedUserId)) {
             throw new ConflictException(ErrorCode.WAITING_STATUS_CHANGE_NOT_ALLOWED);
         }
 
-        waiting.updateStatus(WaitingStatus.CALLING);
+        waiting.updateStatus(WaitingStatus.NOTIFIED);
 
         // 입장 요청 알림
     }
@@ -101,14 +101,14 @@ public class OwnerRestaurantWaitingService {
         WaitingType waitingType = waiting.getType();
         String key = waitingType.getWaitingKey(restaurant.getId());
 
-        if (!waiting.getStatus().equals(WaitingStatus.CALLING)) {
+        if (!waiting.getStatus().equals(WaitingStatus.NOTIFIED)) {
             throw new ConflictException(ErrorCode.WAITING_STATUS_CHANGE_NOT_ALLOWED);
         }
 
-        Long userId = ownerRestaurantWaitingRedisRepository.findFirstRankedUser(key)
+        Long firstRankedUserId = ownerRestaurantWaitingRedisRepository.findFirstRankedUser(key)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_NOT_FOUND));
 
-        if (!waiting.getUser().getId().equals(userId)) {
+        if (!waiting.getUser().getId().equals(firstRankedUserId)) {
             throw new ConflictException(ErrorCode.WAITING_STATUS_CHANGE_NOT_ALLOWED);
         }
 
@@ -130,7 +130,7 @@ public class OwnerRestaurantWaitingService {
 
         Waiting waiting = findWaitingById(request.waitingId());
 
-        if (!waiting.getStatus().equals(WaitingStatus.REQUESTED) && !waiting.getStatus().equals(WaitingStatus.CALLING)) {
+        if (!waiting.getStatus().equals(WaitingStatus.REQUESTED) && !waiting.getStatus().equals(WaitingStatus.NOTIFIED)) {
             throw new ConflictException(ErrorCode.INVALID_WAITING_CANCEL_STATUS);
         }
 
