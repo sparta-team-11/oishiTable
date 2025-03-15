@@ -1,4 +1,4 @@
-package com.sparta.oishitable.domain.auth.kakao.dto.response;
+package com.sparta.oishitable.domain.common.kakao.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

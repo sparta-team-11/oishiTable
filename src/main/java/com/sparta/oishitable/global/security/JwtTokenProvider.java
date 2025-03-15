@@ -108,8 +108,9 @@ public class JwtTokenProvider {
                 .build();
     }
 
-    public long getAccessTokenExpiryTime() {
-        return ACCESS_TOKEN_EXPIRED_TIME;
+    public long getAccessTokenExpiryTime(String token) {
+        Claims claims = parseClaimsFromToken(token);
+        return claims.getExpiration().getTime();
     }
 
     private void validateAccessTokenStartsWithBearer(String token) {

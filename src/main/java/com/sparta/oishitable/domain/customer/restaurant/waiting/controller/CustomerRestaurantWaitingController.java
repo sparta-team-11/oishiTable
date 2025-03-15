@@ -1,6 +1,7 @@
 package com.sparta.oishitable.domain.customer.restaurant.waiting.controller;
 
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.request.WaitingJoinRequest;
+import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueCheckUserResponse;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueFindSizeResponse;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueFindUserRankResponse;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.service.CustomerRestaurantWaitingService;
@@ -33,10 +34,20 @@ public class CustomerRestaurantWaitingController {
     public ResponseEntity<WaitingQueueFindSizeResponse> findWaitingQueueSize(
             @PathVariable Long restaurantId
     ) {
-        WaitingQueueFindSizeResponse waitingQueueSizeResponse
-                = customerRestaurantWaitingService.findWaitingQueueSize(restaurantId);
+        WaitingQueueFindSizeResponse body = customerRestaurantWaitingService.findWaitingQueueSize(restaurantId);
 
-        return ResponseEntity.ok(waitingQueueSizeResponse);
+        return ResponseEntity.ok(body);
+    }
+
+    @GetMapping("/check")
+    public ResponseEntity<WaitingQueueCheckUserResponse> checkUserInWaitingQueue(
+            @PathVariable Long restaurantId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        WaitingQueueCheckUserResponse body
+                = customerRestaurantWaitingService.checkUserInWaitingQueue(userDetails.getId(), restaurantId);
+
+        return ResponseEntity.ok(body);
     }
 
     @GetMapping("/{waitingId}")
@@ -45,10 +56,10 @@ public class CustomerRestaurantWaitingController {
             @PathVariable Long restaurantId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        WaitingQueueFindUserRankResponse waitingQueueUserRankResponse
+        WaitingQueueFindUserRankResponse body
                 = customerRestaurantWaitingService.findWaitingQueueUserRank(userDetails.getId(), restaurantId, waitingId);
 
-        return ResponseEntity.ok(waitingQueueUserRankResponse);
+        return ResponseEntity.ok(body);
     }
 
     @DeleteMapping("/{waitingId}")

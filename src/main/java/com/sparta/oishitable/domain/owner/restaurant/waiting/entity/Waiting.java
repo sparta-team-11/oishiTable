@@ -2,7 +2,6 @@ package com.sparta.oishitable.domain.owner.restaurant.waiting.entity;
 
 import com.sparta.oishitable.domain.common.BaseEntity;
 import com.sparta.oishitable.domain.common.user.entity.User;
-import com.sparta.oishitable.domain.customer.reservation.entity.ReservationStatus;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -42,7 +41,7 @@ public class Waiting extends BaseEntity {
     @Column(nullable = false)
     @ColumnDefault("'RESERVED'")
     @Enumerated(EnumType.STRING)
-    private ReservationStatus status;
+    private WaitingStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -57,7 +56,7 @@ public class Waiting extends BaseEntity {
             Long id,
             Integer totalCount,
             WaitingType type,
-            ReservationStatus status,
+            WaitingStatus status,
             User user,
             Restaurant restaurant,
             Integer dailySequence
@@ -71,7 +70,7 @@ public class Waiting extends BaseEntity {
         this.dailySequence = dailySequence;
     }
 
-    public void updateStatus(ReservationStatus status) {
+    public void updateStatus(WaitingStatus status) {
         this.status = status;
     }
 }

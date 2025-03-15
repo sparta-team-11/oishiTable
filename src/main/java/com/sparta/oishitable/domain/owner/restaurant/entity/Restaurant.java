@@ -73,7 +73,7 @@ public class Restaurant extends BaseEntity {
     @Column(nullable = false)
     @ColumnDefault("'CLOSE'")
     @Enumerated(EnumType.STRING)
-    private WaitingStatus waitingStatus;
+    private RestaurantWaitingStatus waitingStatus;
 
     private Integer minPrice;
     private Integer maxPrice;
@@ -147,12 +147,12 @@ public class Restaurant extends BaseEntity {
     }
 
     public void switchWaitingStatus() {
-        if (this.waitingStatus == WaitingStatus.OPEN) {
-            this.waitingStatus = WaitingStatus.CLOSE;
+        if (this.waitingStatus == RestaurantWaitingStatus.OPEN) {
+            this.waitingStatus = RestaurantWaitingStatus.CLOSE;
             return;
         }
 
-        this.waitingStatus = WaitingStatus.OPEN;
+        this.waitingStatus = RestaurantWaitingStatus.OPEN;
     }
 
     private void updateMinPrice(int minPrice) {

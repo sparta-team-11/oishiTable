@@ -1,0 +1,23 @@
+package com.sparta.oishitable.dummy.controller;
+
+import com.sparta.oishitable.dummy.service.DummyService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+
+@RestController
+@RequestMapping("/admin/api")
+@RequiredArgsConstructor
+public class DummyController {
+
+    private final DummyService dummyService;
+
+    @PostMapping("/dummy/restaurants")
+    public ResponseEntity<String> dummyUsersAndRestaurants() {
+        dummyService.createDummyRestaurants();
+        return ResponseEntity.ok("더미 유저 / 식당 생성 완료");
+    }
+}
