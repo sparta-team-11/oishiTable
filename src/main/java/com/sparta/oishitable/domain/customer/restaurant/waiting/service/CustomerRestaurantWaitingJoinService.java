@@ -2,13 +2,13 @@ package com.sparta.oishitable.domain.customer.restaurant.waiting.service;
 
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
-import com.sparta.oishitable.domain.customer.reservation.entity.ReservationStatus;
 import com.sparta.oishitable.domain.customer.restaurant.repository.CustomerRestaurantRepository;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.request.WaitingJoinRequest;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.CustomerRestaurantWaitingRedisRepository;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.CustomerRestaurantWaitingRepository;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.Waiting;
+import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingStatus;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingType;
 import com.sparta.oishitable.global.aop.annotation.DistributedLock;
 import com.sparta.oishitable.global.exception.NotFoundException;
@@ -28,15 +28,12 @@ public class CustomerRestaurantWaitingJoinService {
     private final CustomerRestaurantWaitingRedisRepository customerRestaurantWaitingRedisRepository;
 
     @DistributedLock(key = "'waiting:' + #restaurantId")
-    public void joinWaitingQueue(Long userId, Long restaurantId, WaitingJoinRequest request) {
+    public int joinWaitingQueue(Long userId, Long restaurantId, WaitingJoinRequest request) {
         Restaurant restaurant = findRestaurantById(restaurantId);
         User user = findUserById(userId);
 
         WaitingType waitingType = WaitingType.IN;
-        String waitingKey = waitingType.getWaitingKey(restaurant.getId());
-
         Integer dailySequence = findWaitingNextSequence(restaurant.getId(), waitingType);
-        log.info("daily sequence is {}", dailySequence);
 
         Waiting waiting = Waiting.builder()
                 .user(user)
@@ -44,12 +41,12 @@ public class CustomerRestaurantWaitingJoinService {
                 .totalCount(request.totalCount())
                 .dailySequence(dailySequence)
                 .type(waitingType)
-                .status(ReservationStatus.RESERVED)
+                .status(WaitingStatus.REQUESTED)
                 .build();
 
         customerRestaurantWaitingRepository.save(waiting);
 
-        customerRestaurantWaitingRedisRepository.join(waitingKey, user.getId(), dailySequence);
+        return dailySequence;
     }
 
     private Integer findWaitingNextSequence(Long restaurantId, WaitingType waitingType) {
@@ -58,6 +55,7 @@ public class CustomerRestaurantWaitingJoinService {
         return customerRestaurantWaitingRedisRepository.zFindLastSequence(waitingKey)
                 .map(i -> i + 1)
                 .orElseGet(() -> customerRestaurantWaitingRepository.findTodayLastSequence(restaurantId, waitingType)
+                        .map(i -> i + 1)
                         .orElse(1));
     }
 
