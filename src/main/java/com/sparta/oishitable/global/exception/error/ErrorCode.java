@@ -116,6 +116,7 @@ public enum ErrorCode {
     WAITING_NOT_FOUND(HttpStatus.NOT_FOUND, "대기열 데이터가 존재하지 않습니다."),
     RESTAURANT_WAITING_IS_CLOSED(HttpStatus.BAD_REQUEST, "식당의 대기열이 닫혀있습니다."),
     INVALID_WAITING_CANCEL_STATUS(HttpStatus.CONFLICT, "웨이팅이 취소될 수 없는 상태입니다."),
+    WAITING_STATUS_CHANGE_NOT_ALLOWED(HttpStatus.CONFLICT, "웨이팅이 변경될 수 없는 상태입니다."),
     ;
 
     private final HttpStatus status;

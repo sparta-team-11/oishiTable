@@ -45,7 +45,7 @@ public class OwnerRestaurantWaitingService {
 
         Long totalElements = ownerRestaurantWaitingRedisRepository.findQueueSize(key);
 
-        int totalPages = (int) Math.ceil((double) totalElements / size) - 1;
+        int totalPages = (int) Math.ceil((double) totalElements / size);
 
         if (totalPages < 0) {
             totalPages = 0;
@@ -67,11 +67,60 @@ public class OwnerRestaurantWaitingService {
     }
 
     @Transactional
-    public void updateWaitingStatus(Long ownerId, Long restaurantId) {
+    public void callRequestWaitingUser(Long ownerId, Long restaurantId, Long waitingId) {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
         authService.checkUserAuthority(restaurant.getOwner().getId(), ownerId);
 
-        restaurant.switchWaitingStatus();
+        Waiting waiting = findWaitingById(waitingId);
+
+        WaitingType waitingType = waiting.getType();
+        String key = waitingType.getWaitingKey(restaurant.getId());
+
+        if (!waiting.getStatus().equals(WaitingStatus.REQUESTED)) {
+            throw new ConflictException(ErrorCode.WAITING_STATUS_CHANGE_NOT_ALLOWED);
+        }
+
+        Long userId = ownerRestaurantWaitingRedisRepository.findFirstRankedUser(key)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_NOT_FOUND));
+
+        if (!waiting.getUser().getId().equals(userId)) {
+            throw new ConflictException(ErrorCode.WAITING_STATUS_CHANGE_NOT_ALLOWED);
+        }
+
+        waiting.updateStatus(WaitingStatus.CALLING);
+
+        // 입장 요청 알림
+    }
+
+    @Transactional
+    public void completeWaitingUser(Long ownerId, Long restaurantId, Long waitingId) {
+        Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
+        authService.checkUserAuthority(restaurant.getOwner().getId(), ownerId);
+
+        Waiting waiting = findWaitingById(waitingId);
+        WaitingType waitingType = waiting.getType();
+        String key = waitingType.getWaitingKey(restaurant.getId());
+
+        if (!waiting.getStatus().equals(WaitingStatus.CALLING)) {
+            throw new ConflictException(ErrorCode.WAITING_STATUS_CHANGE_NOT_ALLOWED);
+        }
+
+        Long userId = ownerRestaurantWaitingRedisRepository.findFirstRankedUser(key)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_NOT_FOUND));
+
+        if (!waiting.getUser().getId().equals(userId)) {
+            throw new ConflictException(ErrorCode.WAITING_STATUS_CHANGE_NOT_ALLOWED);
+        }
+
+        waiting.updateStatus(WaitingStatus.COMPLETED);
+
+        Long deleteCount = ownerRestaurantWaitingRedisRepository.deleteWaitingUser(key, waiting.getUser().getId());
+
+        if (deleteCount == 0) {
+            throw new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND);
+        }
+
+        // 입장 완료 알림
     }
 
     @Transactional
@@ -88,15 +137,23 @@ public class OwnerRestaurantWaitingService {
         WaitingType waitingType = waiting.getType();
         String key = waitingType.getWaitingKey(restaurant.getId());
 
+        waiting.updateStatus(WaitingStatus.CANCELED);
+
         Long deleteCount = ownerRestaurantWaitingRedisRepository.deleteWaitingUser(key, waiting.getUser().getId());
 
         if (deleteCount == 0) {
             throw new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND);
         }
 
-        waiting.updateStatus(WaitingStatus.CANCELED);
-
         // 삭제된 유저에게 취소 됨을 알리는 알림 전송 추가
+    }
+
+    @Transactional
+    public void updateWaitingStatus(Long ownerId, Long restaurantId) {
+        Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
+        authService.checkUserAuthority(restaurant.getOwner().getId(), ownerId);
+
+        restaurant.switchWaitingStatus();
     }
 
     private Waiting findWaitingById(Long waitingId) {

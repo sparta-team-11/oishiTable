@@ -5,6 +5,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -27,6 +28,19 @@ public class OwnerRestaurantWaitingRedisRepositoryImpl implements OwnerRestauran
         return queue.stream()
                 .map(Long::parseLong)
                 .toList();
+    }
+
+    @Override
+    public Optional<Long> findFirstRankedUser(String key) {
+        Set<String> queue = redisTemplate.opsForZSet().range(key, 0, 0);
+
+        if (queue == null || queue.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return queue.stream()
+                .map(Long::parseLong)
+                .findFirst();
     }
 
     @Override
