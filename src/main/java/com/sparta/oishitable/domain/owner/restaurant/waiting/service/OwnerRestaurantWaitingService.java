@@ -1,13 +1,13 @@
 package com.sparta.oishitable.domain.owner.restaurant.waiting.service;
 
 import com.sparta.oishitable.domain.common.auth.service.AuthService;
-import com.sparta.oishitable.domain.customer.reservation.entity.ReservationStatus;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.service.OwnerRestaurantService;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.dto.request.WaitingQueueDeleteUserRequest;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.dto.response.WaitingDetails;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.dto.response.WaitingQueueFindUsersResponse;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.Waiting;
+import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingStatus;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingType;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.repository.OwnerRestaurantWaitingRedisRepository;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.repository.OwnerRestaurantWaitingRepository;
@@ -81,11 +81,11 @@ public class OwnerRestaurantWaitingService {
 
         Waiting waiting = findWaitingById(request.waitingId());
 
-        if (waiting.getStatus().equals(ReservationStatus.COMPLETED)) {
+        if (waiting.getStatus().equals(WaitingStatus.COMPLETED)) {
             throw new ConflictException(ErrorCode.ALREADY_COMPLETED_WAITING_EXCEPTION);
         }
 
-        if (waiting.getStatus().equals(ReservationStatus.CANCELED)) {
+        if (waiting.getStatus().equals(WaitingStatus.CANCELED)) {
             throw new ConflictException(ErrorCode.ALREADY_CANCELED_WAITING_EXCEPTION);
         }
 
@@ -98,7 +98,7 @@ public class OwnerRestaurantWaitingService {
             throw new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND);
         }
 
-        waiting.updateStatus(ReservationStatus.CANCELED);
+        waiting.updateStatus(WaitingStatus.CANCELED);
 
         // 삭제된 유저에게 취소 됨을 알리는 알림 전송 추가
     }
