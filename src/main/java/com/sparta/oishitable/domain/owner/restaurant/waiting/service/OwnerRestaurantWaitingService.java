@@ -1,16 +1,16 @@
 package com.sparta.oishitable.domain.owner.restaurant.waiting.service;
 
 import com.sparta.oishitable.domain.common.auth.service.AuthService;
-import com.sparta.oishitable.domain.customer.reservation.entity.ReservationStatus;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import com.sparta.oishitable.domain.owner.restaurant.service.OwnerRestaurantService;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.dto.request.WaitingQueueDeleteUserRequest;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.dto.response.WaitingDetails;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.dto.response.WaitingQueueFindUsersResponse;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.Waiting;
+import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingStatus;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingType;
-import com.sparta.oishitable.domain.owner.restaurant.waiting.repository.OwnerWaitingRedisRepository;
-import com.sparta.oishitable.domain.owner.restaurant.waiting.repository.OwnerWaitingRepository;
+import com.sparta.oishitable.domain.owner.restaurant.waiting.repository.OwnerRestaurantWaitingRedisRepository;
+import com.sparta.oishitable.domain.owner.restaurant.waiting.repository.OwnerRestaurantWaitingRepository;
 import com.sparta.oishitable.global.exception.ConflictException;
 import com.sparta.oishitable.global.exception.NotFoundException;
 import com.sparta.oishitable.global.exception.error.ErrorCode;
@@ -27,8 +27,9 @@ public class OwnerRestaurantWaitingService {
 
     private final AuthService authService;
     private final OwnerRestaurantService ownerRestaurantService;
-    private final OwnerWaitingRepository ownerWaitingRepository;
-    private final OwnerWaitingRedisRepository ownerWaitingRedisRepository;
+
+    private final OwnerRestaurantWaitingRepository ownerRestaurantWaitingRepository;
+    private final OwnerRestaurantWaitingRedisRepository ownerRestaurantWaitingRedisRepository;
 
     public WaitingQueueFindUsersResponse findWaitingUsers(
             Long ownerId,
@@ -42,9 +43,9 @@ public class OwnerRestaurantWaitingService {
 
         String key = WaitingType.of(waitingType).getWaitingKey(restaurant.getId());
 
-        Long totalElements = ownerWaitingRedisRepository.findQueueSize(key);
+        Long totalElements = ownerRestaurantWaitingRedisRepository.findQueueSize(key);
 
-        int totalPages = (int) Math.ceil((double) totalElements / size) - 1;
+        int totalPages = (int) Math.ceil((double) totalElements / size);
 
         if (totalPages < 0) {
             totalPages = 0;
@@ -56,13 +57,95 @@ public class OwnerRestaurantWaitingService {
             return WaitingQueueFindUsersResponse.from(waitingUserDetails, page, totalPages, totalElements);
         }
 
-        List<Long> userIds = ownerWaitingRedisRepository.findWaitingUsers(key, page, size);
+        List<Long> userIds = ownerRestaurantWaitingRedisRepository.findWaitingUsers(key, page, size);
 
         if (!userIds.isEmpty()) {
-            waitingUserDetails = ownerWaitingRepository.findWaitingDetails(userIds);
+            waitingUserDetails = ownerRestaurantWaitingRepository.findWaitingDetails(userIds);
         }
 
         return WaitingQueueFindUsersResponse.from(waitingUserDetails, page, totalPages, totalElements);
+    }
+
+    @Transactional
+    public void callRequestWaitingUser(Long ownerId, Long restaurantId, Long waitingId) {
+        Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
+        authService.checkUserAuthority(restaurant.getOwner().getId(), ownerId);
+
+        Waiting waiting = findWaitingById(waitingId);
+
+        WaitingType waitingType = waiting.getType();
+        String key = waitingType.getWaitingKey(restaurant.getId());
+
+        if (!waiting.getStatus().equals(WaitingStatus.REQUESTED)) {
+            throw new ConflictException(ErrorCode.WAITING_STATUS_CHANGE_NOT_ALLOWED);
+        }
+
+        Long userId = ownerRestaurantWaitingRedisRepository.findFirstRankedUser(key)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_NOT_FOUND));
+
+        if (!waiting.getUser().getId().equals(userId)) {
+            throw new ConflictException(ErrorCode.WAITING_STATUS_CHANGE_NOT_ALLOWED);
+        }
+
+        waiting.updateStatus(WaitingStatus.CALLING);
+
+        // 입장 요청 알림
+    }
+
+    @Transactional
+    public void completeWaitingUser(Long ownerId, Long restaurantId, Long waitingId) {
+        Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
+        authService.checkUserAuthority(restaurant.getOwner().getId(), ownerId);
+
+        Waiting waiting = findWaitingById(waitingId);
+        WaitingType waitingType = waiting.getType();
+        String key = waitingType.getWaitingKey(restaurant.getId());
+
+        if (!waiting.getStatus().equals(WaitingStatus.CALLING)) {
+            throw new ConflictException(ErrorCode.WAITING_STATUS_CHANGE_NOT_ALLOWED);
+        }
+
+        Long userId = ownerRestaurantWaitingRedisRepository.findFirstRankedUser(key)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_NOT_FOUND));
+
+        if (!waiting.getUser().getId().equals(userId)) {
+            throw new ConflictException(ErrorCode.WAITING_STATUS_CHANGE_NOT_ALLOWED);
+        }
+
+        waiting.updateStatus(WaitingStatus.COMPLETED);
+
+        Long deleteCount = ownerRestaurantWaitingRedisRepository.deleteWaitingUser(key, waiting.getUser().getId());
+
+        if (deleteCount == 0) {
+            throw new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND);
+        }
+
+        // 입장 완료 알림
+    }
+
+    @Transactional
+    public void deleteUserFromWaitingQueue(Long ownerId, Long restaurantId, WaitingQueueDeleteUserRequest request) {
+        Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
+        authService.checkUserAuthority(restaurant.getOwner().getId(), ownerId);
+
+        Waiting waiting = findWaitingById(request.waitingId());
+
+        if (!waiting.getStatus().equals(WaitingStatus.REQUESTED) && !waiting.getStatus().equals(WaitingStatus.CALLING)) {
+            throw new ConflictException(ErrorCode.INVALID_WAITING_CANCEL_STATUS);
+        }
+
+        WaitingType waitingType = waiting.getType();
+        String key = waitingType.getWaitingKey(restaurant.getId());
+
+        waiting.updateStatus(WaitingStatus.CANCELED);
+
+        Long deleteCount = ownerRestaurantWaitingRedisRepository.deleteWaitingUser(key, waiting.getUser().getId());
+
+        if (deleteCount == 0) {
+            throw new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND);
+        }
+
+        // 삭제된 유저에게 취소 됨을 알리는 알림 전송 추가
     }
 
     @Transactional
@@ -73,37 +156,8 @@ public class OwnerRestaurantWaitingService {
         restaurant.switchWaitingStatus();
     }
 
-    @Transactional
-    public void deleteUserFromWaitingQueue(Long ownerId, Long restaurantId, WaitingQueueDeleteUserRequest request) {
-        Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
-        authService.checkUserAuthority(restaurant.getOwner().getId(), ownerId);
-
-        Waiting waiting = findWaitingById(request.waitingId());
-
-        if (waiting.getStatus().equals(ReservationStatus.COMPLETED)) {
-            throw new ConflictException(ErrorCode.ALREADY_COMPLETED_WAITING_EXCEPTION);
-        }
-
-        if (waiting.getStatus().equals(ReservationStatus.CANCELED)) {
-            throw new ConflictException(ErrorCode.ALREADY_CANCELED_WAITING_EXCEPTION);
-        }
-
-        WaitingType waitingType = waiting.getType();
-        String key = waitingType.getWaitingKey(restaurant.getId());
-
-        Long deleteCount = ownerWaitingRedisRepository.deleteWaitingUser(key, waiting.getUser().getId());
-
-        if (deleteCount == 0) {
-            throw new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND);
-        }
-
-        waiting.updateStatus(ReservationStatus.CANCELED);
-
-        // 삭제된 유저에게 취소 됨을 알리는 알림 전송 추가
-    }
-
     private Waiting findWaitingById(Long waitingId) {
-        return ownerWaitingRepository.findById(waitingId)
+        return ownerRestaurantWaitingRepository.findById(waitingId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_NOT_FOUND));
     }
 }

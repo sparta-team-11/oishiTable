@@ -2,7 +2,6 @@ package com.sparta.oishitable.domain.owner.restaurant.waiting.entity;
 
 import com.sparta.oishitable.domain.common.BaseEntity;
 import com.sparta.oishitable.domain.common.user.entity.User;
-import com.sparta.oishitable.domain.customer.reservation.entity.ReservationStatus;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -11,8 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
-
-import java.time.LocalDate;
 
 @Getter
 @Entity
@@ -35,13 +32,16 @@ public class Waiting extends BaseEntity {
     private Integer totalCount;
 
     @Column(nullable = false)
+    private Integer dailySequence;
+
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private WaitingType type;
 
     @Column(nullable = false)
     @ColumnDefault("'RESERVED'")
     @Enumerated(EnumType.STRING)
-    private ReservationStatus status;
+    private WaitingStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -51,12 +51,16 @@ public class Waiting extends BaseEntity {
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
-    @Column(nullable = false)
-    private Integer dailySequence;
-
-
     @Builder
-    public Waiting(Long id, Integer totalCount, WaitingType type, ReservationStatus status, User user, Restaurant restaurant, Integer dailySequence) {
+    public Waiting(
+            Long id,
+            Integer totalCount,
+            WaitingType type,
+            WaitingStatus status,
+            User user,
+            Restaurant restaurant,
+            Integer dailySequence
+    ) {
         this.id = id;
         this.totalCount = totalCount;
         this.type = type;
@@ -66,7 +70,7 @@ public class Waiting extends BaseEntity {
         this.dailySequence = dailySequence;
     }
 
-    public void updateStatus(ReservationStatus status) {
+    public void updateStatus(WaitingStatus status) {
         this.status = status;
     }
 }

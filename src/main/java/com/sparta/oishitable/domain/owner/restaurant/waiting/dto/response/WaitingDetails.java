@@ -1,7 +1,7 @@
 package com.sparta.oishitable.domain.owner.restaurant.waiting.dto.response;
 
 import com.querydsl.core.annotations.QueryProjection;
-import com.sparta.oishitable.domain.customer.reservation.entity.ReservationStatus;
+import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingStatus;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingType;
 
 public record WaitingDetails(
@@ -10,8 +10,9 @@ public record WaitingDetails(
         String userName,
         Integer totalCount,
         String userPhoneNumber,
-        ReservationStatus status,
-        WaitingType type
+        WaitingStatus status,
+        WaitingType type,
+        Integer sequence
 ) {
 
     @QueryProjection

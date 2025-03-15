@@ -44,7 +44,7 @@ public class JwtTokenProvider {
     public String generateAccessToken(String userId, String role) {
         Date now = new Date();
 
-        return BEARER_PREFIX + Jwts.builder()
+        return Jwts.builder()
                 .claim("id", userId)
                 .claim("role", role)
                 .issuedAt(now)
@@ -106,6 +106,11 @@ public class JwtTokenProvider {
                 .id(Long.parseLong(claims.get("id", String.class)))
                 .role(UserRole.of(claims.get("role", String.class)))
                 .build();
+    }
+
+    public long getAccessTokenExpiryTime(String token) {
+        Claims claims = parseClaimsFromToken(token);
+        return claims.getExpiration().getTime();
     }
 
     private void validateAccessTokenStartsWithBearer(String token) {
