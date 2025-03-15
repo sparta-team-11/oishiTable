@@ -6,6 +6,7 @@ import com.sparta.oishitable.domain.common.user.repository.UserRepository;
 import com.sparta.oishitable.domain.customer.reservation.entity.ReservationStatus;
 import com.sparta.oishitable.domain.customer.restaurant.repository.CustomerRestaurantRepository;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.request.WaitingJoinRequest;
+import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueCheckUserResponse;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueFindSizeResponse;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueFindUserRankResponse;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.CustomerRestaurantWaitingRedisRepository;
@@ -86,6 +87,29 @@ public class CustomerRestaurantWaitingService {
         // 유저에게 대기열 취소에 성공함을 알리는 알림 전송 추가
     }
 
+    public WaitingQueueFindSizeResponse findWaitingQueueSize(Long restaurantId) {
+        Restaurant restaurant = findRestaurantById(restaurantId);
+        isPossibleWaiting(restaurant.getWaitingStatus());
+
+        String waitingKey = WaitingType.IN.getWaitingKey(restaurant.getId());
+        Long waitingQueueSize = customerRestaurantWaitingRedisRepository.zCard(waitingKey);
+
+        return WaitingQueueFindSizeResponse.from(waitingQueueSize);
+    }
+
+    public WaitingQueueCheckUserResponse checkUserInWaitingQueue(Long userId, Long restaurantId) {
+        Restaurant restaurant = findRestaurantById(restaurantId);
+        isPossibleWaiting(restaurant.getWaitingStatus());
+
+        User user = findUserById(userId);
+        String key = WaitingType.IN.getWaitingKey(restaurant.getId());
+
+        boolean status = customerRestaurantWaitingRedisRepository.zFindUserRank(key, user.getId())
+                .isPresent();
+
+        return WaitingQueueCheckUserResponse.from(status);
+    }
+
     public WaitingQueueFindUserRankResponse findWaitingQueueUserRank(Long userId, Long restaurantId, Long waitingId) {
         Restaurant restaurant = findRestaurantById(restaurantId);
         isPossibleWaiting(restaurant.getWaitingStatus());
@@ -101,16 +125,6 @@ public class CustomerRestaurantWaitingService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND));
 
         return WaitingQueueFindUserRankResponse.from(rank);
-    }
-
-    public WaitingQueueFindSizeResponse findWaitingQueueSize(Long restaurantId) {
-        Restaurant restaurant = findRestaurantById(restaurantId);
-        isPossibleWaiting(restaurant.getWaitingStatus());
-
-        String waitingKey = WaitingType.IN.getWaitingKey(restaurant.getId());
-        Long waitingQueueSize = customerRestaurantWaitingRedisRepository.zCard(waitingKey);
-
-        return WaitingQueueFindSizeResponse.from(waitingQueueSize);
     }
 
     private void isPossibleWaiting(WaitingStatus waitingStatus) {
