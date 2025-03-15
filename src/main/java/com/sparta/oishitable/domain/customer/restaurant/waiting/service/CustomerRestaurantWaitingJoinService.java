@@ -28,15 +28,12 @@ public class CustomerRestaurantWaitingJoinService {
     private final CustomerRestaurantWaitingRedisRepository customerRestaurantWaitingRedisRepository;
 
     @DistributedLock(key = "'waiting:' + #restaurantId")
-    public void joinWaitingQueue(Long userId, Long restaurantId, WaitingJoinRequest request) {
+    public int joinWaitingQueue(Long userId, Long restaurantId, WaitingJoinRequest request) {
         Restaurant restaurant = findRestaurantById(restaurantId);
         User user = findUserById(userId);
 
         WaitingType waitingType = WaitingType.IN;
-        String waitingKey = waitingType.getWaitingKey(restaurant.getId());
-
         Integer dailySequence = findWaitingNextSequence(restaurant.getId(), waitingType);
-        log.info("daily sequence is {}", dailySequence);
 
         Waiting waiting = Waiting.builder()
                 .user(user)
@@ -49,7 +46,7 @@ public class CustomerRestaurantWaitingJoinService {
 
         customerRestaurantWaitingRepository.save(waiting);
 
-        customerRestaurantWaitingRedisRepository.join(waitingKey, user.getId(), dailySequence);
+        return dailySequence;
     }
 
     private Integer findWaitingNextSequence(Long restaurantId, WaitingType waitingType) {
@@ -58,6 +55,7 @@ public class CustomerRestaurantWaitingJoinService {
         return customerRestaurantWaitingRedisRepository.zFindLastSequence(waitingKey)
                 .map(i -> i + 1)
                 .orElseGet(() -> customerRestaurantWaitingRepository.findTodayLastSequence(restaurantId, waitingType)
+                        .map(i -> i + 1)
                         .orElse(1));
     }
 
