@@ -35,6 +35,7 @@ public class CustomerRestaurantWaitingService {
     private final CustomerRestaurantWaitingRepository customerRestaurantWaitingRepository;
     private final CustomerRestaurantWaitingRedisRepository customerRestaurantWaitingRedisRepository;
 
+    @Transactional
     public void join(Long userId, Long restaurantId, WaitingJoinRequest request) {
         Restaurant restaurant = findRestaurantById(restaurantId);
         isPossibleWaiting(restaurant.getWaitingStatus());
@@ -50,7 +51,9 @@ public class CustomerRestaurantWaitingService {
             throw new ConflictException(ErrorCode.ALREADY_REGISTERED_USER_IN_WAITING_QUEUE);
         }
 
-        customerRestaurantWaitingJoinService.joinWaitingQueue(user.getId(), restaurant.getId(), request);
+        int dailySequence = customerRestaurantWaitingJoinService.joinWaitingQueue(user.getId(), restaurant.getId(), request);
+
+        customerRestaurantWaitingRedisRepository.join(waitingKey, user.getId(), dailySequence);
     }
 
     @Transactional
