@@ -1,7 +1,7 @@
-package com.sparta.oishitable.domain.auth.kakao.controller;
+package com.sparta.oishitable.domain.common.kakao.controller;
 
 
-import com.sparta.oishitable.domain.auth.kakao.service.KakaoService;
+import com.sparta.oishitable.domain.common.kakao.service.KakaoService;
 import com.sparta.oishitable.domain.common.auth.dto.response.AuthLoginResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

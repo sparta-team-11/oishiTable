@@ -92,7 +92,7 @@ function goToStore(storeId) {
 }
 
 // 검색 시 거리값 함께 전송
-async function searchStores(reset = true) {
+function searchStores(reset = true) {
     checkAuthAndRefresh();
 
     if (reset) {
