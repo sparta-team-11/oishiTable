@@ -87,9 +87,9 @@ public class CustomerRestaurantRepositoryQuerydslImpl implements CustomerRestaur
         if (StringUtils.hasText(keyword)) {
             builder.and(
                     fullTextExpression(restaurant.name, keyword).gt(0)
-                            .or(fullTextExpression(menu.name, keyword).gt(0))
+//                            .or(fullTextExpression(menu.name, keyword).gt(0))
             );
-            query.leftJoin(restaurant.menus, menu);
+//            query.leftJoin(restaurant.menus, menu);
         }
 
         if (minPrice != null && maxPrice != null) {
