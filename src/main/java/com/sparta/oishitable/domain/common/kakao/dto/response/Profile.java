@@ -1,4 +1,4 @@
-package com.sparta.oishitable.domain.auth.kakao.dto.response;
+package com.sparta.oishitable.domain.common.kakao.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
