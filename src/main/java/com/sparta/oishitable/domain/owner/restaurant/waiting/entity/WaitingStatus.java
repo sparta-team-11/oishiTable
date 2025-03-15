@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public enum WaitingStatus {
 
-    RESERVED,
+    REQUESTED,
     CALLING,
     COMPLETED,
     CANCELED;

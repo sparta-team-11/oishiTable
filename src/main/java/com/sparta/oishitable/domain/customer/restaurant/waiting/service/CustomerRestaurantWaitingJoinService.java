@@ -41,7 +41,7 @@ public class CustomerRestaurantWaitingJoinService {
                 .totalCount(request.totalCount())
                 .dailySequence(dailySequence)
                 .type(waitingType)
-                .status(WaitingStatus.RESERVED)
+                .status(WaitingStatus.REQUESTED)
                 .build();
 
         customerRestaurantWaitingRepository.save(waiting);

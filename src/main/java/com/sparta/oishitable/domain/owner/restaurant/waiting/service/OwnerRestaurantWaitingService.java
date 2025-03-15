@@ -81,12 +81,8 @@ public class OwnerRestaurantWaitingService {
 
         Waiting waiting = findWaitingById(request.waitingId());
 
-        if (waiting.getStatus().equals(WaitingStatus.COMPLETED)) {
-            throw new ConflictException(ErrorCode.ALREADY_COMPLETED_WAITING_EXCEPTION);
-        }
-
-        if (waiting.getStatus().equals(WaitingStatus.CANCELED)) {
-            throw new ConflictException(ErrorCode.ALREADY_CANCELED_WAITING_EXCEPTION);
+        if (!waiting.getStatus().equals(WaitingStatus.REQUESTED) && !waiting.getStatus().equals(WaitingStatus.CALLING)) {
+            throw new ConflictException(ErrorCode.INVALID_WAITING_CANCEL_STATUS);
         }
 
         WaitingType waitingType = waiting.getType();
