@@ -3,7 +3,6 @@ package com.sparta.oishitable.domain.customer.restaurant.waiting.service;
 import com.sparta.oishitable.domain.common.auth.service.AuthService;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.repository.UserRepository;
-import com.sparta.oishitable.domain.customer.reservation.entity.ReservationStatus;
 import com.sparta.oishitable.domain.customer.restaurant.repository.CustomerRestaurantRepository;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.request.WaitingJoinRequest;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.WaitingQueueCheckUserResponse;
@@ -12,8 +11,9 @@ import com.sparta.oishitable.domain.customer.restaurant.waiting.dto.response.Wai
 import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.CustomerRestaurantWaitingRedisRepository;
 import com.sparta.oishitable.domain.customer.restaurant.waiting.repository.CustomerRestaurantWaitingRepository;
 import com.sparta.oishitable.domain.owner.restaurant.entity.Restaurant;
-import com.sparta.oishitable.domain.owner.restaurant.entity.WaitingStatus;
+import com.sparta.oishitable.domain.owner.restaurant.entity.RestaurantWaitingStatus;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.Waiting;
+import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingStatus;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingType;
 import com.sparta.oishitable.global.exception.ConflictException;
 import com.sparta.oishitable.global.exception.NotFoundException;
@@ -67,12 +67,8 @@ public class CustomerRestaurantWaitingService {
         User user = findUserById(userId);
         authService.checkUserAuthority(waiting.getUser().getId(), user.getId());
 
-        if (waiting.getStatus().equals(ReservationStatus.COMPLETED)) {
-            throw new ConflictException(ErrorCode.ALREADY_COMPLETED_WAITING_EXCEPTION);
-        }
-
-        if (waiting.getStatus().equals(ReservationStatus.CANCELED)) {
-            throw new ConflictException(ErrorCode.ALREADY_CANCELED_WAITING_EXCEPTION);
+        if (!waiting.getStatus().equals(WaitingStatus.REQUESTED)) {
+            throw new ConflictException(ErrorCode.INVALID_WAITING_CANCEL_STATUS);
         }
 
         String key = waiting.getType().getWaitingKey(waiting.getRestaurant().getId());
@@ -80,7 +76,7 @@ public class CustomerRestaurantWaitingService {
         customerRestaurantWaitingRedisRepository.zFindUserRank(key, userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.WAITING_QUEUE_USER_NOT_FOUND));
 
-        waiting.updateStatus(ReservationStatus.CANCELED);
+        waiting.updateStatus(WaitingStatus.CANCELED);
 
         customerRestaurantWaitingRedisRepository.zRemove(key, user.getId());
 
@@ -127,8 +123,8 @@ public class CustomerRestaurantWaitingService {
         return WaitingQueueFindUserRankResponse.from(rank);
     }
 
-    private void isPossibleWaiting(WaitingStatus waitingStatus) {
-        if (waitingStatus.equals(WaitingStatus.CLOSE)) {
+    private void isPossibleWaiting(RestaurantWaitingStatus waitingStatus) {
+        if (waitingStatus.equals(RestaurantWaitingStatus.CLOSE)) {
             throw new ConflictException(ErrorCode.RESTAURANT_WAITING_IS_CLOSED);
         }
     }

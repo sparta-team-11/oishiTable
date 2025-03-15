@@ -31,12 +31,24 @@ public class OwnerRestaurantWaitingController {
         return ResponseEntity.ok(body);
     }
 
-    @PatchMapping
-    public ResponseEntity<Void> updateWaitingStatus(
+    @PatchMapping("/{waitingId}/call-waiting")
+    public ResponseEntity<Void> callWaitingUser(
+            @PathVariable Long waitingId,
             @PathVariable Long restaurantId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        ownerRestaurantWaitingService.updateWaitingStatus(userDetails.getId(), restaurantId);
+        ownerRestaurantWaitingService.callRequestWaitingUser(userDetails.getId(), restaurantId, waitingId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{waitingId}/complete-waiting")
+    public ResponseEntity<Void> completeWaitingUser(
+            @PathVariable Long waitingId,
+            @PathVariable Long restaurantId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        ownerRestaurantWaitingService.completeWaitingUser(userDetails.getId(), restaurantId, waitingId);
 
         return ResponseEntity.ok().build();
     }
@@ -51,5 +63,15 @@ public class OwnerRestaurantWaitingController {
                 .deleteUserFromWaitingQueue(userDetails.getId(), restaurantId, request);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping
+    public ResponseEntity<Void> updateWaitingStatus(
+            @PathVariable Long restaurantId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        ownerRestaurantWaitingService.updateWaitingStatus(userDetails.getId(), restaurantId);
+
+        return ResponseEntity.ok().build();
     }
 }
