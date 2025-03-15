@@ -58,7 +58,7 @@ dependencies {
     // mailSender
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
-    // RabbitMQ TODO : 사용시 풀 것
+    // RabbitMQ
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
 
     // webflux
@@ -76,6 +76,9 @@ dependencies {
 
     // spatial
     implementation 'org.hibernate:hibernate-spatial:6.5.2.Final'
+
+    // Faker
+    implementation 'net.datafaker:datafaker:1.5.0'
 }
 
 tasks.named('test') {
