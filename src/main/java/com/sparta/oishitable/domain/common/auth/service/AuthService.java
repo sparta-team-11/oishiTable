@@ -82,7 +82,7 @@ public class AuthService {
         String newRefreshToken = jwtTokenProvider.generateRefreshToken();
         final long accessTokenExpiryTime = jwtTokenProvider.getAccessTokenExpiryTime(newAccessToken);
 
-        redisRepository.setDataWithExpire(newRefreshToken, userId, DURATION);
+        redisRepository.setDataWithExpire(userId, newRefreshToken, DURATION);
 
         return AuthLoginResponse.of(newAccessToken, newRefreshToken, accessTokenExpiryTime);
     }
