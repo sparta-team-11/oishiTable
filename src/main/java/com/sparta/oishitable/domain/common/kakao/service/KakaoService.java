@@ -1,10 +1,10 @@
-package com.sparta.oishitable.domain.auth.kakao.service;
+package com.sparta.oishitable.domain.common.kakao.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.oishitable.domain.auth.kakao.dto.response.KakaoAccount;
-import com.sparta.oishitable.domain.auth.kakao.dto.response.KakaoInfo;
-import com.sparta.oishitable.domain.auth.kakao.dto.response.OAuthToken;
+import com.sparta.oishitable.domain.common.kakao.dto.response.KakaoAccount;
+import com.sparta.oishitable.domain.common.kakao.dto.response.KakaoInfo;
+import com.sparta.oishitable.domain.common.kakao.dto.response.OAuthToken;
 import com.sparta.oishitable.domain.common.auth.dto.response.AuthLoginResponse;
 import com.sparta.oishitable.domain.common.user.entity.User;
 import com.sparta.oishitable.domain.common.user.entity.UserRole;
@@ -84,7 +84,7 @@ public class KakaoService {
         String jwtAccessToken = jwtTokenProvider.generateAccessToken(userId, user.getRole().getValue());
         String jwtRefreshToken = jwtTokenProvider.generateRefreshToken();
 
-        final long accessTokenExpiryTime = jwtTokenProvider.getAccessTokenExpiryTime();
+        final long accessTokenExpiryTime = jwtTokenProvider.getAccessTokenExpiryTime(jwtAccessToken);
 
         // refresh token 저장 (redis 등)
         redisRepository.setDataWithExpire(userId, jwtRefreshToken, DURATION);

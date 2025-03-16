@@ -87,7 +87,7 @@ async function login() {
             const responseData = await response.json();
             const accessToken = responseData.accessToken;
             const refreshToken = responseData.refreshToken;
-            const accessTokenExpiryTime = Date.now() + responseData.accessTokenExpiryTime;
+            const accessTokenExpiryTime = responseData.accessTokenExpiryTime;
 
             console.log(accessToken);
             console.log(refreshToken);

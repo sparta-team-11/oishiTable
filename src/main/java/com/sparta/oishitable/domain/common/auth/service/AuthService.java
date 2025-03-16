@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -60,8 +59,7 @@ public class AuthService {
 
         String accessToken = jwtTokenProvider.generateAccessToken(userId, user.getRole().getValue());
         String refreshToken = jwtTokenProvider.generateRefreshToken();
-
-        final long accessTokenExpiryTime = jwtTokenProvider.getAccessTokenExpiryTime();
+        final long accessTokenExpiryTime = jwtTokenProvider.getAccessTokenExpiryTime(accessToken);
 
         redisRepository.setDataWithExpire(userId, refreshToken, DURATION);
 
@@ -70,29 +68,19 @@ public class AuthService {
 
     @Transactional
     public AuthLoginResponse recreateAccessAndRefreshToken(AccessTokenReissueReq accessTokenReissueReq) {
-        String accessToken = accessTokenReissueReq.accessToken();
         String refreshToken = accessTokenReissueReq.refreshToken();
-
-        if (!jwtTokenProvider.validateToken(accessToken, TokenType.ACCESS)) {
-            throw new InvalidException(ErrorCode.INVALID_TOKEN);
-        }
-
-        User user = jwtTokenProvider.getUserFromToken(accessToken);
 
         if (!jwtTokenProvider.validateToken(refreshToken, TokenType.REFRESH)) {
             throw new InvalidException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
-        String userId = String.valueOf(user.getId());
-
-        if (!Objects.equals(refreshToken, redisRepository.getData(userId))) {
-            throw new InvalidException(ErrorCode.INVALID_REFRESH_TOKEN);
-        }
+        String userId = redisRepository.getData(refreshToken);
+        User user = userRepository.findById(Long.parseLong(userId))
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
         String newAccessToken = jwtTokenProvider.generateAccessToken(userId, user.getRole().getValue());
         String newRefreshToken = jwtTokenProvider.generateRefreshToken();
-
-        final long accessTokenExpiryTime = jwtTokenProvider.getAccessTokenExpiryTime();
+        final long accessTokenExpiryTime = jwtTokenProvider.getAccessTokenExpiryTime(newAccessToken);
 
         redisRepository.setDataWithExpire(userId, newRefreshToken, DURATION);
 

@@ -14,6 +14,11 @@
     <h1>메인 페이지</h1>
     <div class="search-bar">
         <input type="text" id="search-input" placeholder="맛집 검색">
+        <!-- 새로운 거리 선택 영역 -->
+        <div id="distance-container" class="distance-container" style="display: none;">
+            <p>주변 <span id="distance-display">3000km</span></p> <!-- 텍스트 형식으로 1자만 표시 -->
+            <input type="range" id="distance" min="0" max="5" step="1" value="5"> <!-- 100, 200, 500, 1000, 2000, 3000으로만 선택 가능 -->
+        </div>
         <div class="filter-container">
             <button id="sort-btn" onclick="openSortModal()">정렬</button>
             <button id="filter-btn" onclick="openFilterModal()">필터</button>
@@ -27,10 +32,10 @@
         <div class="modal-content">
             <span class="close" onclick="closeSortModal()">&times;</span>
             <h3>정렬 기준</h3>
-            <div class="sort-option" data-sort="popularity">
+            <div class="sort-option selected" data-sort="popularity">
                 <span>✔</span> <span>인기순</span>
             </div>
-            <div class="sort-option" data-sort="distance">
+            <div class="sort-option" data-sort="nearby">
                 <span>✔</span> <span>거리순</span>
             </div>
         </div>
@@ -46,9 +51,11 @@
             <input type="text" id="address" placeholder="주소 입력">
 
             <!-- 가격 필터 -->
-            <input type="range" id="min-price" min="0" max="400000" step="1000" value="0">
-            <input type="range" id="max-price" min="0" max="400000" step="1000" value="400000">
-            <div>최소 가격: <span id="min-price-display">0</span>원 / 최대 가격: <span id="max-price-display">400000</span>원
+            <div id="slider-container">
+                <input type="range" id="min-price" min="0" max="400000" step="10000" value="0" oninput="updatePriceDisplay()">
+                <input type="range" id="max-price" min="0" max="400000" step="10000" value="400000" oninput="updatePriceDisplay()">
+            </div>
+            <div><span id="min-price-display">0</span>원 ~ <span id="max-price-display">400000</span>원
             </div>
 
             <!-- 좌석 유형 필터 -->

@@ -109,13 +109,15 @@ public enum ErrorCode {
     GEOCODING_NO_RESULT(HttpStatus.NOT_FOUND, "Geocoding API 결과가 없습니다."),
 
     // 웨이팅 관련 익셉션
+    INVALID_WAITING_STATUS(HttpStatus.BAD_REQUEST, "유효하지 않은 웨이팅 상태입니다."),
     INVALID_WAITING_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 웨이팅 타입입니다."),
     ALREADY_REGISTERED_USER_IN_WAITING_QUEUE(HttpStatus.CONFLICT, "이미 대기열에 등록된 고객입니다."),
     WAITING_QUEUE_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "대기열에 등록되지 않은 고객입니다."),
     WAITING_NOT_FOUND(HttpStatus.NOT_FOUND, "대기열 데이터가 존재하지 않습니다."),
     RESTAURANT_WAITING_IS_CLOSED(HttpStatus.BAD_REQUEST, "식당의 대기열이 닫혀있습니다."),
-    ALREADY_COMPLETED_WAITING_EXCEPTION(HttpStatus.CONFLICT, "이미 완료된 웨이팅입니다."),
-    ALREADY_CANCELED_WAITING_EXCEPTION(HttpStatus.CONFLICT, "이미 완료된 웨이팅입니다.");
+    INVALID_WAITING_CANCEL_STATUS(HttpStatus.CONFLICT, "웨이팅이 취소될 수 없는 상태입니다."),
+    WAITING_STATUS_CHANGE_NOT_ALLOWED(HttpStatus.CONFLICT, "웨이팅이 변경될 수 없는 상태입니다."),
+    ;
 
     private final HttpStatus status;
     private final String message;
