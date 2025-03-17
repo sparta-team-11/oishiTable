@@ -87,7 +87,7 @@ public class KakaoService {
         final long accessTokenExpiryTime = jwtTokenProvider.getAccessTokenExpiryTime(jwtAccessToken);
 
         // refresh token 저장 (redis 등)
-        redisRepository.setDataWithExpire(jwtRefreshToken, userId, DURATION);
+        redisRepository.setDataWithExpire(userId, jwtRefreshToken, DURATION);
 
         return AuthLoginResponse.of(jwtAccessToken, jwtRefreshToken, accessTokenExpiryTime);
     }
