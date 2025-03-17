@@ -17,16 +17,15 @@ public class OwnerRestaurantWaitingController {
 
     private final OwnerRestaurantWaitingService ownerRestaurantWaitingService;
 
-    @GetMapping
+    @GetMapping("/queue")
     public ResponseEntity<WaitingQueueFindUsersResponse> findWaitingQueue(
             @PathVariable Long restaurantId,
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "10") int size,
-            @RequestParam(required = false, name = "type") String waitingType,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         WaitingQueueFindUsersResponse body = ownerRestaurantWaitingService
-                .findWaitingUsers(userDetails.getId(), restaurantId, page, size, waitingType);
+                .findWaitingUsers(userDetails.getId(), restaurantId, page, size);
 
         return ResponseEntity.ok(body);
     }

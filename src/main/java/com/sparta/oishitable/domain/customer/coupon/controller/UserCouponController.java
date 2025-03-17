@@ -26,10 +26,9 @@ public class UserCouponController {
         return ResponseEntity.ok(coupons);
     }
 
-    @PostMapping("/{couponId}/download/")
+    @PostMapping("/{couponId}/download")
     public ResponseEntity<Void> downloadCoupon(
             @PathVariable Long couponId,
-            @RequestParam Long restaurantId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
 
@@ -38,7 +37,7 @@ public class UserCouponController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/downloadCoupon")
+    @GetMapping("/download")
     public ResponseEntity<List<UserCouponResponse>> findUserCoupons(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(required = false) Long cursor,

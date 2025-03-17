@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datafaker.Faker;
 import org.locationtech.jts.geom.Point;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +51,7 @@ public class DummyService {
         return users;
     }
 
+    @Async
     public void createDummyRestaurants() {
 
         List<User> dummyUsers = createDummyUsers();

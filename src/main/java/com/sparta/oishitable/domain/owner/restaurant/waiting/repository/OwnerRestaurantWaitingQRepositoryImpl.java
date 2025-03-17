@@ -3,6 +3,7 @@ package com.sparta.oishitable.domain.owner.restaurant.waiting.repository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.dto.response.QWaitingDetails;
 import com.sparta.oishitable.domain.owner.restaurant.waiting.dto.response.WaitingDetails;
+import com.sparta.oishitable.domain.owner.restaurant.waiting.entity.WaitingStatus;
 import com.sparta.oishitable.global.util.DateTimeUtil;
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +39,7 @@ public class OwnerRestaurantWaitingQRepositoryImpl implements OwnerRestaurantWai
                 .innerJoin(waiting.user, user)
                 .where(
                         waiting.user.id.in(userIds),
+                        waiting.status.in(WaitingStatus.REQUESTED, WaitingStatus.NOTIFIED),
                         waiting.createdAt.between(startOfToday, endOfToday)
                 )
                 .orderBy(waiting.createdAt.asc())
