@@ -29,7 +29,8 @@ public class WaitingQueryDslRepositoryImpl implements WaitingQueryDslRepository 
                         waiting.totalCount,
                         waiting.dailySequence,
                         waiting.status,
-                        waiting.restaurant.name
+                        waiting.restaurant.name,
+                        waiting.createdAt
                 ))
                 .from(waiting)
                 .leftJoin(waiting.restaurant, restaurant)
