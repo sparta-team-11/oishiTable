@@ -35,13 +35,12 @@ public class OwnerRestaurantWaitingService {
             Long ownerId,
             Long restaurantId,
             int page,
-            int size,
-            String waitingType
+            int size
     ) {
         Restaurant restaurant = ownerRestaurantService.findById(restaurantId);
         authService.checkUserAuthority(restaurant.getOwner().getId(), ownerId);
 
-        String key = WaitingType.of(waitingType).getWaitingKey(restaurant.getId());
+        String key = WaitingType.IN.getWaitingKey(restaurant.getId());
 
         Long totalElements = ownerRestaurantWaitingRedisRepository.findQueueSize(key);
 
