@@ -18,6 +18,6 @@ public class DummyController {
     @PostMapping("/dummy/restaurants")
     public ResponseEntity<String> dummyUsersAndRestaurants() {
         dummyService.createDummyRestaurants();
-        return ResponseEntity.ok("더미 유저 / 식당 생성 완료");
+        return ResponseEntity.ok("더미 생성 작업 시작");
     }
 }
