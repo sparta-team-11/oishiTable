@@ -1,7 +1,6 @@
 package com.sparta.oishitable.domain.customer.collection.bookmark.dto.response;
 
 import com.querydsl.core.annotations.QueryProjection;
-import org.locationtech.jts.geom.Point;
 
 public record CollectionBookmarkDetails(
         Long collectionBookmarkId,
@@ -10,7 +9,8 @@ public record CollectionBookmarkDetails(
         String restaurantName,
         String restaurantIntroduction,
         String restaurantAddress,
-        Point location
+        Double longitude,
+        Double latitude
 ) {
 
     @QueryProjection
