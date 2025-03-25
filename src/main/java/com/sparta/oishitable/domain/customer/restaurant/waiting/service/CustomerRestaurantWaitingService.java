@@ -22,6 +22,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -43,7 +45,8 @@ public class CustomerRestaurantWaitingService {
 
         User user = findUserById(userId);
 
-        String waitingKey = WaitingType.IN.getWaitingKey(restaurant.getId());
+        WaitingType waitingType = WaitingType.IN;
+        String waitingKey = waitingType.getWaitingKey(restaurant.getId());
 
         boolean isExists = customerRestaurantWaitingRedisRepository.zFindUserRank(waitingKey, user.getId())
                 .isPresent();
@@ -52,9 +55,31 @@ public class CustomerRestaurantWaitingService {
             throw new ConflictException(ErrorCode.ALREADY_REGISTERED_USER_IN_WAITING_QUEUE);
         }
 
+        joinWaitingRedisRollbackHandler(waitingKey, user.getId());
+
         int dailySequence = customerRestaurantWaitingJoinService.joinWaitingQueue(user.getId(), restaurant.getId(), request);
 
-        customerRestaurantWaitingRedisRepository.join(waitingKey, user.getId(), dailySequence);
+        Waiting waiting = Waiting.builder()
+                .user(user)
+                .restaurant(restaurant)
+                .totalCount(request.totalCount())
+                .dailySequence(dailySequence)
+                .type(waitingType)
+                .status(WaitingStatus.REQUESTED)
+                .build();
+
+        customerRestaurantWaitingRepository.save(waiting);
+    }
+
+    private void joinWaitingRedisRollbackHandler(String waitingKey, Long userId) {
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCompletion(int status) {
+                if (status == TransactionSynchronization.STATUS_ROLLED_BACK) {
+                    customerRestaurantWaitingRedisRepository.zRemove(waitingKey, userId);
+                }
+            }
+        });
     }
 
     @Transactional
