@@ -1,5 +1,6 @@
 package com.sparta.oishitable.domain.customer.collection.bookmark.repository;
 
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.oishitable.domain.customer.collection.bookmark.dto.response.CollectionBookmarkDetails;
@@ -55,7 +56,8 @@ public class CollectionBookmarkQRepositoryImpl implements CollectionBookmarkQRep
                         restaurant.name,
                         restaurant.introduce,
                         restaurant.address,
-                        restaurant.location
+                        Expressions.numberTemplate(Double.class, "ST_Y({0})", restaurant.location),
+                        Expressions.numberTemplate(Double.class, "ST_X({0})", restaurant.location) // 경도
                 ))
                 .from(collectionBookmark)
                 .innerJoin(collectionBookmark.bookmark, bookmark)

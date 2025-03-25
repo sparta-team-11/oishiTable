@@ -8,7 +8,7 @@ import java.util.Arrays;
 public enum WaitingStatus {
 
     REQUESTED,
-    CALLING,
+    NOTIFIED,
     COMPLETED,
     CANCELED;
 
