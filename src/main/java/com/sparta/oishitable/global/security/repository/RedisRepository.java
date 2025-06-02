@@ -7,6 +7,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.TimeUnit;
+
 @Component
 @RequiredArgsConstructor
 public class RedisRepository {
@@ -26,6 +28,6 @@ public class RedisRepository {
     public void setDataWithExpire(String key, String value, long duration) {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
 
-        valueOperations.set(key, value, duration);
+        valueOperations.set(key, value, duration, TimeUnit.MILLISECONDS);
     }
 }
